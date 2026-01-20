@@ -1,0 +1,10 @@
+{
+    "/merge-pdf": {
+        "title": "オンラインでPDFファイルを結合する方法 (無料 & 安全)",
+        "htmlContext": "<div class=\"space-y-6 text-slate-600 dark:text-slate-300\">\n                <p>\n                    PDFファイルの結合は、最も一般的なドキュメント管理タスクの1つです。講義ノートをまとめる学生、異なる部門からのレポートを編集する専門家、または単に個人のドキュメントを整理する場合でも、信頼できる <strong>PDF結合ツール</strong> は不可欠です。当社のツールを使用すると、複数のPDFドキュメントを迅速、安全、かつ無料で1つのファイルにまとめることができます。\n                </p>\n\n                <h3 class=\"text-xl font-bold text-slate-900 dark:text-white\">なぜPDFファイルを結合するのですか？</h3>\n                <p>\n                    複数のPDFファイルを追跡するのは大変です。それらを1つにまとめることで、次のようなメリットがあります：\n                </p>\n                <ul class=\"list-disc list-inside ml-4 space-y-2\">\n                    <li><strong>共有の簡素化：</strong> 10個の別々のドキュメントを添付する代わりに、メールで1つのファイルを送信できます。</li>\n                    <li><strong>整理の向上：</strong> 関連するドキュメント（請求書や契約書など）をまとめて保管できます。</li>\n                    <li><strong>読みやすさの向上：</strong> 読者にとって論理的な情報の流れを作成できます。</li>\n                </ul>\n\n                <h3 class=\"text-xl font-bold text-slate-900 dark:text-white\">安全ですか？</h3>\n                <p>\n                    <strong>はい、もちろんです。</strong> 当社は何よりもお客様のプライバシーを優先します。プロセスは可能な限り <em>クライアント側</em> で行われるため、お客様のファイルが当社のサーバーに保存されることはありません。\n                </p>\n            </div>"
+    },
+    "/compress-pdf": {
+        "title": "PDF圧縮：品質を落とさずにファイルサイズを縮小",
+        "htmlContext": "<div class=\"space-y-6 text-slate-600 dark:text-slate-300\">\n                <p>\n                    大きなPDFファイルは大きな悩みとなります。当社の <strong>PDF圧縮ツール</strong> は、優れた品質を維持しながらファイルを可能な限り最小サイズに最適化することで、この問題を即座に解決します。\n                </p>\n\n                <h3 class=\"text-xl font-bold text-slate-900 dark:text-white\">圧縮はどのように機能しますか？</h3>\n                <p>\n                    当社のスマートな圧縮アルゴリズムは、未使用のオブジェクトを削除し、画像を最適化することで重量を削減します。\n                </p>\n            </div>"
+    }
+}

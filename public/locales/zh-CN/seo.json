@@ -1,0 +1,10 @@
+{
+    "/merge-pdf": {
+        "title": "如何在线合并 PDF 文件（免费且安全）",
+        "htmlContext": "<div class=\"space-y-6 text-slate-600 dark:text-slate-300\">\n                <p>\n                    合并 PDF 文件是最常见的文档管理任务之一。无论你是合并课堂笔记的学生，还是汇总报告的专业人士，或者只是整理个人文件，拥有一个可靠的 <strong>PDF 合并工具</strong> 都至关重要。我们的工具可以让你快速、安全且免费地将多个 PDF 文档合并为一个文件。\n                </p>\n\n                <h3 class=\"text-xl font-bold text-slate-900 dark:text-white\">为什么要合并 PDF 文件？</h3>\n                <p>\n                    追踪多个 PDF 文件可能是一场噩梦。通过将它们合并为一个，你可以：\n                </p>\n                <ul class=\"list-disc list-inside ml-4 space-y-2\">\n                    <li><strong>简化共享：</strong> 通过电子邮件发送一个文件，而不是附加十个单独的文档。</li>\n                    <li><strong>改善组织：</strong> 将相关文档（例如：发票和合同）保存在一起。</li>\n                    <li><strong>增强可读性：</strong> 为你的读者创造逻辑性的信息流。</li>\n                </ul>\n\n                <h3 class=\"text-xl font-bold text-slate-900 dark:text-white\">安全吗？</h3>\n                <p>\n                    <strong>是的，绝对安全。</strong> 我们将你的隐私放在首位。处理过程尽可能在 <em>客户端</em> 进行，这意味着你的文件不会存储在我们的服务器上。\n                </p>\n            </div>"
+    },
+    "/compress-pdf": {
+        "title": "压缩 PDF：在不损失质量的情况下减小文件大小",
+        "htmlContext": "<div class=\"space-y-6 text-slate-600 dark:text-slate-300\">\n                <p>\n                    大型 PDF 文件可能是一个大问题。我们的 <strong>PDF 压缩器</strong> 通过在保持优异质量的同时将文件优化到最小体积，立即解决这个问题。\n                </p>\n\n                <h3 class=\"text-xl font-bold text-slate-900 dark:text-white\">压缩是如何工作的？</h3>\n                <p>\n                    我们的智能压缩算法通过删除未使用的对象和优化图像来减轻重量。\n                </p>\n            </div>"
+    }
+}
