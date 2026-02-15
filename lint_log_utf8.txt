@@ -1,0 +1,1547 @@
+﻿
+> pdf-tools@1.0.0 lint
+> next lint
+
+node.exe : 
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (:St  
+  ring) [], RemoteExcept   
+ ion
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+./app/api/fetch-url/route.t
+s
+120:21  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+
+./app/api/generate-pdf/rout
+e.ts
+2:8  Warning: 'puppeteer' 
+is defined but never used. 
+ @typescript-eslint/no-unus
+ed-vars
+82:53  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+95:53  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+104:33  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+111:29  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+121:21  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+
+./app/sitemap.ts
+42:70  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+
+./app/[lang]/about/page.tsx
+5:41  Warning: 'Heart' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+
+./app/[lang]/add-page-numbe
+rs/page.tsx
+4:10  Warning: 'Type' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+4:26  Warning: 'ArrowDown' 
+is defined but never used. 
+ @typescript-eslint/no-unus
+ed-vars
+4:37  Warning: 'ArrowUp' 
+is defined but never used. 
+ @typescript-eslint/no-unus
+ed-vars
+4:46  Warning: 'ArrowLeft' 
+is defined but never used. 
+ @typescript-eslint/no-unus
+ed-vars
+4:57  Warning: 
+'ArrowRight' is defined 
+but never used.  @typescrip
+t-eslint/no-unused-vars
+58:51  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+
+./app/[lang]/add-watermark/
+page.tsx
+4:35  Warning: 
+'MoveHorizontal' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+10:10  Warning: 
+'addWatermark' is defined 
+but never used.  @typescrip
+t-eslint/no-unused-vars
+11:58  Warning: 'cn' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+
+./app/[lang]/blog/how-to-pa
+ssword-protect-pdf/page.tsx
+61:55  Error: `'` can be 
+escaped with `&apos;`, 
+`&lsquo;`, `&#39;`, 
+`&rsquo;`.  
+react/no-unescaped-entities
+61:64  Error: `'` can be 
+escaped with `&apos;`, 
+`&lsquo;`, `&#39;`, 
+`&rsquo;`.  
+react/no-unescaped-entities
+125:39  Error: `"` can be 
+escaped with `&quot;`, 
+`&ldquo;`, `&#34;`, 
+`&rdquo;`.  
+react/no-unescaped-entities
+125:51  Error: `"` can be 
+escaped with `&quot;`, 
+`&ldquo;`, `&#34;`, 
+`&rdquo;`.  
+react/no-unescaped-entities
+139:35  Error: `'` can be 
+escaped with `&apos;`, 
+`&lsquo;`, `&#39;`, 
+`&rsquo;`.  
+react/no-unescaped-entities
+165:85  Error: `'` can be 
+escaped with `&apos;`, 
+`&lsquo;`, `&#39;`, 
+`&rsquo;`.  
+react/no-unescaped-entities
+
+./app/[lang]/blog/page.tsx
+6:20  Warning: 'Clock' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+6:49  Warning: 'Tag' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+
+./app/[lang]/chat-pdf/page.
+tsx
+5:10  Warning: 
+'MessageSquare' is defined 
+but never used.  @typescrip
+t-eslint/no-unused-vars
+5:42  Warning: 'FileText' 
+is defined but never used. 
+ @typescript-eslint/no-unus
+ed-vars
+81:19  Warning: 'engine' 
+is assigned a value but 
+never used.  @typescript-es
+lint/no-unused-vars
+157:23  Warning: 
+'newHighlights' is 
+assigned a value but never 
+used.  @typescript-eslint/n
+o-unused-vars
+157:38  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+224:85  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+293:36  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+296:45  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+330:36  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+333:45  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+501:73  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+501:93  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+501:101  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+502:79  Warning: Function 
+Call Object Injection Sink 
+ security/detect-object-inj
+ection
+502:87  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+
+./app/[lang]/compress-pdf/p
+age.tsx
+53:11  Warning: 
+'handleRemoveFile' is 
+assigned a value but never 
+used.  @typescript-eslint/n
+o-unused-vars
+53:31  Warning: 'index' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+101:17  Warning: Function 
+Call Object Injection Sink 
+ security/detect-object-inj
+ection
+
+./app/[lang]/contact/page.t
+sx
+5:16  Warning: 
+'MessageSquare' is defined 
+but never used.  @typescrip
+t-eslint/no-unused-vars
+5:37  Warning: 'MapPin' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+73:23  Error: `'` can be 
+escaped with `&apos;`, 
+`&lsquo;`, `&#39;`, 
+`&rsquo;`.  
+react/no-unescaped-entities
+
+./app/[lang]/crop-pdf/page.
+tsx
+3:27  Warning: 'useEffect' 
+is defined but never used. 
+ @typescript-eslint/no-unus
+ed-vars
+3:38  Warning: 'useMemo' 
+is defined but never used. 
+ @typescript-eslint/no-unus
+ed-vars
+8:10  Warning: 
+'ProgressBar' is defined 
+but never used.  @typescrip
+t-eslint/no-unused-vars
+37:12  Warning: 'progress' 
+is assigned a value but 
+never used.  @typescript-es
+lint/no-unused-vars
+134:34  Warning: 'removed' 
+is assigned a value but 
+never used.  @typescript-es
+lint/no-unused-vars
+148:13  Error: 
+'cropsToSubmit' is never 
+reassigned. Use 'const' 
+instead.  prefer-const
+196:63  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+
+./app/[lang]/edit-metadata/
+page.tsx
+3:27  Warning: 'useEffect' 
+is defined but never used. 
+ @typescript-eslint/no-unus
+ed-vars
+4:15  Warning: 'Download' 
+is defined but never used. 
+ @typescript-eslint/no-unus
+ed-vars
+
+./app/[lang]/edit-pdf/page.
+tsx
+4:62  Warning: 'Layers' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+4:98  Warning: 'Circle' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+4:106  Warning: 'Minus' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+4:113  Warning: 
+'MousePointer2' is defined 
+but never used.  @typescrip
+t-eslint/no-unused-vars
+4:246  Warning: 'Heart' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+4:268  Warning: 'Info' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+4:274  Warning: 
+'ArrowRight' is defined 
+but never used.  @typescrip
+t-eslint/no-unused-vars
+18:27  Warning: 
+'TextSelect' is defined 
+but never used.  @typescrip
+t-eslint/no-unused-vars
+83:56  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+96:12  Warning: 
+'isSearching' is assigned 
+a value but never used.  @t
+ypescript-eslint/no-unused-
+vars
+96:25  Warning: 
+'setIsSearching' is 
+assigned a value but never 
+used.  @typescript-eslint/n
+o-unused-vars
+205:27  Warning: Variable 
+Assigned to Object 
+Injection Sink  security/de
+tect-object-injection
+249:43  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+448:13  Error: 
+'newModsToAdd' is never 
+reassigned. Use 'const' 
+instead.  prefer-const
+552:14  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+552:73  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+554:14  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+554:73  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+622:66  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+800:53  Warning: Using 
+`<img>` could result in 
+slower LCP and higher 
+bandwidth. Consider using 
+`<Image />` from 
+`next/image` to 
+automatically optimize 
+images. This may incur 
+additional usage or cost 
+from your provider. See: ht
+tps://nextjs.org/docs/messa
+ges/no-img-element  
+@next/next/no-img-element
+800:53  Warning: img 
+elements must have an alt 
+prop, either with 
+meaningful text, or an 
+empty string for 
+decorative images.  
+jsx-a11y/alt-text
+800:110  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+1020:123  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+1040:102  Error: `'` can 
+be escaped with `&apos;`, 
+`&lsquo;`, `&#39;`, 
+`&rsquo;`.  
+react/no-unescaped-entities
+1068:103  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+1143:57  Warning: Using 
+`<img>` could result in 
+slower LCP and higher 
+bandwidth. Consider using 
+`<Image />` from 
+`next/image` to 
+automatically optimize 
+images. This may incur 
+additional usage or cost 
+from your provider. See: ht
+tps://nextjs.org/docs/messa
+ges/no-img-element  
+@next/next/no-img-element
+1143:57  Warning: img 
+elements must have an alt 
+prop, either with 
+meaningful text, or an 
+empty string for 
+decorative images.  
+jsx-a11y/alt-text
+1323:97  Error: `'` can be 
+escaped with `&apos;`, 
+`&lsquo;`, `&#39;`, 
+`&rsquo;`.  
+react/no-unescaped-entities
+1323:106  Error: `'` can 
+be escaped with `&apos;`, 
+`&lsquo;`, `&#39;`, 
+`&rsquo;`.  
+react/no-unescaped-entities
+
+./app/[lang]/excel-to-pdf/p
+age.tsx
+4:31  Warning: 'Table' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+4:38  Warning: 'Sheet' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+66:48  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+
+./app/[lang]/extract-pages/
+page.tsx
+82:51  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+
+./app/[lang]/faq/page.tsx
+64:304  Error: `'` can be 
+escaped with `&apos;`, 
+`&lsquo;`, `&#39;`, 
+`&rsquo;`.  
+react/no-unescaped-entities
+68:240  Error: `"` can be 
+escaped with `&quot;`, 
+`&ldquo;`, `&#34;`, 
+`&rdquo;`.  
+react/no-unescaped-entities
+68:248  Error: `"` can be 
+escaped with `&quot;`, 
+`&ldquo;`, `&#34;`, 
+`&rdquo;`.  
+react/no-unescaped-entities
+
+./app/[lang]/flatten-pdf/pa
+ge.tsx
+4:18  Warning: 'Download' 
+is defined but never used. 
+ @typescript-eslint/no-unus
+ed-vars
+
+./app/[lang]/html-to-pdf/pa
+ge.tsx
+82:25  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+
+./app/[lang]/layout.tsx
+148:41  Warning: Dangerous 
+property 
+'dangerouslySetInnerHTML' 
+found  react/no-danger
+
+./app/[lang]/master-organiz
+er/page.tsx
+4:22  Warning: 'Download' 
+is defined but never used. 
+ @typescript-eslint/no-unus
+ed-vars
+53:9  Warning: Use 
+"@ts-expect-error" instead 
+of "@ts-ignore", as 
+"@ts-ignore" will do 
+nothing if the following 
+line is error-free.  @types
+cript-eslint/ban-ts-comment
+131:22  Warning: 'e' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+139:37  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+141:35  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+147:40  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+182:115  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+279:29  Warning: Use 
+"@ts-expect-error" instead 
+of "@ts-ignore", as 
+"@ts-ignore" will do 
+nothing if the following 
+line is error-free.  @types
+cript-eslint/ban-ts-comment
+
+./app/[lang]/merge-pdf/page
+.tsx
+4:30  Warning: 'Plus' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+
+./app/[lang]/metadata-audit
+or/page.tsx
+4:23  Warning: 'Download' 
+is defined but never used. 
+ @typescript-eslint/no-unus
+ed-vars
+22:46  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+34:22  Warning: 'e' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+
+./app/[lang]/ocr-pdf/page.t
+sx
+3:27  Warning: 'useRef' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+3:35  Warning: 'useEffect' 
+is defined but never used. 
+ @typescript-eslint/no-unus
+ed-vars
+4:47  Warning: 'FileImage' 
+is defined but never used. 
+ @typescript-eslint/no-unus
+ed-vars
+12:24  Warning: 
+'validatePDFFile' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+59:35  Warning: Variable 
+Assigned to Object 
+Injection Sink  security/de
+tect-object-injection
+74:25  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+94:13  Warning: Unexpected 
+console statement.  
+no-console
+153:63  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+205:49  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+212:54  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+
+./app/[lang]/organize-pdf/p
+age.tsx
+4:34  Warning: 'ArrowLeft' 
+is defined but never used. 
+ @typescript-eslint/no-unus
+ed-vars
+4:45  Warning: 
+'ArrowRight' is defined 
+but never used.  @typescrip
+t-eslint/no-unused-vars
+12:10  Warning: 'PDFGrid' 
+is defined but never used. 
+ @typescript-eslint/no-unus
+ed-vars
+35:9  Warning: Use 
+"@ts-expect-error" instead 
+of "@ts-ignore", as 
+"@ts-ignore" will do 
+nothing if the following 
+line is error-free.  @types
+cript-eslint/ban-ts-comment
+67:12  Warning: 
+'pageCount' is assigned a 
+value but never used.  @typ
+escript-eslint/no-unused-va
+rs
+108:37  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+112:35  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+119:40  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+229:29  Warning: Use 
+"@ts-expect-error" instead 
+of "@ts-ignore", as 
+"@ts-ignore" will do 
+nothing if the following 
+line is error-free.  @types
+cript-eslint/ban-ts-comment
+
+./app/[lang]/page.tsx
+12:32  Warning: 'params' 
+is defined but never used. 
+ @typescript-eslint/no-unus
+ed-vars
+
+./app/[lang]/pdf-to-excel/p
+age.tsx
+4:47  Warning: 
+'Smartphone' is defined 
+but never used.  @typescrip
+t-eslint/no-unused-vars
+60:50  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+
+./app/[lang]/pdf-to-jpg/pag
+e.tsx
+39:11  Warning: 'sleep' is 
+assigned a value but never 
+used.  @typescript-eslint/n
+o-unused-vars
+
+./app/[lang]/pdf-to-powerpo
+int/page.tsx
+4:50  Warning: 'Layers' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+59:49  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+
+./app/[lang]/pdf-to-word/pa
+ge.tsx
+7:10  Warning: 
+'ProgressBar' is defined 
+but never used.  @typescrip
+t-eslint/no-unused-vars
+65:25  Warning: Variable 
+Assigned to Object 
+Injection Sink  security/de
+tect-object-injection
+72:42  Warning: 
+'isScanned' is assigned a 
+value but never used.  @typ
+escript-eslint/no-unused-va
+rs
+
+./app/[lang]/powerpoint-to-
+pdf/page.tsx
+59:48  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+
+./app/[lang]/pricing/page.t
+sx
+4:17  Warning: 'Zap' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+4:22  Warning: 'Crown' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+8:8  Warning: 'toast' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+11:19  Warning: 'setTier' 
+is assigned a value but 
+never used.  @typescript-es
+lint/no-unused-vars
+
+./app/[lang]/protect-pdf/pa
+ge.tsx
+91:25  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+
+./app/[lang]/redact-pdf/pag
+e.tsx
+7:10  Warning: 
+'ProgressBar' is defined 
+but never used.  @typescrip
+t-eslint/no-unused-vars
+24:12  Warning: 'progress' 
+is assigned a value but 
+never used.  @typescript-es
+lint/no-unused-vars
+
+./app/[lang]/remove-pages/p
+age.tsx
+4:18  Warning: 'Download' 
+is defined but never used. 
+ @typescript-eslint/no-unus
+ed-vars
+11:58  Warning: 'cn' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+
+./app/[lang]/repair-pdf/pag
+e.tsx
+4:18  Warning: 'Download' 
+is defined but never used. 
+ @typescript-eslint/no-unus
+ed-vars
+
+./app/[lang]/rotate-pdf/pag
+e.tsx
+10:10  Warning: 
+'rotatePDF' is defined but 
+never used.  @typescript-es
+lint/no-unused-vars
+59:28  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+67:17  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+67:29  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+106:29  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+191:49  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+191:138  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+192:54  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+
+./app/[lang]/scan-pdf/page.
+tsx
+4:51  Warning: 'ImageIcon' 
+is defined but never used. 
+ @typescript-eslint/no-unus
+ed-vars
+4:65  Warning: 'Repeat' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+53:31  Warning: Variable 
+Assigned to Object 
+Injection Sink  security/de
+tect-object-injection
+62:29  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+64:29  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+69:25  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+
+./app/[lang]/sign-pdf/page.
+tsx
+4:37  Warning: 'Move' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+7:10  Warning: 
+'ProgressBar' is defined 
+but never used.  @typescrip
+t-eslint/no-unused-vars
+21:7  Warning: 
+'SIGNATURE_FONTS' is 
+assigned a value but never 
+used.  @typescript-eslint/n
+o-unused-vars
+40:12  Warning: 'progress' 
+is assigned a value but 
+never used.  @typescript-es
+lint/no-unused-vars
+214:11  Warning: 
+'applyToAllPages' is 
+assigned a value but never 
+used.  @typescript-eslint/n
+o-unused-vars
+357:51  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+374:38  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+528:49  Warning: Using 
+`<img>` could result in 
+slower LCP and higher 
+bandwidth. Consider using 
+`<Image />` from 
+`next/image` to 
+automatically optimize 
+images. This may incur 
+additional usage or cost 
+from your provider. See: ht
+tps://nextjs.org/docs/messa
+ges/no-img-element  
+@next/next/no-img-element
+
+./app/[lang]/split-pdf/page
+.tsx
+4:43  Warning: 'Copy' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+
+./app/[lang]/terms/terms/pa
+ge.tsx
+17:44  Error: `"` can be 
+escaped with `&quot;`, 
+`&ldquo;`, `&#34;`, 
+`&rdquo;`.  
+react/no-unescaped-entities
+17:50  Error: `"` can be 
+escaped with `&quot;`, 
+`&ldquo;`, `&#34;`, 
+`&rdquo;`.  
+react/no-unescaped-entities
+
+./app/[lang]/tools/[slug]/p
+age.tsx
+83:21  Warning: Dangerous 
+property 
+'dangerouslySetInnerHTML' 
+found  react/no-danger
+
+./app/[lang]/workflows/crea
+te/page.tsx
+6:10  Warning: 
+'useTranslation' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+20:19  Warning: 
+'updateJob' is assigned a 
+value but never used.  @typ
+escript-eslint/no-unused-va
+rs
+29:38  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+
+./components/home/ToolsGrid
+.tsx
+12:34  Warning: 'index' is 
+assigned a value but never 
+used.  @typescript-eslint/n
+o-unused-vars
+12:55  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+
+./components/pdf/Interactiv
+eOverlay.tsx
+3:35  Warning: 'useEffect' 
+is defined but never used. 
+ @typescript-eslint/no-unus
+ed-vars
+102:11  Warning: 
+'handleTouchStart' is 
+assigned a value but never 
+used.  @typescript-eslint/n
+o-unused-vars
+102:31  Warning: 'e' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+102:34  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+
+./components/pdf/PDFGrid.ts
+x
+37:34  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+47:51  Warning: 'e' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+48:51  Warning: 'e' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+
+./components/pdf/PDFPageVie
+wer.tsx
+66:25  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+104:72  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+135:27  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+151:8  Warning: React Hook 
+useEffect has missing 
+dependencies: 'onPageLoad' 
+and 'onTextLayerLoaded'. 
+Either include them or 
+remove the dependency 
+array. If 'onPageLoad' 
+changes too often, find 
+the parent component that 
+defines it and wrap that 
+definition in useCallback. 
+ 
+react-hooks/exhaustive-deps
+
+./components/providers/Subs
+criptionProvider.tsx
+3:44  Warning: 'useEffect' 
+is defined but never used. 
+ @typescript-eslint/no-unus
+ed-vars
+
+./components/seo/Structured
+Data.tsx
+5:26  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+18:13  Warning: Dangerous 
+property 
+'dangerouslySetInnerHTML' 
+found  react/no-danger
+
+./components/shared/AdSense
+.tsx
+18:33  Warning: 'format' 
+is assigned a value but 
+never used.  @typescript-es
+lint/no-unused-vars
+
+./components/shared/FileUpl
+oad.tsx
+38:27  Warning: 
+'getInputProps' is 
+assigned a value but never 
+used.  @typescript-eslint/n
+o-unused-vars
+
+./components/shared/History
+Sidebar.tsx
+4:50  Warning: 'File' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+
+./components/shared/QuickGu
+ide.tsx
+3:10  Warning: 
+'CheckCircle2' is defined 
+but never used.  @typescrip
+t-eslint/no-unused-vars
+
+./components/shared/ToolCon
+tent.tsx
+20:11  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+39:40  Warning: 'node' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+40:39  Warning: 'node' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+41:40  Warning: 'node' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+42:40  Warning: 'node' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+43:39  Warning: 'node' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+44:44  Warning: 'node' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+45:40  Warning: 'node' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+
+./components/ui/Button.tsx
+45:17  Warning: Function 
+Call Object Injection Sink 
+ security/detect-object-inj
+ection
+46:17  Warning: Function 
+Call Object Injection Sink 
+ security/detect-object-inj
+ection
+51:27  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+
+./components/ui/GlassCard.t
+sx
+41:17  Warning: Function 
+Call Object Injection Sink 
+ security/detect-object-inj
+ection
+
+./components/workflow/StepC
+ard.tsx
+3:32  Warning: 'Settings' 
+is defined but never used. 
+ @typescript-eslint/no-unus
+ed-vars
+190:11  Warning: 
+'getStepIcon' is assigned 
+a value but never used.  @t
+ypescript-eslint/no-unused-
+vars
+
+./components/workflow/StepC
+ontrols.tsx
+3:68  Warning: 'Key' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+
+./lib/auth.ts
+31:39  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+32:40  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+33:46  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+39:34  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+40:34  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+41:34  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+
+./lib/excel-utils.ts
+31:42  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+33:18  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+33:27  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+34:13  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+39:13  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+47:29  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+71:23  Warning: Variable 
+Assigned to Object 
+Injection Sink  security/de
+tect-object-injection
+74:21  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+
+./lib/ocr-utils.ts
+21:31  Warning: Variable 
+Assigned to Object 
+Injection Sink  security/de
+tect-object-injection
+31:21  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+
+./lib/pdf-text-extractor.ts
+41:23  Warning: 'tx' is 
+assigned a value but never 
+used.  @typescript-eslint/n
+o-unused-vars
+49:23  Warning: 
+'fontScale' is assigned a 
+value but never used.  @typ
+escript-eslint/no-unused-va
+rs
+50:23  Warning: 'width' is 
+assigned a value but never 
+used.  @typescript-eslint/n
+o-unused-vars
+71:23  Warning: 'vHeight' 
+is assigned a value but 
+never used.  @typescript-es
+lint/no-unused-vars
+
+./lib/pdf-to-ppt.ts
+57:5  Warning: Use 
+"@ts-expect-error" instead 
+of "@ts-ignore", as 
+"@ts-ignore" will do 
+nothing if the following 
+line is error-free.  @types
+cript-eslint/ban-ts-comment
+
+./lib/pdf-utils-edit.ts
+1:43  Warning: 'PDFPage' 
+is defined but never used. 
+ @typescript-eslint/no-unus
+ed-vars
+160:32  Warning: Variable 
+Assigned to Object 
+Injection Sink  security/de
+tect-object-injection
+
+./lib/ppt-to-pdf.ts
+46:30  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+
+./lib/services/file-system.
+ts
+8:41  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+66:13  Warning: Unexpected 
+console statement.  
+no-console
+
+./lib/services/job-queue.ts
+74:27  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+75:23  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+
+./lib/services/pdf/converte
+rs/pdfToWord.ts
+34:48  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+
+./lib/services/pdf/core.ts
+9:32  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+9:64  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+10:37  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+23:50  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+28:20  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+29:27  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+36:28  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+37:36  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+
+./lib/services/pdf/manipula
+tors/basic.ts
+26:30  Warning: Variable 
+Assigned to Object 
+Injection Sink  security/de
+tect-object-injection
+56:30  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+146:26  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+
+./lib/services/pdf/manipula
+tors/enrichment.ts
+22:22  Warning: Variable 
+Assigned to Object 
+Injection Sink  security/de
+tect-object-injection
+
+./lib/services/pdf/manipula
+tors/metadata.ts
+4:56  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+
+./lib/services/pdf/manipula
+tors/organization.ts
+13:32  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+48:32  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+66:9  Warning: Use 
+"@ts-expect-error" instead 
+of "@ts-ignore", as 
+"@ts-ignore" will do 
+nothing if the following 
+line is error-free.  @types
+cript-eslint/ban-ts-comment
+120:18  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+
+./lib/services/pdf/manipula
+tors/repair.ts
+9:5  Warning: Unexpected 
+console statement.  
+no-console
+41:14  Warning: 'error' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+
+./lib/services/pdf/Optimiza
+tionService.ts
+100:22  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+
+./lib/services/pdf/security
+.ts
+1:23  Warning: 'degrees' 
+is defined but never used. 
+ @typescript-eslint/no-unus
+ed-vars
+13:30  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+20:24  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+44:21  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+65:29  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+74:30  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+78:21  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+
+./lib/stores/job-store.ts
+44:39  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+45:42  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+133:33  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+142:24  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+205:49  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+
+./lib/utils.ts
+13:69  Warning: Generic 
+Object Injection Sink  secu
+rity/detect-object-injectio
+n
+
+./lib/web-llm.ts
+36:60  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+40:45  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+46:14  Warning: 'e' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+
+./lib/workflow/strategies.t
+s
+17:38  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+21:44  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+29:42  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+34:44  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+38:45  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+44:44  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+48:45  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+54:44  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+59:45  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+65:44  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+70:45  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+76:44  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+80:45  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+86:44  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+90:45  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+96:44  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+100:49  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+108:44  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+113:45  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+119:34  Warning: 
+'_settings' is defined but 
+never used.  @typescript-es
+lint/no-unused-vars
+119:45  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+128:44  Warning: 
+Unexpected any. Specify a 
+different type.  @typescrip
+t-eslint/no-explicit-any
+
+./lib/workflow/workflow.tes
+t.ts
+4:10  Warning: 
+'WORKFLOW_STRATEGIES' is 
+defined but never used.  @t
+ypescript-eslint/no-unused-
+vars
+
+./lib/workflow-engine.ts
+19:15  Warning: Unexpected 
+any. Specify a different 
+type.  @typescript-eslint/n
+o-explicit-any
+43:22  Warning: Variable 
+Assigned to Object 
+Injection Sink  security/de
+tect-object-injection
+46:9  Warning: Unexpected 
+console statement.  
+no-console
+62:22  Warning: Variable 
+Assigned to Object 
+Injection Sink  security/de
+tect-object-injection
+
+info  - Need to disable 
+some ESLint rules? Learn 
+more here: https://nextjs.o
+rg/docs/basic-features/esli
+nt#disabling-rules
