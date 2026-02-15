@@ -1,0 +1,178 @@
+'use client';
+
+import React, { useState } from 'react';
+import { Type, Download, ArrowDown, ArrowUp, ArrowLeft, ArrowRight, LayoutTemplate } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { FileUpload } from '@/components/shared/FileUpload';
+import { ProgressBar } from '@/components/shared/ProgressBar';
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { addPageNumbers } from '@/lib/pdf-utils';
+import { downloadFile, validatePDFFile, getBaseFileName } from '@/lib/utils';
+import { toolGuides } from '@/data/guides';
+import { QuickGuide } from '@/components/shared/QuickGuide';
+import { RelatedTools } from '@/components/shared/RelatedTools';
+import { ToolContent } from '@/components/shared/ToolContent';
+import { useSubscription } from '@/components/providers/SubscriptionProvider';
+import { ToolHeader } from '@/components/shared/ToolHeader';
+import clsx from 'clsx';
+
+type Position = 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
+
+export default function AddPageNumbersPage() {
+    const { limits, isPro } = useSubscription();
+    const [file, setFile] = useState<File | null>(null);
+    const [processing, setProcessing] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const [position, setPosition] = useState<Position>('bottom-center');
+    const [startFrom, setStartFrom] = useState<number>(1);
+
+    const handleFileSelected = (files: File[]) => {
+        const validation = validatePDFFile(files[0]);
+        if (validation.valid) {
+            setFile(files[0]);
+            toast.success('PDF uploaded successfully');
+        } else {
+            toast.error(validation.error || 'Invalid file');
+        }
+    };
+
+    const handleAddPageNumbers = async () => {
+        if (!file) return;
+
+        setProcessing(true);
+        setProgress(0);
+
+        try {
+            const progressInterval = setInterval(() => {
+                setProgress((prev) => Math.min(prev + 10, 90));
+            }, 200);
+
+            const newPdfBytes = await addPageNumbers(file, {
+                position,
+                startFrom,
+            });
+
+            clearInterval(progressInterval);
+            setProgress(100);
+
+            const blob = new Blob([newPdfBytes as any], { type: 'application/pdf' });
+            const baseName = getBaseFileName(file.name);
+            downloadFile(blob, `${baseName}_numbered.pdf`);
+
+            toast.success('Page numbers added successfully!');
+            setFile(null);
+            setProgress(0);
+        } catch (error) {
+            console.error('Error adding page numbers:', error);
+            toast.error('Failed to add page numbers');
+        } finally {
+            setProcessing(false);
+        }
+    };
+
+    const PositionButton = ({ pos, label }: { pos: Position; label: string }) => (
+        <button
+            onClick={() => setPosition(pos)}
+            className={clsx(
+                "p-3 rounded-lg border flex flex-col items-center justify-center transition-all",
+                position === pos
+                    ? "bg-blue-600 border-blue-500 text-white shadow-lg scale-105"
+                    : "bg-slate-800/50 border-slate-700 text-slate-400 hover:bg-slate-700"
+            )}
+        >
+            <div className="w-8 h-10 border border-current rounded-sm relative mb-2 opacity-50">
+                <span className={clsx(
+                    "absolute text-[10px] font-bold",
+                    pos.includes('top') ? "top-1" : "bottom-1",
+                    pos.includes('left') ? "left-1" : pos.includes('right') ? "right-1" : "left-1/2 -translate-x-1/2"
+                )}>#</span>
+            </div>
+            <span className="text-xs font-medium">{label}</span>
+        </button>
+    );
+
+    return (
+        <div className="container mx-auto px-4 py-12 lg:py-20 max-w-4xl">
+            <ToolHeader
+                toolId="addPageNumbers"
+                title="Add Page Numbers"
+                description="Insert page numbers into your PDF with custom positioning"
+                icon={LayoutTemplate}
+                color="from-green-500 to-emerald-500"
+            />
+
+            <div className="mb-8">
+                <FileUpload
+                    onFilesSelected={handleFileSelected}
+                    files={file ? [file] : []}
+                    onRemoveFile={() => setFile(null)}
+                    multiple={false}
+                    maxSize={limits.maxFileSize}
+                    isPro={isPro}
+                />
+            </div>
+
+            {file && !processing && (
+                <div className="grid md:grid-cols-2 gap-6 mb-8">
+                    <GlassCard className="p-6">
+                        <label className="block text-white font-semibold mb-4">
+                            Position
+                        </label>
+                        <div className="grid grid-cols-3 gap-3">
+                            <PositionButton pos="top-left" label="Top Left" />
+                            <PositionButton pos="top-center" label="Top Center" />
+                            <PositionButton pos="top-right" label="Top Right" />
+                            <PositionButton pos="bottom-left" label="Bottom Left" />
+                            <PositionButton pos="bottom-center" label="Bottom Center" />
+                            <PositionButton pos="bottom-right" label="Bottom Right" />
+                        </div>
+                    </GlassCard>
+
+                    <GlassCard className="p-6">
+                        <label className="block text-white font-semibold mb-4">
+                            Start Numbering From
+                        </label>
+                        <input
+                            type="number"
+                            min="1"
+                            value={startFrom}
+                            onChange={(e) => setStartFrom(parseInt(e.target.value) || 1)}
+                            className="w-full px-4 py-3 rounded-xl glass text-white placeholder-slate-500 focus-ring"
+                        />
+                        <p className="text-sm text-slate-400 mt-2">
+                            The number to display on the first page
+                        </p>
+                    </GlassCard>
+                </div>
+            )}
+
+            {processing && (
+                <div className="mb-8">
+                    <ProgressBar progress={progress} label="Adding page numbers..." />
+                </div>
+            )}
+
+            {file && (
+                <GlassCard className="p-6">
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <p className="text-white font-semibold">Ready to add page numbers</p>
+                        <Button
+                            variant="primary"
+                            onClick={handleAddPageNumbers}
+                            loading={processing}
+                            icon={<Download className="w-5 h-5" />}
+                        >
+                            Add Page Numbers
+                        </Button>
+                    </div>
+                </GlassCard>
+            )}
+
+
+            <QuickGuide steps={toolGuides['/add-page-numbers']} />
+            <ToolContent toolName="/add-page-numbers" />
+            <RelatedTools currentToolHref="/add-page-numbers" />
+        </div>
+    );
+}

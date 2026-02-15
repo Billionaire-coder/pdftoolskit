@@ -1,0 +1,10 @@
+{
+    "/merge-pdf": {
+        "title": "온라인에서 PDF 파일 병합하는 방법 (무료 및 안전)",
+        "htmlContext": "<div class=\"space-y-6 text-slate-600 dark:text-slate-300\">\n                <p>\n                    PDF 파일 병합은 가장 일반적인 문서 관리 작업 중 하나입니다. 강의 노트를 합치는 학생, 보고서를 작성하는 전문가, 또는 단순히 개인 문서를 정리하는 경우에도 신뢰할 수 있는 <strong>PDF 병합 도구</strong>는 필수적입니다. 당사의 도구를 사용하면 여러 PDF 문서를 빠르고 안전하게 비용 없이 하나의 파일로 결합할 수 있습니다.\n                </p>\n\n                <h3 class=\"text-xl font-bold text-slate-900 dark:text-white\">왜 PDF 파일을 병합해야 하나요?</h3>\n                <p>\n                    여러 개의 PDF 파일을 추적하는 것은 매우 번거로운 일입니다. 하나로 병합하면 다음과 같은 이점이 있습니다：\n                </p>\n                <ul class=\"list-disc list-inside ml-4 space-y-2\">\n                    <li><strong>공유 단순화：</strong> 10개의 별도 문서를 첨부하는 대신 이메일로 파일 하나만 보내면 됩니다.</li>\n                    <li><strong>정리 개선：</strong> 관련 문서(예：송장 및 계약서)를 함께 보관할 수 있습니다.</li>\n                    <li><strong>가독성 향상：</strong> 독자에게 논리적인 정보 흐름을 제공할 수 있습니다.</li>\n                    <h3 class=\"text-xl font-bold text-slate-900 dark:text-white\">안전한가요?</h3>\n                    <p>\n                        <strong>네, 물론입니다.</strong> 당사는 무엇보다 귀하의 개인정보 보호를 최우선으로 생각합니다. 프로세스는 가능한 한 <em>클라이언트 측</em>에서 이루어지므로 귀하의 파일이 당사 서버에 저장되지 않습니다.\n                    </p>\n            </div>"
+    },
+    "/compress-pdf": {
+        "title": "PDF 압축：품질 저하 없이 파일 크기 줄이기",
+        "htmlContext": "<div class=\"space-y-6 text-slate-600 dark:text-slate-300\">\n                <p>\n                    용량이 큰 PDF 파일은 큰 골칫거리가 될 수 있습니다. 당사의 <strong>PDF 압축 도구</strong>는 우수한 품질을 유지하면서 파일을 가능한 가장 작은 크기로 최적화하여 이 문제를 즉시 해결합니다.\n                </p>\n\n                <h3 class=\"text-xl font-bold text-slate-900 dark:text-white\">압축은 어떻게 작동하나요?</h3>\n                <p>\n                    당사의 스마트 압축 알고리즘은 사용하지 않는 개체를 제거하고 이미지를 최적화하여 용량을 줄입니다.\n                </p>\n            </div>"
+    }
+}

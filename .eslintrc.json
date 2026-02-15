@@ -1,0 +1,37 @@
+{
+    "ignorePatterns": [
+        "node_modules",
+        ".next",
+        "dist",
+        "out",
+        "public",
+        "scripts",
+        "worker"
+    ],
+    "extends": [
+        "next/core-web-vitals",
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
+    "plugins": [
+        "@typescript-eslint",
+        "security"
+    ],
+    "rules": {
+        "@typescript-eslint/no-explicit-any": "warn",
+        "@typescript-eslint/no-unused-vars": "warn",
+        "@typescript-eslint/ban-ts-comment": "warn",
+        "react/no-danger": "warn",
+        "security/detect-object-injection": "warn",
+        "security/detect-non-literal-require": "warn",
+        "no-console": [
+            "warn",
+            {
+                "allow": [
+                    "warn",
+                    "error"
+                ]
+            }
+        ]
+    }
+}

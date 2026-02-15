@@ -1,0 +1,10 @@
+{
+    "/merge-pdf": {
+        "title": "如何在線合併 PDF 文件（免費且安全）",
+        "htmlContext": "<div class=\"space-y-6 text-slate-600 dark:text-slate-300\">\n                <p>\n                    合併 PDF 文件是最常見的文檔管理任務之一。無論你是合併課堂筆記的學生，還是彙總報告的專業人士，或者只是整理個人文件，擁有一個可靠的 <strong>PDF 合併工具</strong> 都至關重要。我們的工具可以讓你快速、安全且免費地將多個 PDF 文檔合併為一個文件。\n                </p>\n\n                <h3 class=\"text-xl font-bold text-slate-900 dark:text-white\">為什麼要合併 PDF 文件？</h3>\n                <p>\n                    追蹤多個 PDF 文件可能是一場噩夢。通過將它們合併為一個，你可以：\n                </p>\n                <ul class=\"list-disc list-inside ml-4 space-y-2\">\n                    <li><strong>簡化共享：</strong> 通過電子郵件發送一個文件，而不是附加十個單獨的文檔。</li>\n                    <li><strong>改善組織：</strong> 將相關文檔（例如：發票和合同）保存在一起。</li>\n                    <li><strong>增強可讀性：</strong> 為你的讀者創造邏輯性的信息流。</li>\n                </ul>\n\n                <h3 class=\"text-xl font-bold text-slate-900 dark:text-white\">安全嗎？</h3>\n                <p>\n                    <strong>是的，絕對安全。</strong> 我們將你的隱私放在首位。處理過程盡可能在 <em>客戶端</em> 進行，這意味著你的文件不會存儲在我們的服務器上。\n                </p>\n            </div>"
+    },
+    "/compress-pdf": {
+        "title": "壓縮 PDF：在不損失質量的情況下減小文件大小",
+        "htmlContext": "<div class=\"space-y-6 text-slate-600 dark:text-slate-300\">\n                <p>\n                    大型 PDF 文件可能是一個大問題。我們的 <strong>PDF 壓縮器</strong> 通過在保持優異質量的同時將文件優化到最小體積，立即解決這個問題。\n                </p>\n\n                <h3 class=\"text-xl font-bold text-slate-900 dark:text-white\">壓縮是如何工作的？</h3>\n                <p>\n                    我們的智能壓縮算法通過刪除未使用的對象和優化圖像來減輕重量。\n                </p>\n            </div>"
+    }
+}

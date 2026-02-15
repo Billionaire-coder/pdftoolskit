@@ -1,0 +1,252 @@
+{
+    "nav": {
+        "home": "Home",
+        "tools": "Tools",
+        "blog": "Blog",
+        "about": "About",
+        "contact": "Contact",
+        "privacy": "Privacy"
+    },
+    "categories": {
+        "all": "All",
+        "workflows": "Workflows",
+        "organize": "Organize PDF",
+        "optimize": "Optimize PDF",
+        "convert": "Convert PDF",
+        "edit": "Edit PDF",
+        "security": "PDF Security"
+    },
+    "settings": "Settings",
+    "hero": {
+        "title": "All the tools you need to enable",
+        "titleHighlight": "PDF Productivity",
+        "description": "Convert, merge, split, and edit PDF files effortlessly. 100% free and secure processing directly in your browser.",
+        "start": "Get Started",
+        "github": "Star on GitHub",
+        "badge": "100% Free • Secure • No Signup"
+    },
+    "toolsPage": {
+        "siteName": "PDFToolskit",
+        "siteTitle": "PDFToolskit - All Tools For Every PDF Need",
+        "title": "PDF Tools",
+        "subtitle": "Browse all our free PDF tools in one place",
+        "noTools": "No tools found in this category."
+    },
+    "stats": {
+        "tools": "Tools",
+        "noLimit": "No File Limit",
+        "secure": "Secure"
+    },
+    "toolsSection": {
+        "title": "All PDF Tools You Need",
+        "subtitle": "Process your PDFs instantly with our suite of professional tools. Fast, secure, and completely free.",
+        "useTool": "Use Tool"
+    },
+    "features": {
+        "title": "Why Choose PDFToolskit?",
+        "subtitle": "Built with modern web technology to give you the best PDF experience possible.",
+        "fast": "Lightning Fast",
+        "fastDesc": "Process PDFs instantly with client-side processing. No server delays, no waiting.",
+        "secure": "100% Secure",
+        "secureDesc": "Your files never leave your device. All processing happens locally in your browser.",
+        "free": "Completely Free",
+        "freeDesc": "All tools are free forever. No hidden charges, no subscriptions, no limits.",
+        "unlimited": "Unlimited Usage",
+        "unlimitedDesc": "Process as many files as you want. No daily limits, no file size restrictions."
+    },
+    "cta": {
+        "title": "Ready to Get Started?",
+        "description": "Choose any tool above and start processing your PDFs instantly. No sign-up required.",
+        "button": "Browse All Tools"
+    },
+    "footer": {
+        "description": "Free, fast, and secure PDF tools. Process your documents directly in your browser - no uploads, no tracking, 100% private.",
+        "tools": "Tools",
+        "company": "Company",
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service",
+        "pricing": "Pricing",
+        "contact": "Contact",
+        "newsletterTitle": "Sign up to our newsletter",
+        "newsletterPlaceholder": "Enter your email",
+        "newsletterSubmit": "Submit",
+        "builtBy": "Built with ❤️ by Saif Qadri for everyone.",
+        "copyright": "© {{year}} PDFToolskit. All rights reserved."
+    },
+    "tools": {
+        "mergePdf": "Merge PDF",
+        "mergePdfDesc": "Combine multiple PDF files into one document",
+        "splitPdf": "Split PDF",
+        "splitPdfDesc": "Extract pages from your PDF document",
+        "compressPdf": "Compress PDF",
+        "compressPdfDesc": "Reduce PDF file size while maintaining quality",
+        "pdfToJpg": "PDF to JPG",
+        "pdfToJpgDesc": "Convert PDF pages to high-quality images",
+        "jpgToPdf": "JPG to PDF",
+        "jpgToPdfDesc": "Create PDF from multiple images",
+        "rotatePdf": "Rotate PDF",
+        "rotatePdfDesc": "Rotate PDF pages to the correct orientation",
+        "removePages": "Remove Pages",
+        "removePagesDesc": "Delete unwanted pages from your PDF",
+        "organizePdf": "Organize PDF",
+        "organizePdfDesc": "Reorder and reorganize PDF pages",
+        "protectPdf": "Password Protect",
+        "protectPdfDesc": "Secure PDF files with password encryption",
+        "unlockPdf": "Unlock PDF",
+        "unlockPdfDesc": "Remove password protection from PDFs",
+        "pdfToWord": "PDF to Word",
+        "pdfToWordDesc": "Convert PDF documents to editable Word files",
+        "extractPages": "Extract Pages",
+        "extractPagesDesc": "Create a new PDF with specific pages",
+        "addPageNumbers": "Add Page Numbers",
+        "addPageNumbersDesc": "Insert page numbers with custom positioning",
+        "addWatermark": "Add Watermark",
+        "addWatermarkDesc": "Stamp text watermarks on your documents",
+        "cropPdf": "Crop PDF",
+        "cropPdfDesc": "Trim margins from your PDF pages",
+        "signPdf": "Sign PDF",
+        "signPdfDesc": "Add your signature to PDF documents",
+        "redactPdf": "Redact PDF",
+        "redactPdfDesc": "Permanently hide sensitive information",
+        "scanPdf": "Scan to PDF",
+        "scanPdfDesc": "Capture documents using your camera",
+        "ocrPdf": "OCR PDF",
+        "ocrPdfDesc": "Extract text from scanned PDFs and Images",
+        "editMetadata": "Edit Metadata",
+        "editMetadataDesc": "Update Title, Author and Keywords",
+        "flattenPdf": "Flatten PDF",
+        "flattenPdfDesc": "Merge layers and lock forms",
+        "repairPdf": "Repair PDF",
+        "repairPdfDesc": "Fix corrupted PDF documents",
+        "pdfToExcel": "PDF to Excel",
+        "pdfToExcelDesc": "Convert PDF tables to editable Excel spreadsheets",
+        "excelToPdf": "Excel to PDF",
+        "excelToPdfDesc": "Convert Excel spreadsheets to professional PDFs",
+        "pdfToPowerPoint": "PDF to PowerPoint",
+        "pdfToPowerPointDesc": "Convert PDF slides to editable PowerPoint",
+        "powerPointToPdf": "PowerPoint to PDF",
+        "powerPointToPdfDesc": "Convert PowerPoint presentations to PDF",
+        "htmlToPdf": "HTML to PDF",
+        "htmlToPdfDesc": "Convert web pages and HTML to PDF",
+        "editPdf": "Edit PDF",
+        "editPdfDesc": "Edit text, add images, and annotate PDFs",
+        "chatPdf": "Chat with PDF",
+        "chatPdfDesc": "Ask questions and extract insights from your PDF using AI",
+        "createWorkflow": "Create Workflow",
+        "createWorkflowDesc": "Build custom automated PDF workflows",
+        "masterOrganizer": "Master Organizer",
+        "masterOrganizerDesc": "Unified UI to Reorder, Rotate and Delete pages",
+        "metadataAuditor": "Metadata Auditor",
+        "metadataAuditorDesc": "Inspect and wipe hidden tracking data",
+        "wordToPdf": "Word to PDF",
+        "wordToPdfDesc": "Convert Word documents to PDF format",
+        "pdfA": "PDF/A Converter",
+        "pdfADesc": "Convert PDF to long-term archiving format",
+        "printReadyPdf": "Print-Ready PDF",
+        "printReadyPdfDesc": "Prepare PDF for professional printing (CMYK)"
+    },
+    "toasts": {
+        "filesAdded": "Added {{count}} file(s)",
+        "fileRemoved": "File removed",
+        "mergeSuccess": "PDFs merged successfully!",
+        "mergeError": "Failed to merge PDFs. Please try again.",
+        "atLeastTwo": "Please upload at least 2 PDF files to merge",
+        "invalidFile": "Invalid file",
+        "genericError": "An error occurred. Please try again."
+    },
+    "toolPages": {
+        "common": {
+            "clearAll": "Clear All",
+            "download": "Download",
+            "processing": "Processing...",
+            "success": "Success!",
+            "howToUse": "How to Use This Tool"
+        },
+        "merge": {
+            "title": "Merge PDF Files",
+            "description": "Combine multiple PDF documents into one file. Fast, secure, and completely free.",
+            "readyToMerge": "{{count}} file(s) ready to merge",
+            "orderHint": "Files will be merged in the order shown above",
+            "button": "Merge PDFs",
+            "merging": "Merging PDFs..."
+        },
+        "compress": {
+            "title": "Compress PDF",
+            "description": "Optimize your PDF files with smart compression.",
+            "statusOptimizing": "Optimizing your PDF...",
+            "statusAnalyzing": "Analyzing structure...",
+            "statusAssets": "Compressing assets...",
+            "statusRebuilding": "Rebuilding PDF...",
+            "levelTitle": "Compression Level",
+            "extremeTitle": "Extreme Compression",
+            "extremeDesc": "Less quality, high compression. Perfect for heavy files.",
+            "recommendedTitle": "Recommended Compression",
+            "recommendedDesc": "Good quality, good compression. Best for most files.",
+            "lessTitle": "Less Compression",
+            "lessDesc": "High quality, less compression. Ideal for images.",
+            "customTitle": "Custom Size",
+            "customDesc": "Set a target file size limit (e.g. 5MB).",
+            "targetPlaceholder": "Max Size",
+            "customLimitHint": "*May use aggressive processing to meet limit.",
+            "buttonDirect": "Compress PDF",
+            "buttonTarget": "Compress to Target",
+            "completeTitle": "Compression Complete!",
+            "completeSub": "Your PDF is now lighter and ready to download.",
+            "originalSize": "Original Size",
+            "compressedSize": "Compressed Size",
+            "saved": "SAVED",
+            "downloadButton": "Download Compressed PDF",
+            "anotherButton": "Compress Another File"
+        }
+    },
+    "relatedTools": {
+        "title": "Explore Other Tools",
+        "subtitle": "Discover more ways to manage your PDF files"
+    },
+    "about": {
+        "hero": {
+            "badge": "Privacy-First PDF Tools",
+            "title": "Privacy-First PDF Tools",
+            "subtitle": "PDFToolskit was built with a simple but powerful mission: To provide world-class PDF tools that respect your privacy and never touch our servers."
+        },
+        "philosophy": {
+            "zeroServer": {
+                "title": "The Zero-Server Model",
+                "content": "Most online PDF tools upload your sensitive documents to their servers for processing. At PDFToolskit, we believe your files should stay where they belong: **on your device**.",
+                "subContent": "Using advanced WebAssembly (WASM) technology, we bring the processing power of professional PDF libraries directly into your browser. This means 100% privacy and zero risk of data leaks."
+            },
+            "speed": {
+                "title": "Lightning Fast Speed",
+                "content": "By eliminating the need to upload and download large files, PDFToolskit processes your documents instantly. Small or large, your tasks are completed in milliseconds.",
+                "features": [
+                    "No upload wait times",
+                    "No download delays",
+                    "Works offline after loading",
+                    "Hardware accelerated"
+                ]
+            }
+        },
+        "ai": {
+            "title": "Secure AI Integration",
+            "subtitle": "Next-generation AI features that don't compromise security.",
+            "local": {
+                "title": "Local Learning",
+                "desc": "Our summary and scanning tools run light AI models entirely in your browser memory."
+            },
+            "training": {
+                "title": "No Training Data",
+                "desc": "We never use your documents to train models. Your intent and data are strictly yours."
+            },
+            "private": {
+                "title": "Private-by-Design",
+                "desc": "Every feature is audited to ensure it adheres to our Zero-Server manifesto."
+            }
+        },
+        "cta": {
+            "title": "Ready to process some files?",
+            "subtitle": "Join thousands of users who trust PDFToolskit for their most sensitive document workflows.",
+            "button": "Explore All Tools",
+            "back": "Back to Home"
+        }
+    }
+}
