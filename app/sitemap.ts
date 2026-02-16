@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
 import { tools } from '@/data/tools';
-import { blogPosts } from '@/data/blog-posts';
+import { getBlogPosts } from '@/data/blog-posts';
 import { pseoPages } from '@/data/pseo';
 import { i18n } from '@/i18n-config';
 
@@ -21,7 +21,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
         generateLocalizedUrls(tool.href, 0.8, 'monthly')
     );
 
-    const blogUrls = blogPosts.flatMap((post) =>
+    const posts = getBlogPosts('en');
+    const blogUrls = posts.flatMap((post) =>
         generateLocalizedUrls(`/blog/${post.slug}`, 0.6, 'monthly')
     );
 
