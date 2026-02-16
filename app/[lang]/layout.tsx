@@ -42,6 +42,9 @@ const baseMetadata: Metadata = {
     authors: [{ name: 'PDFToolskit' }],
     creator: 'PDFToolskit',
     publisher: 'PDFToolskit',
+    verification: {
+        google: 'wis3ufVMVUufS8dZNv_4QYfrsZapNPe0iNutOLTXvPs',
+    },
     robots: 'index, follow',
     openGraph: {
         type: 'website',
@@ -71,9 +74,7 @@ const baseMetadata: Metadata = {
         apple: '/favicon.png',
     },
     manifest: '/manifest.json',
-    verification: {
-        google: 'wis3ufVMVUufS8dZNv_4QYfrsZapNPe0iNutOLTXvPs',
-    },
+
 };
 
 export async function generateMetadata({ params }: { params: { lang: string } }): Promise<Metadata> {
