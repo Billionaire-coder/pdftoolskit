@@ -16,6 +16,13 @@
         "security": "Seguridad PDF"
     },
     "settings": "Configuración",
+    "blog": {
+        "title": "Blog de Herramientas PDF",
+        "description": "Guías de expertos, tutoriales y consejos para dominar las herramientas PDF y aumentar tu productividad.",
+        "readArticle": "Leer Artículo",
+        "backToBlog": "Volver al Blog",
+        "share": "Compartir este artículo"
+    },
     "hero": {
         "title": "Todas las herramientas para habilitar",
         "titleHighlight": "Productividad PDF",

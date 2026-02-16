@@ -29,9 +29,10 @@ function ThemeToggleClient() {
     const { theme, toggleTheme } = useTheme();
 
     return (
+
         <motion.button
             onClick={toggleTheme}
-            className="relative p-2 rounded-lg glass hover:bg-slate-900/5 dark:hover:bg-white/10 transition-all duration-300"
+            className="relative p-1.5 w-8 h-8 rounded-lg glass hover:bg-slate-900/5 dark:hover:bg-white/10 transition-all duration-300"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             aria-label="Toggle theme"
@@ -45,9 +46,9 @@ function ThemeToggleClient() {
                         rotate: theme === 'dark' ? 0 : 180,
                     }}
                     transition={{ duration: 0.3 }}
-                    className="absolute inset-0"
+                    className="absolute inset-0 flex items-center justify-center"
                 >
-                    <Moon className="w-6 h-6 text-yellow-300" />
+                    <Moon className="w-4 h-4 text-yellow-300" />
                 </motion.div>
                 <motion.div
                     initial={false}
@@ -57,9 +58,9 @@ function ThemeToggleClient() {
                         rotate: theme === 'light' ? 0 : -180,
                     }}
                     transition={{ duration: 0.3 }}
-                    className="absolute inset-0"
+                    className="absolute inset-0 flex items-center justify-center"
                 >
-                    <Sun className="w-6 h-6 text-yellow-500" />
+                    <Sun className="w-4 h-4 text-yellow-500" />
                 </motion.div>
             </div>
         </motion.button>

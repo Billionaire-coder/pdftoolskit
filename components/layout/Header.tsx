@@ -7,8 +7,7 @@ import { Lucide } from '@/lib/lucide-registry';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { useSubscription } from '@/components/providers/SubscriptionProvider';
 import { Button } from '@/components/ui/Button';
-import { LanguageSelector } from './LanguageSelector';
-import { ThemeToggle } from './ThemeToggle';
+import { SettingsMenu } from './SettingsMenu';
 import { ProBadge } from '@/components/shared/ProBadge';
 import { MyToolsMenu } from './MyToolsMenu';
 
@@ -58,10 +57,14 @@ export function Header() {
                                 <span suppressHydrationWarning>{item.name}</span>
                             </Link>
                         ))}
+                    </div>
+
+                    {/* Right Actions (Visible on all screens) */}
+                    <div className="flex items-center gap-2 md:gap-4 md:ps-4 md:border-s md:border-slate-200 dark:md:border-white/10 ml-auto md:ml-0 mr-2 md:mr-0">
                         <MyToolsMenu />
-                        <div className="flex items-center gap-4 ps-4 border-s border-slate-200 dark:border-white/10">
-                            {mounted && (
-                                isPro ? (
+                        {mounted && (
+                            <div className="hidden md:block">
+                                {isPro ? (
                                     <Link href="/pricing">
                                         <ProBadge variant="default" className="hover:scale-105 transition-transform cursor-pointer" />
                                     </Link>
@@ -72,15 +75,14 @@ export function Header() {
                                             Go Pro
                                         </Button>
                                     </Link>
-                                )
-                            )}
-                            {!mounted && (
-                                <div className="w-20 h-8 animate-pulse bg-white/5 rounded-lg" />
-                            )}
-                            <div className="flex items-center gap-2">
-                                <LanguageSelector />
-                                <ThemeToggle />
+                                )}
                             </div>
+                        )}
+                        {!mounted && (
+                            <div className="hidden md:block w-20 h-8 animate-pulse bg-white/5 rounded-lg" />
+                        )}
+                        <div className="hidden md:flex items-center gap-1 md:gap-2">
+                            <SettingsMenu />
                         </div>
                     </div>
 
@@ -104,7 +106,7 @@ export function Header() {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="md:hidden mt-4 pt-4 border-t border-white/10 overflow-hidden"
+                        className="md:hidden mt-4 pt-4 border-t border-white/10 overflow-hidden max-h-[calc(100vh-80px)] overflow-y-auto"
                     >
                         <div className="flex flex-col gap-4">
                             {navigation.map((item) => (
@@ -117,17 +119,34 @@ export function Header() {
                                     <span suppressHydrationWarning>{item.name}</span>
                                 </Link>
                             ))}
+
+                            <div className="px-3 py-2">
+                                <SettingsMenu />
+                            </div>
+
                             <div className="flex items-center justify-between p-3 border-t border-slate-200 dark:border-white/10 bg-slate-900/5 dark:bg-white/5 rounded-xl">
-                                <span className="text-sm text-slate-600 dark:text-slate-400">{t('nav.settings')}</span>
+                                <span className="text-sm text-slate-600 dark:text-slate-400">{isPro ? 'Your Plan' : 'Unlock Pro'}</span>
                                 <div className="flex items-center gap-3">
-                                    <LanguageSelector />
-                                    <ThemeToggle />
+                                    {mounted && (
+                                        isPro ? (
+                                            <Link href="/pricing" onClick={() => setMobileMenuOpen(false)}>
+                                                <ProBadge variant="default" className="hover:scale-105 transition-transform cursor-pointer" />
+                                            </Link>
+                                        ) : (
+                                            <Link href="/pricing" onClick={() => setMobileMenuOpen(false)}>
+                                                <Button size="sm" variant="ghost" className="bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 border border-purple-500/20 text-xs gap-2">
+                                                    <Lucide.Zap className="w-3.5 h-3.5" />
+                                                    Go Pro
+                                                </Button>
+                                            </Link>
+                                        )
+                                    )}
                                 </div>
                             </div>
                         </div>
                     </motion.div>
                 )}
             </GlassCard>
-        </header>
+        </header >
     );
 }

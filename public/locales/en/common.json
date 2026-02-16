@@ -17,6 +17,13 @@
         "security": "PDF Security"
     },
     "settings": "Settings",
+    "blog": {
+        "title": "PDF Tools Blog",
+        "description": "Expert guides, tutorials, and tips to master PDF tools and boost your productivity.",
+        "readArticle": "Read Article",
+        "backToBlog": "Back to Blog",
+        "share": "Share this article"
+    },
     "hero": {
         "title": "All the tools you need to enable",
         "titleHighlight": "PDF Productivity",

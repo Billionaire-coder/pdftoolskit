@@ -1,9 +1,9 @@
 export const i18n = {
     defaultLocale: 'en',
     locales: [
-        'en', 'es', 'fr', 'de', 'it', 'pt', 'nl', 'pl', 'ru', 'ja',
-        'ko', 'zh', 'ar', 'hi', 'tr', 'id', 'vi', 'th', 'sv', 'da',
-        'fi', 'no', 'cs', 'el', 'ro', 'hu'
+        'en', 'es', 'fr', 'de', 'it', 'pt', 'ja', 'ru', 'ko', 'zh-CN', 'zh-TW',
+        'ar', 'bg', 'ca', 'nl', 'el', 'hi', 'id', 'ms', 'pl', 'sv', 'th', 'tr',
+        'uk', 'vi', 'ur'
     ],
 } as const;
 

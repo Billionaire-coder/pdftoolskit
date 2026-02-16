@@ -7,6 +7,7 @@ import { Footer } from '@/components/layout/Footer';
 // import { AdSense } from '@/components/shared/AdSense';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { I18nProvider } from '@/components/providers/I18nProvider';
+import { AccessibilityEffects } from '@/components/providers/AccessibilityEffects';
 import '../globals.css';
 import { OfflineDetection } from '@/components/shared/OfflineDetection';
 import { HistorySidebar } from '@/components/shared/HistorySidebar';
@@ -18,7 +19,6 @@ import QueryProvider from '@/components/providers/QueryProvider';
 import { i18n, isRtlLang } from '@/i18n-config';
 import { StructuredData } from '@/components/seo/StructuredData';
 import { CookieConsent } from '@/components/privacy/CookieConsent';
-import { AccessibilityOverlay } from '@/components/shared/AccessibilityOverlay';
 import { PostHogProvider } from '@/components/providers/PostHogProvider';
 import { GoogleAnalytics } from '@/components/shared/GoogleAnalytics';
 
@@ -71,6 +71,9 @@ const baseMetadata: Metadata = {
         apple: '/favicon.png',
     },
     manifest: '/manifest.json',
+    verification: {
+        google: 'wis3ufVMVUufS8dZNv_4QYfrsZapNPe0iNutOLTXvPs',
+    },
 };
 
 export async function generateMetadata({ params }: { params: { lang: string } }): Promise<Metadata> {
@@ -110,7 +113,7 @@ export default function RootLayout({
     const dir = isRtlLang(params.lang) ? 'rtl' : 'ltr';
 
     return (
-        <html lang={params.lang} dir={dir} className={`${inter.variable} ${jakarta.variable}`}>
+        <html lang={params.lang} dir={dir} className={`${inter.variable} ${jakarta.variable}`} suppressHydrationWarning>
             <head>
                 {/* Structured Data */}
                 <StructuredData
@@ -172,7 +175,8 @@ export default function RootLayout({
                         <AuthProvider>
                             <SubscriptionProvider>
                                 <QueryProvider>
-                                    <I18nProvider>
+                                    <I18nProvider locale={params.lang}>
+                                        <AccessibilityEffects />
                                         <LiveAnnouncerProvider>
                                             <div className="relative min-h-screen flex flex-col">
                                                 <Header />
@@ -211,7 +215,6 @@ export default function RootLayout({
                                                 }}
                                             />
                                             <CookieConsent />
-                                            <AccessibilityOverlay />
                                         </LiveAnnouncerProvider>
                                     </I18nProvider>
                                 </QueryProvider>

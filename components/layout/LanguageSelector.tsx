@@ -5,6 +5,9 @@ import { Globe, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 
+import { usePathname, useRouter } from 'next/navigation';
+import { i18n as i18nConfig } from '@/i18n-config';
+
 const LANGUAGES = [
     { code: 'en', name: 'English' },
     { code: 'es', name: 'Español' },
@@ -38,6 +41,8 @@ export function LanguageSelector() {
     const { i18n } = useTranslation('common');
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const pathname = usePathname();
+    const router = useRouter();
 
     // Close on click outside
     useEffect(() => {
@@ -51,7 +56,25 @@ export function LanguageSelector() {
     }, []);
 
     const handleSelect = (code: string) => {
-        i18n.changeLanguage(code);
+        if (!pathname) return;
+
+        const segments = pathname.split('/');
+        // pathname starts with /, so segments[0] is ''
+        // segments[1] is the locale if present
+
+        if (segments.length > 1 && i18nConfig.locales.includes(segments[1] as any)) {
+            segments[1] = code;
+        } else {
+            // If locale is missing (should not happen with middleware), insert it
+            segments.splice(1, 0, code);
+        }
+
+        const newPath = segments.join('/');
+
+        // Update cookie to persist preference
+        document.cookie = `NEXT_LOCALE=${code}; path=/; max-age=31536000; SameSite=Lax`;
+
+        router.push(newPath);
         setIsOpen(false);
     };
 
@@ -59,10 +82,10 @@ export function LanguageSelector() {
         <div className="relative" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-900/5 dark:hover:bg-white/5 transition-colors"
+                className="p-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-900/5 dark:hover:bg-white/5 transition-colors"
                 aria-label="Select Language"
             >
-                <Globe className="w-5 h-5" />
+                <Globe className="w-4 h-4" />
             </button>
 
             <AnimatePresence>

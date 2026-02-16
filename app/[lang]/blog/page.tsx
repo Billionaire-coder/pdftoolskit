@@ -6,22 +6,29 @@ import { motion } from 'framer-motion';
 import { Calendar, Clock, ArrowRight, BookOpen, Tag } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { ToolHeader } from '@/components/shared/ToolHeader';
-import { blogPosts } from '@/data/blog-posts';
+import { getBlogPosts } from '@/data/blog-posts';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'next/navigation';
 
 export default function BlogPage() {
+    const { t } = useTranslation('common');
+    const params = useParams();
+    const lang = (params?.lang as string) || 'en';
+    const posts = getBlogPosts(lang);
+
     return (
         <div className="container mx-auto px-4 py-12 lg:py-20 max-w-6xl">
             {/* Header */}
             <ToolHeader
-                title="PDF Tools Blog"
-                description="Expert guides, tutorials, and tips to master PDF tools and boost your productivity."
+                title={t('blog.title', 'PDF Tools Blog')}
+                description={t('blog.description', 'Expert guides, tutorials, and tips to master PDF tools and boost your productivity.')}
                 icon={BookOpen}
                 color="from-purple-500 to-pink-500"
             />
 
             {/* Blog Posts Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {blogPosts.map((post, index) => (
+                {posts.map((post, index) => (
                     <motion.div
                         key={post.slug}
                         initial={{ opacity: 0, y: 20 }}
@@ -60,10 +67,15 @@ export default function BlogPage() {
                                             <Calendar className="w-3 h-3" />
                                             <span>{post.date}</span>
                                         </div>
-                                        <div className="flex items-center gap-1 text-purple-400">
-                                            <span>Read Article</span>
-                                            <ArrowRight className="w-3 h-3" />
+                                        <div className="flex items-center gap-1">
+                                            <Clock className="w-3 h-3" />
+                                            <span>{post.readTime}</span>
                                         </div>
+                                    </div>
+
+                                    <div className="mt-4 flex items-center gap-2 text-purple-600 dark:text-purple-400 text-sm font-medium group-hover:gap-3 transition-all">
+                                        {t('blog.readArticle', 'Read Article')}
+                                        <ArrowRight className="w-4 h-4" />
                                     </div>
                                 </div>
                             </GlassCard>
@@ -74,3 +86,4 @@ export default function BlogPage() {
         </div>
     );
 }
+

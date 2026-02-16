@@ -7,7 +7,7 @@ const MarkdownRenderer = dynamic(() => import('@/components/shared/MarkdownRende
 
 // ... (existing imports)
 import { Calendar, Clock, ArrowLeft, Tag, User } from 'lucide-react';
-import { blogPosts } from '@/data/blog-posts';
+import { getBlogPosts } from '@/data/blog-posts';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { RelatedTools } from '@/components/shared/RelatedTools';
 import { ToolHeader } from '@/components/shared/ToolHeader';
@@ -15,13 +15,15 @@ import { BookOpen } from 'lucide-react';
 
 interface BlogPostPageProps {
     params: {
+        lang: string;
         slug: string;
     };
 }
 
 // Generate Metadata for SEO
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
-    const post = blogPosts.find((p) => p.slug === params.slug);
+    const posts = getBlogPosts(params.lang);
+    const post = posts.find((p) => p.slug === params.slug);
 
     if (!post) {
         return {
@@ -44,7 +46,8 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
 }
 
 export default function BlogPostPage({ params }: BlogPostPageProps) {
-    const post = blogPosts.find((p) => p.slug === params.slug);
+    const posts = getBlogPosts(params.lang);
+    const post = posts.find((p) => p.slug === params.slug);
 
     if (!post) {
         notFound();
@@ -99,7 +102,8 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
 
 // Generate Static Params for SSG
 export async function generateStaticParams() {
-    return blogPosts.map((post) => ({
+    const posts = getBlogPosts('en'); // Slugs are currently the same for all languages
+    return posts.map((post) => ({
         slug: post.slug,
     }));
 }

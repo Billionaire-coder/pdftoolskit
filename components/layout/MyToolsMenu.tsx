@@ -34,7 +34,7 @@ export function MyToolsMenu() {
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className={cn(
-                    "flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all duration-300",
+                    "flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-all duration-300",
                     "hover:bg-slate-900/5 dark:hover:bg-white/5 group",
                     isOpen ? "bg-slate-900/10 dark:bg-white/10 text-slate-900 dark:text-white" : "text-slate-700 dark:text-slate-300"
                 )}
@@ -51,7 +51,6 @@ export function MyToolsMenu() {
                         </span>
                     )}
                 </div>
-                <span className="text-sm font-medium hidden lg:block">My Tools</span>
                 <ChevronDown className={cn(
                     "w-4 h-4 transition-transform duration-300",
                     isOpen ? "rotate-180" : ""

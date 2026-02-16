@@ -192,18 +192,14 @@ function AccessibilityStyles({ highContrast, reduceMotion }: { highContrast: boo
         let css = '';
         if (highContrast) {
             css += `
+                html {
+                    filter: contrast(175%);
+                }
                 .high-contrast * {
-                    background-color: black !important;
-                    color: white !important;
-                    border-color: white !important;
-                    box-shadow: none !important;
-                    text-shadow: none !important;
+                    /* Only force colors where needed, avoided universal background-black to keep transparency */
                 }
                 .high-contrast img, .high-contrast video {
-                    filter: grayscale(100%) contrast(150%);
-                }
-                .high-contrast button {
-                    border: 2px solid yellow !important;
+                    filter: grayscale(100%);
                 }
             `;
         }

@@ -15,11 +15,13 @@ const i18nInstance = i18n.use(initReactI18next);
 
 if (typeof window !== 'undefined') {
     i18nInstance
-        .use(HttpApi)
-        .use(LanguageDetector);
+        .use(HttpApi);
 }
 
 i18nInstance.init({
+    lng: 'en', // Force initial language to match server (english)
+    debug: true,
+    partialBundledLanguages: true,
     fallbackLng: 'en',
     supportedLngs,
     defaultNS: 'common',
