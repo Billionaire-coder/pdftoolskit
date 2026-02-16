@@ -181,7 +181,9 @@ export function FileUpload({
         try {
             const tokenClient = (window as any).google.accounts.oauth2.initTokenClient({
                 client_id: clientId,
-                scope: 'https://www.googleapis.com/auth/drive.readonly',
+                // Use per-file access scope instead of full drive read access
+                // This is safer and reduces verification requirements
+                scope: 'https://www.googleapis.com/auth/drive.file',
                 callback: async (response: any) => {
                     if (response.error !== undefined) {
                         console.error('Auth Error:', response);
