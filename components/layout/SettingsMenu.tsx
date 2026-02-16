@@ -53,6 +53,31 @@ export function SettingsMenu() {
     const pathname = usePathname();
     const router = useRouter();
 
+    // PWA Install specific logic
+    const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+    const [showInstall, setShowInstall] = useState(false);
+
+    useEffect(() => {
+        const handler = (e: any) => {
+            e.preventDefault();
+            setDeferredPrompt(e);
+            setShowInstall(true);
+        };
+        window.addEventListener('beforeinstallprompt', handler);
+        return () => window.removeEventListener('beforeinstallprompt', handler);
+    }, []);
+
+    const handleInstallClick = () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult: any) => {
+            if (choiceResult.outcome === 'accepted') {
+                setShowInstall(false);
+            }
+            setDeferredPrompt(null);
+        });
+    };
+
     // Close on click outside
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -121,7 +146,7 @@ export function SettingsMenu() {
                                         {/* Theme Toggle */}
                                         <div className="p-2">
                                             <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 px-1">Theme</div>
-                                            <div className="grid grid-cols-3 gap-1 bg-slate-100 dark:bg-white/5 p-1 rounded-lg">
+                                            <div className="grid grid-cols-2 gap-1 bg-slate-100 dark:bg-white/5 p-1 rounded-lg">
                                                 <button
                                                     onClick={() => setTheme('light')}
                                                     className={cn(
@@ -139,15 +164,6 @@ export function SettingsMenu() {
                                                     )}
                                                 >
                                                     <Moon className="w-4 h-4" />
-                                                </button>
-                                                <button
-                                                    onClick={() => setTheme('system')}
-                                                    className={cn(
-                                                        "flex items-center justify-center p-1.5 rounded-md transition-all",
-                                                        theme === 'system' ? "bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white" : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-                                                    )}
-                                                >
-                                                    <Monitor className="w-4 h-4" />
                                                 </button>
                                             </div>
                                         </div>
@@ -215,6 +231,26 @@ export function SettingsMenu() {
                                                 </button>
                                             </div>
                                         </div>
+
+                                        {/* PWA Install Button */}
+                                        {showInstall && (
+                                            <>
+                                                <div className="h-px bg-slate-200 dark:bg-white/10 mx-2 my-1" />
+                                                <button
+                                                    onClick={handleInstallClick}
+                                                    className="w-full flex items-center gap-3 p-3 text-left hover:bg-slate-900/5 dark:hover:bg-white/5 transition-colors group"
+                                                >
+                                                    <div className="p-1.5 rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                                                        <ArrowLeft className="w-4 h-4 rotate-90" />
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <div className="text-sm font-medium text-slate-700 dark:text-slate-200">Install App</div>
+                                                        <div className="text-xs text-slate-500 dark:text-slate-400">Add to Home Screen</div>
+                                                    </div>
+                                                    <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+                                                </button>
+                                            </>
+                                        )}
                                     </div>
                                 </motion.div>
 

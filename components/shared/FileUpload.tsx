@@ -57,20 +57,53 @@ export function FileUpload({
     useEffect(() => {
         const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
         const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
-        if (!clientId || !apiKey || clientId === 'your-google-client-id') return;
 
-        const loadGoogleScripts = () => {
-            const apiScript = document.createElement('script');
-            apiScript.src = 'https://apis.google.com/js/api.js';
-            apiScript.onload = () => (window as any).gapi.load('picker', () => setGDriveReady(true));
-            document.head.appendChild(apiScript);
+        if (!clientId || !apiKey || clientId === 'your-google-client-id') {
+            console.warn('Google Drive API keys are missing or default.');
+            return;
+        }
 
-            const gsiScript = document.createElement('script');
-            gsiScript.src = 'https://accounts.google.com/gsi/client';
-            document.head.appendChild(gsiScript);
+        const loadPicker = () => {
+            if ((window as any).gapi) {
+                (window as any).gapi.load('picker', () => {
+                    console.log('Google Picker API loaded');
+                    setGDriveReady(true);
+                });
+            }
         };
 
-        loadGoogleScripts();
+        const loadGoogleScripts = () => {
+            // Check if scripts are already present
+            const existingApiScript = document.querySelector('script[src="https://apis.google.com/js/api.js"]');
+            const existingGsiScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
+
+            if (existingApiScript) {
+                // If script exists, just try to load picker
+                loadPicker();
+            } else {
+                const apiScript = document.createElement('script');
+                apiScript.src = 'https://apis.google.com/js/api.js';
+                apiScript.async = true;
+                apiScript.defer = true;
+                apiScript.onload = loadPicker;
+                document.head.appendChild(apiScript);
+            }
+
+            if (!existingGsiScript) {
+                const gsiScript = document.createElement('script');
+                gsiScript.src = 'https://accounts.google.com/gsi/client';
+                gsiScript.async = true;
+                gsiScript.defer = true;
+                document.head.appendChild(gsiScript);
+            }
+        };
+
+        // Try immediate load if window.gapi exists
+        if ((window as any).gapi) {
+            loadPicker();
+        } else {
+            loadGoogleScripts();
+        }
     }, []);
 
 
@@ -128,51 +161,69 @@ export function FileUpload({
 
     const handleGoogleDriveClick = () => {
         if (!gDriveReady) {
-            toast.error('Google Drive is not configured or still loading.');
-            return;
+            // Force check if it's actually ready now
+            if ((window as any).gapi && (window as any).google) {
+                setGDriveReady(true);
+            } else {
+                toast.error('Google Drive is loading... Please try again in a moment.');
+                return;
+            }
         }
 
         const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
         const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
 
-        const tokenClient = (window as any).google.accounts.oauth2.initTokenClient({
-            client_id: clientId,
-            scope: 'https://www.googleapis.com/auth/drive.readonly',
-            callback: async (response: any) => {
-                if (response.error !== undefined) throw response;
+        if (!clientId || !apiKey) {
+            toast.error('Google Drive Configuration Missing');
+            return;
+        }
 
-                const picker = new (window as any).google.picker.PickerBuilder()
-                    .addView((window as any).google.picker.ViewId.PDFS)
-                    .setOAuthToken(response.access_token)
-                    .setDeveloperKey(apiKey)
-                    .setCallback(async (data: any) => {
-                        if (data.action === (window as any).google.picker.Action.PICKED) {
-                            const file = data.docs[0];
-                            const url = `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`;
-                            try {
-                                const fileRes = await fetch(url, {
-                                    headers: { Authorization: `Bearer ${response.access_token}` }
-                                });
-                                if (!fileRes.ok) throw new Error(`Fetch failed: ${fileRes.statusText}`);
+        try {
+            const tokenClient = (window as any).google.accounts.oauth2.initTokenClient({
+                client_id: clientId,
+                scope: 'https://www.googleapis.com/auth/drive.readonly',
+                callback: async (response: any) => {
+                    if (response.error !== undefined) {
+                        console.error('Auth Error:', response);
+                        throw response;
+                    }
 
-                                const blob = await fileRes.blob();
-                                if (blob.size === 0) throw new Error('Blob is empty');
+                    const picker = new (window as any).google.picker.PickerBuilder()
+                        .addView((window as any).google.picker.ViewId.PDFS)
+                        .setOAuthToken(response.access_token)
+                        .setDeveloperKey(apiKey)
+                        .setCallback(async (data: any) => {
+                            if (data.action === (window as any).google.picker.Action.PICKED) {
+                                const file = data.docs[0];
+                                const url = `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`;
+                                try {
+                                    const fileRes = await fetch(url, {
+                                        headers: { Authorization: `Bearer ${response.access_token}` }
+                                    });
+                                    if (!fileRes.ok) throw new Error(`Fetch failed: ${fileRes.statusText}`);
 
-                                const pdfFile = new File([blob], file.name, { type: 'application/pdf' });
-                                onFilesSelected([pdfFile]);
-                                toast.success('File imported from Google Drive!');
-                            } catch (error: any) {
-                                console.error('Google Drive Import Error:', error);
-                                toast.error(`Failed to download from Google Drive: ${error.message}`);
+                                    const blob = await fileRes.blob();
+                                    if (blob.size === 0) throw new Error('Blob is empty');
+
+                                    const pdfFile = new File([blob], file.name, { type: 'application/pdf' });
+                                    onFilesSelected([pdfFile]);
+                                    toast.success('File imported from Google Drive!');
+                                } catch (error: any) {
+                                    console.error('Google Drive Import Error:', error);
+                                    toast.error(`Failed to download from Google Drive: ${error.message}`);
+                                }
                             }
-                        }
-                    })
-                    .build();
-                picker.setVisible(true);
-            },
-        });
+                        })
+                        .build();
+                    picker.setVisible(true);
+                },
+            });
 
-        tokenClient.requestAccessToken();
+            tokenClient.requestAccessToken();
+        } catch (error) {
+            console.error('Google Drive Initialization Error:', error);
+            toast.error('Failed to initialize Google Drive. Please refresh and try again.');
+        }
     };
 
 

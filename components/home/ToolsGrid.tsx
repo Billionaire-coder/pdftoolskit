@@ -46,8 +46,14 @@ export function ToolCard({ tool, index = 0 }: { tool: any, index?: number }) {
                 {/* Footer Actions */}
                 <div className="mt-4 flex items-center justify-between">
                     {/* Share Button - Positioned bottom-left */}
+                    {/* Share Button - Positioned bottom-left */}
                     <div className="z-10">
-                        <ShareButton className="p-1.5" />
+                        <ShareButton
+                            className="p-1.5"
+                            url={tool.href}
+                            title={`${t(`tools.${tool.id}`)} - PDFToolskit`}
+                            text={t(`tools.${tool.id}Desc`)}
+                        />
                     </div>
 
                     {/* Arrow indicator */}

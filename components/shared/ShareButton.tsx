@@ -8,19 +8,27 @@ import { cn } from '@/lib/utils';
 
 interface ShareButtonProps {
     className?: string;
+    url?: string;
+    title?: string;
+    text?: string;
 }
 
-export function ShareButton({ className }: ShareButtonProps) {
+export function ShareButton({ className, url, title, text }: ShareButtonProps) {
     const [copied, setCopied] = React.useState(false);
 
     const handleShare = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
 
+        // Use provided URL or fallback to current window URL
+        const shareUrl = url ? (url.startsWith('http') ? url : `${window.location.origin}${url}`) : window.location.href;
+        const shareTitle = title || document.title;
+        const shareText = text || 'Check out this PDF tool!';
+
         const shareData = {
-            title: document.title,
-            text: 'Check out this PDF tool!',
-            url: window.location.href,
+            title: shareTitle,
+            text: shareText,
+            url: shareUrl,
         };
 
         try {
@@ -30,10 +38,13 @@ export function ShareButton({ className }: ShareButtonProps) {
             } else {
                 throw new Error('Web Share API not supported');
             }
-        } catch (error) {
+        } catch (error: any) {
+            // If user cancelled share, do nothing
+            if (error.name === 'AbortError') return;
+
             // Fallback: Copy to clipboard
             try {
-                await navigator.clipboard.writeText(window.location.href);
+                await navigator.clipboard.writeText(shareUrl);
                 setCopied(true);
                 toast.success('Link copied to clipboard!');
                 setTimeout(() => setCopied(false), 2000);

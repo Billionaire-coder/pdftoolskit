@@ -35,8 +35,8 @@ export function MyToolsMenu() {
                 onClick={() => setIsOpen(!isOpen)}
                 className={cn(
                     "flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-all duration-300",
-                    "hover:bg-slate-900/5 dark:hover:bg-white/5 group",
-                    isOpen ? "bg-slate-900/10 dark:bg-white/10 text-slate-900 dark:text-white" : "text-slate-700 dark:text-slate-300"
+                    "hover:bg-slate-100 dark:hover:bg-slate-800 group",
+                    isOpen ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white" : "text-slate-700 dark:text-slate-300"
                 )}
             >
                 <div className="relative">
