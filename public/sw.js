@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pdftoolkit-v1';
+const CACHE_NAME = 'pdftoolkit-v2';
 const ASSETS_TO_CACHE = [
     '/',
     '/manifest.json',
