@@ -191,7 +191,7 @@ export function FileUpload({
                     }
 
                     const picker = new (window as any).google.picker.PickerBuilder()
-                        .addView((window as any).google.picker.ViewId.PDFS)
+                        .addView((window as any).google.picker.ViewId.DOCS) // Show all files
                         .setOAuthToken(response.access_token)
                         .setDeveloperKey(apiKey)
                         .setCallback(async (data: any) => {
@@ -207,9 +207,12 @@ export function FileUpload({
                                     const blob = await fileRes.blob();
                                     if (blob.size === 0) throw new Error('Blob is empty');
 
-                                    const pdfFile = new File([blob], file.name, { type: 'application/pdf' });
-                                    onFilesSelected([pdfFile]);
-                                    toast.success('File imported from Google Drive!');
+                                    // Use the actual MIME type from the blob or fallback to file.mimeType
+                                    const mimeType = blob.type || file.mimeType || 'application/octet-stream';
+
+                                    const importedFile = new File([blob], file.name, { type: mimeType });
+                                    onFilesSelected([importedFile]);
+                                    toast.success(`Imported ${file.name} from Drive!`);
                                 } catch (error: any) {
                                     console.error('Google Drive Import Error:', error);
                                     toast.error(`Failed to download from Google Drive: ${error.message}`);
