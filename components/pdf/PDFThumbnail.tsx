@@ -41,7 +41,6 @@ export const PDFThumbnail = React.memo(function PDFThumbnail({
     useEffect(() => {
         let worker: Worker | null = null;
         let isCancelled = false;
-        let objectUrl: string | null = null;
 
         const renderPage = async () => {
             setLoading(true);
