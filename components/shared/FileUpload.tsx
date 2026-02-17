@@ -199,10 +199,20 @@ export function FileUpload({
                                 const file = data.docs[0];
                                 const url = `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`;
                                 try {
-                                    const fileRes = await fetch(url, {
-                                        headers: { Authorization: `Bearer ${response.access_token}` }
+                                    // Use specific endpoint for binary file fetching to avoid 404s from generic fetcher
+                                    const fileRes = await fetch('/api/fetch-drive-file', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({
+                                            url,
+                                            token: response.access_token
+                                        })
                                     });
-                                    if (!fileRes.ok) throw new Error(`Fetch failed: ${fileRes.statusText}`);
+
+                                    if (!fileRes.ok) {
+                                        const errorData = await fileRes.json().catch(() => ({}));
+                                        throw new Error(errorData.error || `Fetch failed: ${fileRes.statusText}`);
+                                    }
 
                                     const blob = await fileRes.blob();
                                     if (blob.size === 0) throw new Error('Blob is empty');
