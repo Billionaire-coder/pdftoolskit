@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     description: 'Learn how to password protect your PDF files for free. Step-by-step guide with best practices for PDF security and encryption. Protect sensitive documents now.',
     keywords: ['password protect pdf', 'pdf security', 'encrypt pdf', 'secure pdf files', 'pdf password protection'],
     alternates: {
-        canonical: 'https://pdftoolskit.com/blog/how-to-password-protect-pdf',
+        canonical: 'https://pdftoolskit.vercel.app/blog/how-to-password-protect-pdf',
     },
 };
 

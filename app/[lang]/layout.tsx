@@ -35,7 +35,7 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 const baseMetadata: Metadata = {
-    metadataBase: new URL('https://pdftoolskit.com'),
+    metadataBase: new URL('https://pdftoolskit.vercel.app'),
     title: 'PDFToolskit - Privacy-First PDF Tools',
     description: 'The ultimate privacy-first PDF toolkit that works entirely in your browser. Merge, split, compress, and edit PDFs without uploading them to any server.',
     keywords: ['pdf tools', 'merge pdf', 'split pdf', 'compress pdf', 'pdf to jpg', 'free pdf editor', 'privacy-first pdf', 'browser pdf tools'],
@@ -49,7 +49,7 @@ const baseMetadata: Metadata = {
     openGraph: {
         type: 'website',
         locale: 'en_US',
-        url: 'https://pdftoolskit.com',
+        url: 'https://pdftoolskit.vercel.app',
         siteName: 'PDFToolskit',
         title: 'PDFToolskit - Privacy-First PDF Tools',
         description: 'The ultimate privacy-first PDF toolkit that works entirely in your browser. Merge, split, compress, and edit PDFs without uploading them to any server.',
@@ -80,7 +80,7 @@ const baseMetadata: Metadata = {
 export async function generateMetadata({ params }: { params: { lang: string } }): Promise<Metadata> {
     const headersList = headers();
     const purePath = headersList.get('x-pure-path') || '';
-    const baseUrl = 'https://pdftoolskit.com';
+    const baseUrl = 'https://pdftoolskit.vercel.app';
 
     // Generate alternates (hreflang)
     const languages: Record<string, string> = {};
@@ -122,7 +122,7 @@ export default function RootLayout({
                     data={{
                         name: 'PDFToolskit',
                         description: 'Free online PDF tools for merging, splitting, compressing, and converting PDFs',
-                        url: 'https://pdftoolskit.com',
+                        url: 'https://pdftoolskit.vercel.app',
                         applicationCategory: 'UtilityApplication',
                         offers: {
                             '@type': 'Offer',
