@@ -5,7 +5,7 @@ import { pseoPages } from '@/data/pseo';
 import { i18n } from '@/i18n-config';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    const baseUrl = 'https://pdftoolkit.com';
+    const baseUrl = 'https://pdftoolskit.vercel.app';
 
     // Helper to generate localized URLs
     const generateLocalizedUrls = (path: string, priority: number, changeFrequency: 'daily' | 'weekly' | 'monthly') => {
