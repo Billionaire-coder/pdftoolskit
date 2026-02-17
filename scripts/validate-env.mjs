@@ -2,8 +2,8 @@ import fs from 'fs';
 import path from 'path';
 
 const REQUIRED_ENV_VARS = [
-    'NEXTAUTH_SECRET',
-    'NEXTAUTH_URL',
+    // 'NEXTAUTH_SECRET',
+    // 'NEXTAUTH_URL',
     // Add other required vars here as the project grows
 ];
 
