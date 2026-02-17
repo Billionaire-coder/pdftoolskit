@@ -114,7 +114,7 @@ export default function OCRPDFPage() {
                 // Dynamic import for pdfjs-dist
                 const pdfjsLib = await import('pdfjs-dist');
                 // Use CDN to ensure version compatibility
-                const workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+                const workerSrc = '/pdf.worker.min.mjs';
                 pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
 
                 const arrayBuffer = await file.arrayBuffer();

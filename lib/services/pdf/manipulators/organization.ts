@@ -84,7 +84,7 @@ export async function* convertPDFToImages(
     const pdfjsLib = await import('pdfjs-dist');
 
     if (typeof window !== 'undefined' && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
-        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
     }
 
     const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;

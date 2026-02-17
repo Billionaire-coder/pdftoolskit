@@ -2,7 +2,7 @@ import * as pdfjsLib from 'pdfjs-dist';
 
 // Ensure worker is configured (should be handled in global init, but good to ensure)
 if (typeof window !== 'undefined' && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
-    const workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+    const workerSrc = '/pdf.worker.min.mjs';
     pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
 }
 

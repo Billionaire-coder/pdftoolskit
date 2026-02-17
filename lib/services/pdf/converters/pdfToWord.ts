@@ -8,7 +8,7 @@ export async function pdfToWord(file: File): Promise<{ data: Uint8Array; isScann
         const pdfjsLib = await import('pdfjs-dist');
 
         if (typeof window !== 'undefined' && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
-            pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+            pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
         }
 
         const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
