@@ -17,6 +17,15 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+    const url = new URL(event.request.url);
+
+    // Skip API routes, Next.js internals, and extension schemes
+    if (url.pathname.startsWith('/api/') ||
+        url.pathname.startsWith('/_next/') ||
+        url.protocol.startsWith('chrome-extension')) {
+        return;
+    }
+
     event.respondWith(
         caches.match(event.request).then((response) => {
             return response || fetch(event.request);
