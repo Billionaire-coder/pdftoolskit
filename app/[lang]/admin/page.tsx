@@ -17,7 +17,7 @@ export default function AdminPage() {
         <div className="space-y-8">
             <div>
                 <h1 className="text-2xl font-bold text-white mb-2">Dashboard Overview</h1>
-                <p className="text-slate-400">Welcome back, Admin. Here is what's happening today.</p>
+                <p className="text-slate-400">Welcome back, Admin. Here is what&apos;s happening today.</p>
             </div>
 
             {/* Stats Grid */}

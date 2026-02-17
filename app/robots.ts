@@ -7,5 +7,6 @@ export default function robots(): MetadataRoute.Robots {
             allow: '/',
         },
         sitemap: 'https://pdftoolskit.vercel.app/sitemap.xml',
+        host: 'https://pdftoolskit.vercel.app',
     };
 }

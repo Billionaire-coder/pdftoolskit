@@ -24,7 +24,7 @@ export default async function PrivacyPolicy({ params: { lang } }: { params: { la
                 <section className="mb-8">
                     <h2 className="text-2xl font-semibold mb-4 text-slate-800 dark:text-slate-200">1. Overview</h2>
                     <p>
-                        PDFToolskit ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we handle your information when you use our website and services.
+                        PDFToolskit (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;) is committed to protecting your privacy. This Privacy Policy explains how we handle your information when you use our website and services.
                         <strong> We do not store, copy, or share your files. All file processing happens locally in your browser or temporarily on secure servers before being immediately deleted.</strong>
                     </p>
                 </section>

@@ -16,9 +16,6 @@ interface AdSenseProps {
  * In production, it loads the Carbon or AdSense script logic.
  */
 export function AdSense({ slot, format = 'auto', className = '', style }: AdSenseProps) {
-    // AdSense disabled per user request
-    return null;
-
     const { isPro } = useSubscription();
     const [isDev, setIsDev] = useState(false);
     const [hasConsent, setHasConsent] = useState(false);
@@ -29,6 +26,9 @@ export function AdSense({ slot, format = 'auto', className = '', style }: AdSens
         const consent = localStorage.getItem('cookie-consent');
         setHasConsent(consent === 'all');
     }, []);
+
+    // AdSense disabled per user request (moved after hooks)
+    return null;
 
     // Pro users don't see ads
     if (isPro) return null;

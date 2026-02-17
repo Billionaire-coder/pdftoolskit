@@ -227,7 +227,7 @@ export function ChatTool() {
                         <div className="p-4 border-b border-slate-700 bg-slate-900/40">
                             <ProgressBar progress={llmProgress} label={llmStatus || "Preparing local AI..."} />
                             <p className="text-[10px] text-slate-500 mt-2 text-center">
-                                This downloads the model to your browser's cache once (~150MB).
+                                This downloads the model to your browser&apos;s cache once (~150MB).
                             </p>
                         </div>
                     )}
