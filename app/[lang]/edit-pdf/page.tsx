@@ -83,6 +83,15 @@ export default function EditPDFPage() {
     const [selection, setSelection] = useState<SelectionRect>({ x: 50, y: 100, width: 200, height: 50 });
     const [pageTextItems, setPageTextItems] = useState<any[]>([]);
 
+    const [result, setResult] = useState<{ blob: Blob; fileName: string } | null>(null);
+    const [downloadFileName, setDownloadFileName] = useState('');
+
+    useEffect(() => {
+        if (result?.fileName) {
+            setDownloadFileName(result.fileName);
+        }
+    }, [result]);
+
     // Drawing State
     const [isDrawing, setIsDrawing] = useState(false);
     const [currentPath, setCurrentPath] = useState<{ x: number, y: number }[]>([]);
@@ -578,7 +587,10 @@ export default function EditPDFPage() {
         try {
             const newPdfBytes = await editPDF(file, modifications);
             const blob = new Blob([newPdfBytes as BlobPart], { type: 'application/pdf' });
-            downloadFile(blob, `${getBaseFileName(file.name)}_edited.pdf`);
+            const baseName = getBaseFileName(file.name);
+
+            setResult({ blob, fileName: `${baseName}_edited.pdf` });
+
             toast.success('PDF saved successfully');
         } catch (e) {
             console.error(e);
@@ -1276,18 +1288,51 @@ export default function EditPDFPage() {
                             </div>
                         </div>
 
-                        <div className="flex justify-center mt-8 mb-4">
-                            <Button
-                                onClick={handleDownload}
-                                disabled={modifications.length === 0}
-                                variant="primary"
-                                loading={processing}
-                                className="px-8 py-4 text-lg shadow-xl shadow-blue-500/20 hover:scale-105 transition-transform"
-                                icon={<Download className="w-6 h-6 mr-2" />}
-                            >
-                                Download PDF
-                            </Button>
-                        </div>
+                        {result ? (
+                            <GlassCard className="p-6 mb-8 text-center animate-in zoom-in-95 duration-500 max-w-md mx-auto mt-8">
+                                <div className="mx-auto w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mb-4">
+                                    <PenTool className="w-8 h-8 text-blue-500" />
+                                </div>
+                                <h3 className="text-xl font-bold text-white mb-2">PDF Edited Successfully!</h3>
+
+                                <div className="flex justify-center mt-6">
+                                    <div className="flex flex-col sm:flex-row gap-3 items-center w-full">
+                                        <input
+                                            type="text"
+                                            value={downloadFileName}
+                                            onChange={(e) => setDownloadFileName(e.target.value)}
+                                            className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 w-full flex-grow text-center sm:text-left"
+                                            placeholder="Filename"
+                                        />
+                                        <Button
+                                            variant="primary"
+                                            size="lg"
+                                            onClick={() => downloadFile(result.blob, downloadFileName || result.fileName)}
+                                            icon={<Download className="w-5 h-5" />}
+                                            className="w-full sm:w-auto"
+                                        >
+                                            Download
+                                        </Button>
+                                    </div>
+                                </div>
+                                <Button variant="ghost" onClick={() => setResult(null)} className="mt-4 text-sm">
+                                    Continue Editing
+                                </Button>
+                            </GlassCard>
+                        ) : (
+                            <div className="flex justify-center mt-8 mb-4">
+                                <Button
+                                    onClick={handleDownload}
+                                    disabled={modifications.length === 0}
+                                    variant="primary"
+                                    loading={processing}
+                                    className="px-8 py-4 text-lg shadow-xl shadow-blue-500/20 hover:scale-105 transition-transform"
+                                    icon={<Download className="w-6 h-6 mr-2" />}
+                                >
+                                    Download PDF
+                                </Button>
+                            </div>
+                        )}
                     </>
                 )
             }

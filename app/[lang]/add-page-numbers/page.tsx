@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Type, Download, ArrowDown, ArrowUp, ArrowLeft, ArrowRight, LayoutTemplate } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
@@ -26,6 +26,14 @@ export default function AddPageNumbersPage() {
     const [progress, setProgress] = useState(0);
     const [position, setPosition] = useState<Position>('bottom-center');
     const [startFrom, setStartFrom] = useState<number>(1);
+    const [result, setResult] = useState<{ blob: Blob; fileName: string } | null>(null);
+    const [downloadFileName, setDownloadFileName] = useState('');
+
+    useEffect(() => {
+        if (result?.fileName) {
+            setDownloadFileName(result.fileName);
+        }
+    }, [result]);
 
     const handleFileSelected = (files: File[]) => {
         const validation = validatePDFFile(files[0]);
@@ -58,7 +66,8 @@ export default function AddPageNumbersPage() {
 
             const blob = new Blob([newPdfBytes as any], { type: 'application/pdf' });
             const baseName = getBaseFileName(file.name);
-            downloadFile(blob, `${baseName}_numbered.pdf`);
+
+            setResult({ blob, fileName: `${baseName}_numbered.pdf` });
 
             toast.success('Page numbers added successfully!');
             setFile(null);
@@ -113,7 +122,41 @@ export default function AddPageNumbersPage() {
                 />
             </div>
 
-            {file && !processing && (
+            {/* Result Card */}
+            {result && (
+                <GlassCard className="p-6 mb-8 text-center animate-in zoom-in-95 duration-500">
+                    <div className="mx-auto w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-4">
+                        <LayoutTemplate className="w-8 h-8 text-green-500" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2">Page Numbers Added!</h3>
+
+                    <div className="flex justify-center mt-6">
+                        <div className="flex flex-col sm:flex-row gap-3 items-center w-full max-w-md">
+                            <input
+                                type="text"
+                                value={downloadFileName}
+                                onChange={(e) => setDownloadFileName(e.target.value)}
+                                className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-green-500 w-full sm:w-auto flex-grow text-center sm:text-left"
+                                placeholder="Filename"
+                            />
+                            <Button
+                                variant="primary"
+                                size="lg"
+                                onClick={() => downloadFile(result.blob, downloadFileName || result.fileName)}
+                                icon={<Download className="w-5 h-5" />}
+                                className="w-full sm:w-auto"
+                            >
+                                Download PDF
+                            </Button>
+                        </div>
+                    </div>
+                    <Button variant="ghost" onClick={() => setResult(null)} className="mt-4 text-sm">
+                        Process Another
+                    </Button>
+                </GlassCard>
+            )}
+
+            {file && !processing && !result && (
                 <div className="grid md:grid-cols-2 gap-6 mb-8">
                     <GlassCard className="p-6">
                         <label className="block text-white font-semibold mb-4">
@@ -153,7 +196,7 @@ export default function AddPageNumbersPage() {
                 </div>
             )}
 
-            {file && (
+            {file && !result && (
                 <GlassCard className="p-6">
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                         <p className="text-white font-semibold">Ready to add page numbers</p>

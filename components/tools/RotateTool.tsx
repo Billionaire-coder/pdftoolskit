@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Upload, Download, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
@@ -60,6 +60,15 @@ export function RotateTool() {
         setRotations({});
     };
 
+    const [result, setResult] = useState<{ blob: Blob; fileName: string } | null>(null);
+    const [downloadFileName, setDownloadFileName] = useState('');
+
+    useEffect(() => {
+        if (result?.fileName) {
+            setDownloadFileName(result.fileName);
+        }
+    }, [result]);
+
     const handleRotatePDF = async () => {
         if (!file) return;
 
@@ -97,7 +106,9 @@ export function RotateTool() {
             // @ts-expect-error - Uint8Array is compatible with BlobPart
             const blob = new Blob([rotatedPdfBytes], { type: 'application/pdf' });
             const baseName = getBaseFileName(file.name);
-            downloadFile(blob, `${baseName}_rotated.pdf`);
+            const outputName = `${baseName}_rotated.pdf`;
+
+            setResult({ blob, fileName: outputName });
 
             toast.success(`PDF saved successfully!`);
             setFile(null);
@@ -124,7 +135,7 @@ export function RotateTool() {
                 />
             </div>
 
-            {file && !processing && (
+            {file && !processing && !result && (
                 <div className="space-y-6">
                     <GlassCard className="p-4 flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -160,6 +171,36 @@ export function RotateTool() {
                         />
                     </div>
                 </div>
+            )}
+
+            {result && (
+                <GlassCard className="p-6 text-center animate-in zoom-in-95 duration-500">
+                    <div className="mx-auto w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mb-4">
+                        <Download className="w-6 h-6 text-green-500" />
+                    </div>
+                    <h3 className="text-lg font-bold text-white mb-2">PDF Rotated Successfully!</h3>
+                    <div className="flex justify-center mt-4">
+                        <div className="flex flex-col sm:flex-row gap-3 items-center">
+                            <input
+                                type="text"
+                                value={downloadFileName}
+                                onChange={(e) => setDownloadFileName(e.target.value)}
+                                className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-green-500 w-64 text-center sm:text-left"
+                                placeholder="Filename"
+                            />
+                            <Button
+                                variant="primary"
+                                onClick={() => downloadFile(result.blob, downloadFileName || result.fileName)}
+                                icon={<Download className="w-5 h-5" />}
+                            >
+                                Download Rotated PDF
+                            </Button>
+                            <Button variant="ghost" onClick={() => setResult(null)}>
+                                Rotate Another
+                            </Button>
+                        </div>
+                    </div>
+                </GlassCard>
             )}
 
             {processing && (

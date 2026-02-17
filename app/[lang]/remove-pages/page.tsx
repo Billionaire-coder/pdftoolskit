@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Trash2, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
@@ -26,6 +26,14 @@ export default function RemovePagesPage() {
     const [pageCount, setPageCount] = useState(0);
     const [processing, setProcessing] = useState(false);
     const [progress, setProgress] = useState(0);
+    const [result, setResult] = useState<{ blob: Blob; fileName: string } | null>(null);
+    const [downloadFileName, setDownloadFileName] = useState('');
+
+    useEffect(() => {
+        if (result?.fileName) {
+            setDownloadFileName(result.fileName);
+        }
+    }, [result]);
 
     // Storing indices of pages to REMOVE
     const [pagesToRemove, setPagesToRemove] = useState<number[]>([]);
@@ -86,7 +94,8 @@ export default function RemovePagesPage() {
             // @ts-expect-error - Uint8Array is compatible with BlobPart
             const blob = new Blob([modifiedPdfBytes], { type: 'application/pdf' });
             const baseName = getBaseFileName(file.name);
-            downloadFile(blob, `${baseName}_modified.pdf`);
+
+            setResult({ blob, fileName: `${baseName}_modified.pdf` });
 
             toast.success(`Removed ${pagesToRemove.length} page(s)!`);
             setFile(null);
@@ -121,7 +130,41 @@ export default function RemovePagesPage() {
                 />
             </div>
 
-            {file && !processing && (
+            {/* Result Card */}
+            {result && (
+                <GlassCard className="p-6 mb-8 text-center animate-in zoom-in-95 duration-500 max-w-md mx-auto">
+                    <div className="mx-auto w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mb-4">
+                        <Trash2 className="w-8 h-8 text-red-500" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2">Pages Removed!</h3>
+
+                    <div className="flex justify-center mt-6">
+                        <div className="flex flex-col sm:flex-row gap-3 items-center w-full">
+                            <input
+                                type="text"
+                                value={downloadFileName}
+                                onChange={(e) => setDownloadFileName(e.target.value)}
+                                className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-red-500 w-full flex-grow text-center sm:text-left"
+                                placeholder="Filename"
+                            />
+                            <Button
+                                variant="primary"
+                                size="lg"
+                                onClick={() => downloadFile(result.blob, downloadFileName || result.fileName)}
+                                icon={<Download className="w-5 h-5" />}
+                                className="w-full sm:w-auto"
+                            >
+                                Download
+                            </Button>
+                        </div>
+                    </div>
+                    <Button variant="ghost" onClick={() => setResult(null)} className="mt-4 text-sm">
+                        Process Another
+                    </Button>
+                </GlassCard>
+            )}
+
+            {file && !processing && !result && (
                 <div className="space-y-8">
                     {/* Sticky Toolbar */}
                     <GlassCard className="p-4 sticky top-24 z-30 flex items-center justify-between">

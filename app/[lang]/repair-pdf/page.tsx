@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Wrench, Download, ShieldCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
@@ -21,6 +21,14 @@ export default function RepairPDFPage() {
     const [file, setFile] = useState<File | null>(null);
     const [processing, setProcessing] = useState(false);
     const [progress, setProgress] = useState(0);
+    const [result, setResult] = useState<{ blob: Blob; fileName: string } | null>(null);
+    const [downloadFileName, setDownloadFileName] = useState('');
+
+    useEffect(() => {
+        if (result?.fileName) {
+            setDownloadFileName(result.fileName);
+        }
+    }, [result]);
 
     const handleFileSelected = (files: File[]) => {
         // We use a custom validation here as we might want to allow "invalid" PDFs to try and fix them,
@@ -57,7 +65,8 @@ export default function RepairPDFPage() {
             // @ts-expect-error - Uint8Array is compatible with BlobPart
             const blob = new Blob([newPdfBytes], { type: 'application/pdf' });
             const baseName = getBaseFileName(file.name);
-            downloadFile(blob, `${baseName}_repaired.pdf`);
+
+            setResult({ blob, fileName: `${baseName}_repaired.pdf` });
 
             toast.success('Repaired PDF structure successfully!');
             setProgress(0);
@@ -92,7 +101,7 @@ export default function RepairPDFPage() {
                 />
             </div>
 
-            {file && !processing && (
+            {file && !processing && !result && (
                 <GlassCard className="p-6 mb-8 text-center">
                     <p className="text-white">
                         This tool rebuilds the PDF structure (XRef table) which fixes many common corruption issues.
@@ -107,7 +116,41 @@ export default function RepairPDFPage() {
                 </div>
             )}
 
-            {file && (
+            {/* Result Card */}
+            {result && (
+                <GlassCard className="p-6 mb-8 text-center animate-in zoom-in-95 duration-500">
+                    <div className="mx-auto w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-4">
+                        <ShieldCheck className="w-8 h-8 text-green-500" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2">PDF Repaired!</h3>
+
+                    <div className="flex justify-center mt-6">
+                        <div className="flex flex-col sm:flex-row gap-3 items-center w-full max-w-md">
+                            <input
+                                type="text"
+                                value={downloadFileName}
+                                onChange={(e) => setDownloadFileName(e.target.value)}
+                                className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-green-600 w-full sm:w-auto flex-grow text-center sm:text-left"
+                                placeholder="Filename"
+                            />
+                            <Button
+                                variant="primary"
+                                size="lg"
+                                onClick={() => downloadFile(result.blob, downloadFileName || result.fileName)}
+                                icon={<Download className="w-5 h-5" />}
+                                className="w-full sm:w-auto"
+                            >
+                                Download PDF
+                            </Button>
+                        </div>
+                    </div>
+                    <Button variant="ghost" onClick={() => setResult(null)} className="mt-4 text-sm">
+                        Repair Another
+                    </Button>
+                </GlassCard>
+            )}
+
+            {file && !result && (
                 <GlassCard className="p-6">
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                         <p className="text-white font-semibold">Ready to repair</p>

@@ -1,14 +1,14 @@
 'use client';
 
-import React, { useState } from 'react';
-import { GripVertical, Download, ArrowLeft, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { GripVertical, Download, ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
 import { ProgressBar } from '@/components/shared/ProgressBar';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { organizePDF } from '@/lib/pdf-utils';
-import { downloadFile, validatePDFFile } from '@/lib/utils';
+import { downloadFile, validatePDFFile, getBaseFileName } from '@/lib/utils';
 import { PDFGrid } from '@/components/pdf/PDFGrid';
 import { PDFThumbnail } from '@/components/pdf/PDFThumbnail';
 import { toolGuides } from '@/data/guides';
@@ -129,6 +129,15 @@ export default function OrganizePDFPage() {
     const [pageOrder, setPageOrder] = useState<number[]>([]);
     const [activeId, setActiveId] = useState<number | null>(null);
 
+    const [result, setResult] = useState<{ blob: Blob; fileName: string } | null>(null);
+    const [downloadFileName, setDownloadFileName] = useState('');
+
+    useEffect(() => {
+        if (result?.fileName) {
+            setDownloadFileName(result.fileName);
+        }
+    }, [result]);
+
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: {
@@ -197,7 +206,10 @@ export default function OrganizePDFPage() {
 
             // @ts-expect-error - Uint8Array is compatible with BlobPart
             const blob = new Blob([organizedPdfBytes], { type: 'application/pdf' });
-            downloadFile(blob, 'organized.pdf');
+            // downloadFile(blob, 'organized.pdf');
+
+            const baseName = getBaseFileName(file.name);
+            setResult({ blob, fileName: `${baseName}_organized.pdf` });
 
             toast.success('PDF pages reorganized!');
             setFile(null);
@@ -232,7 +244,7 @@ export default function OrganizePDFPage() {
                 />
             </div>
 
-            {file && !processing && (
+            {file && !processing && !result && (
                 <div className="space-y-8 select-none">
                     <GlassCard className="p-4 sticky top-24 z-30 flex items-center justify-between backdrop-blur-xl border-blue-500/30">
                         <div className="flex items-center gap-3">
@@ -301,6 +313,41 @@ export default function OrganizePDFPage() {
                             ) : null}
                         </DragOverlay>
                     </DndContext>
+                </div>
+            )}
+
+            {result && (
+                <div className="mt-8 flex justify-center animate-in zoom-in-95 duration-500">
+                    <GlassCard className="p-8 text-center max-w-lg w-full">
+                        <div className="mx-auto w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mb-6">
+                            <CheckCircle className="w-8 h-8 text-blue-500" />
+                        </div>
+                        <h3 className="text-2xl font-bold text-white mb-2">PDF Organized!</h3>
+                        <div className="flex flex-col gap-4 mt-8">
+                            <div className="relative">
+                                <label className="absolute -top-2 left-3 bg-slate-900 px-1 text-xs text-blue-400">Filename</label>
+                                <input
+                                    type="text"
+                                    value={downloadFileName}
+                                    onChange={(e) => setDownloadFileName(e.target.value)}
+                                    className="bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-4 text-white text-base focus:outline-none focus:border-blue-500 w-full text-center"
+                                    placeholder="Enter filename"
+                                />
+                            </div>
+                            <Button
+                                variant="primary"
+                                size="lg"
+                                onClick={() => downloadFile(result.blob, downloadFileName || result.fileName)}
+                                icon={<Download className="w-5 h-5" />}
+                                className="w-full py-4 text-lg"
+                            >
+                                Download Ordered PDF
+                            </Button>
+                            <Button variant="ghost" onClick={() => setResult(null)} className="text-sm text-slate-400">
+                                Organize Another
+                            </Button>
+                        </div>
+                    </GlassCard>
                 </div>
             )}
 

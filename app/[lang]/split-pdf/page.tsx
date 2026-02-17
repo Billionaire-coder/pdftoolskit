@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import JSZip from 'jszip';
 import { Scissors, Download, CheckCircle, Copy } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
@@ -32,6 +33,15 @@ export default function SplitPDFPage() {
     // PDFGrid uses 1-based page numbers for display, but indices are 0-based.
     // Let's store 1-based "selectedPages" for the Grid component compatibility.
     const [selectedPages, setSelectedPages] = useState<number[]>([]);
+
+    const [result, setResult] = useState<{ blob: Blob; fileName: string } | null>(null);
+    const [downloadFileName, setDownloadFileName] = useState('');
+
+    useEffect(() => {
+        if (result?.fileName) {
+            setDownloadFileName(result.fileName);
+        }
+    }, [result]);
 
     const handleFileSelected = async (files: File[]) => {
         const validation = validatePDFFile(files[0]);
@@ -101,8 +111,7 @@ export default function SplitPDFPage() {
             const results: { name: string, data: Uint8Array }[] = [];
             const baseName = getBaseFileName(file.name);
 
-            // Sort pages to keep order or process by user selection order? 
-            // Usually ascending order.
+            // Sort pages to keep order
             const sortedPages = [...pagesToProcess].sort((a, b) => a - b);
 
             for (const pageNum of sortedPages) {
@@ -117,22 +126,20 @@ export default function SplitPDFPage() {
             }
 
             clearInterval(progressInterval);
-            setProgress(100);
+            setProgress(90);
 
-            // Download files
-            // If multiple, maybe ZIP? For now simple sequential download
-            if (results.length > 5) {
-                toast("Multiple files downloading...", { icon: '📦' });
-            }
-
-            results.forEach((res, i) => {
-                // @ts-expect-error - Uint8Array is compatible with BlobPart
-                const blob = new Blob([res.data], { type: 'application/pdf' });
-                // Stagger downloads
-                setTimeout(() => downloadFile(blob, res.name), i * 300);
+            // Create ZIP
+            const zip = new JSZip();
+            results.forEach(res => {
+                zip.file(res.name, res.data);
             });
 
-            toast.success(`Extracted ${results.length} pages!`);
+            const zipContent = await zip.generateAsync({ type: 'blob' });
+            setProgress(100);
+
+            setResult({ blob: zipContent, fileName: `${baseName}_split.zip` });
+
+            toast.success(`Extracted ${results.length} pages into a ZIP!`);
             setFile(null);
             setSelectedPages([]);
             setProgress(0);
@@ -165,7 +172,7 @@ export default function SplitPDFPage() {
                 />
             </div>
 
-            {file && !processing && (
+            {file && !processing && !result && (
                 <div className="space-y-8">
                     <GlassCard className="p-4 sticky top-24 z-30 flex items-center justify-between">
                         <div className="text-white font-semibold flex gap-2 items-center">
@@ -194,6 +201,41 @@ export default function SplitPDFPage() {
                         onPageClick={togglePageSelection}
                         customOverlay={(idx) => selectedPages.includes(idx + 1) ? <CheckCircle className="w-12 h-12 text-green-500 fill-white" /> : null}
                     />
+                </div>
+            )}
+
+            {result && (
+                <div className="mt-8 flex justify-center animate-in zoom-in-95 duration-500">
+                    <GlassCard className="p-8 text-center max-w-lg w-full">
+                        <div className="mx-auto w-16 h-16 bg-cyan-500/20 rounded-full flex items-center justify-center mb-6">
+                            <CheckCircle className="w-8 h-8 text-cyan-500" />
+                        </div>
+                        <h3 className="text-2xl font-bold text-white mb-2">PDF Split Successfully!</h3>
+                        <div className="flex flex-col gap-4 mt-8">
+                            <div className="relative">
+                                <label className="absolute -top-2 left-3 bg-slate-900 px-1 text-xs text-cyan-400">Zip Filename</label>
+                                <input
+                                    type="text"
+                                    value={downloadFileName}
+                                    onChange={(e) => setDownloadFileName(e.target.value)}
+                                    className="bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-4 text-white text-base focus:outline-none focus:border-cyan-500 w-full text-center"
+                                    placeholder="Enter filename"
+                                />
+                            </div>
+                            <Button
+                                variant="primary"
+                                size="lg"
+                                onClick={() => downloadFile(result.blob, downloadFileName || result.fileName)}
+                                icon={<Download className="w-5 h-5" />}
+                                className="w-full py-4 text-lg"
+                            >
+                                Download ZIP
+                            </Button>
+                            <Button variant="ghost" onClick={() => setResult(null)} className="text-sm text-slate-400">
+                                Split Another
+                            </Button>
+                        </div>
+                    </GlassCard>
                 </div>
             )}
 

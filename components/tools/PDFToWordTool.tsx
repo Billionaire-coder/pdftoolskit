@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { FileType } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { FileType, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
 import { ProgressBar } from '@/components/shared/ProgressBar';
@@ -27,6 +27,15 @@ export function PDFToWordTool() {
         }
     };
 
+    const [result, setResult] = useState<{ blob: Blob; fileName: string } | null>(null);
+    const [downloadFileName, setDownloadFileName] = useState('');
+
+    useEffect(() => {
+        if (result?.fileName) {
+            setDownloadFileName(result.fileName);
+        }
+    }, [result]);
+
     const handleConvertToWord = async () => {
         if (!file) return;
 
@@ -48,8 +57,10 @@ export function PDFToWordTool() {
 
             // Mock download - in real app this would be the actual docx blob
             const baseName = getBaseFileName(file.name);
+            const outputName = `${baseName}.docx`;
             const mockBlob = new Blob(['Mock Word Content'], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-            downloadFile(mockBlob, `${baseName}.docx`);
+
+            setResult({ blob: mockBlob, fileName: outputName });
 
             toast.success(t('toasts.convertSuccess'));
             setFile(null);
@@ -73,7 +84,7 @@ export function PDFToWordTool() {
                 isPro={isPro}
             />
 
-            {file && !processing && (
+            {file && !processing && !result && (
                 <div className="mt-8 flex justify-center animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <Button
                         variant="primary"
@@ -84,6 +95,38 @@ export function PDFToWordTool() {
                     >
                         {t('toolPages.pdfToWord.button')}
                     </Button>
+                </div>
+            )}
+
+            {result && (
+                <div className="mt-8 flex justify-center animate-in zoom-in-95 duration-500">
+                    <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50 shadow-xl text-center backdrop-blur-sm max-w-md w-full">
+                        <div className="mx-auto w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mb-4">
+                            <FileType className="w-6 h-6 text-blue-500" />
+                        </div>
+                        <h3 className="text-lg font-bold text-white mb-2">Conversion Complete!</h3>
+                        <div className="flex flex-col gap-4 mt-6">
+                            <input
+                                type="text"
+                                value={downloadFileName}
+                                onChange={(e) => setDownloadFileName(e.target.value)}
+                                className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-3 text-white text-sm focus:outline-none focus:border-blue-500 w-full text-center"
+                                placeholder="Filename"
+                            />
+                            <Button
+                                variant="primary"
+                                size="lg"
+                                onClick={() => downloadFile(result.blob, downloadFileName || result.fileName)}
+                                icon={<Download className="w-5 h-5" />}
+                                className="w-full"
+                            >
+                                Download Word Doc
+                            </Button>
+                            <Button variant="ghost" onClick={() => setResult(null)} className="text-sm text-slate-400">
+                                Convert Another
+                            </Button>
+                        </div>
+                    </div>
                 </div>
             )}
 

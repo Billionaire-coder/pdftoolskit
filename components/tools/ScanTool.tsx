@@ -65,6 +65,15 @@ export function ScanTool() {
         setCapturedImages(prev => prev.filter((_, i) => i !== index));
     };
 
+    const [result, setResult] = useState<{ blob: Blob; fileName: string } | null>(null);
+    const [downloadFileName, setDownloadFileName] = useState('');
+
+    useEffect(() => {
+        if (result?.fileName) {
+            setDownloadFileName(result.fileName);
+        }
+    }, [result]);
+
     const generatePDF = async () => {
         if (capturedImages.length === 0) return;
         setProcessing(true);
@@ -91,7 +100,9 @@ export function ScanTool() {
             const pdfBytes = await pdfDoc.save();
             // @ts-expect-error - Uint8Array is compatible with BlobPart
             const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-            downloadFile(blob, 'scanned_document.pdf');
+            // downloadFile(blob, 'scanned_document.pdf');
+
+            setResult({ blob, fileName: 'scanned_document.pdf' });
 
             setProgress(100);
             toast.success("PDF generated successfully!");
@@ -150,7 +161,7 @@ export function ScanTool() {
                 </div>
             )}
 
-            {capturedImages.length > 0 && (
+            {capturedImages.length > 0 && !result && (
                 <div className="mt-8 space-y-6">
                     <div className="flex items-center justify-between">
                         <h3 className="text-lg font-bold text-white flex items-center gap-2">
@@ -197,6 +208,38 @@ export function ScanTool() {
                     >
                         Create PDF Document
                     </Button>
+                </div>
+            )}
+
+            {result && (
+                <div className="mt-8 flex justify-center animate-in zoom-in-95 duration-500">
+                    <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50 shadow-xl text-center backdrop-blur-sm max-w-md w-full">
+                        <div className="mx-auto w-12 h-12 bg-emerald-500/20 rounded-full flex items-center justify-center mb-4">
+                            <CheckCircle className="w-6 h-6 text-emerald-500" />
+                        </div>
+                        <h3 className="text-lg font-bold text-white mb-2">Scan Saved!</h3>
+                        <div className="flex flex-col gap-4 mt-6">
+                            <input
+                                type="text"
+                                value={downloadFileName}
+                                onChange={(e) => setDownloadFileName(e.target.value)}
+                                className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-3 text-white text-sm focus:outline-none focus:border-emerald-500 w-full text-center"
+                                placeholder="Filename"
+                            />
+                            <Button
+                                variant="primary"
+                                size="lg"
+                                onClick={() => downloadFile(result.blob, downloadFileName || result.fileName)}
+                                icon={<Download className="w-5 h-5" />}
+                                className="w-full"
+                            >
+                                Download PDF
+                            </Button>
+                            <Button variant="ghost" onClick={() => { setResult(null); startCamera(); }} className="text-sm text-slate-400">
+                                Scan New Document
+                            </Button>
+                        </div>
+                    </div>
                 </div>
             )}
 

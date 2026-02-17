@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Presentation, Download, LayoutTemplate, Layers } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
@@ -21,6 +21,14 @@ export default function PDFToPowerPointPage() {
     const [file, setFile] = useState<File | null>(null);
     const [processing, setProcessing] = useState(false);
     const [progress, setProgress] = useState(0);
+    const [result, setResult] = useState<{ blob: Blob; fileName: string } | null>(null);
+    const [downloadFileName, setDownloadFileName] = useState('');
+
+    useEffect(() => {
+        if (result?.fileName) {
+            setDownloadFileName(result.fileName);
+        }
+    }, [result]);
 
     const handleFileSelected = (files: File[]) => {
         if (files.length > 0) {
@@ -61,7 +69,8 @@ export default function PDFToPowerPointPage() {
                 type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
             });
             const filename = file.name.replace('.pdf', '.pptx');
-            downloadFile(blob, filename);
+
+            setResult({ blob, fileName: filename });
 
             toast.success('PDF converted to PowerPoint successfully!');
             setFile(null);
@@ -102,7 +111,41 @@ export default function PDFToPowerPointPage() {
                 </div>
             )}
 
-            {file && (
+            {/* Result Card */}
+            {result && (
+                <GlassCard className="p-6 mb-8 text-center animate-in zoom-in-95 duration-500 max-w-md mx-auto">
+                    <div className="mx-auto w-16 h-16 bg-orange-500/20 rounded-full flex items-center justify-center mb-4">
+                        <Presentation className="w-8 h-8 text-orange-500" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2">PowerPoint Ready!</h3>
+
+                    <div className="flex justify-center mt-6">
+                        <div className="flex flex-col sm:flex-row gap-3 items-center w-full">
+                            <input
+                                type="text"
+                                value={downloadFileName}
+                                onChange={(e) => setDownloadFileName(e.target.value)}
+                                className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-orange-500 w-full flex-grow text-center sm:text-left"
+                                placeholder="Filename"
+                            />
+                            <Button
+                                variant="primary"
+                                size="lg"
+                                onClick={() => downloadFile(result.blob, downloadFileName || result.fileName)}
+                                icon={<Download className="w-5 h-5" />}
+                                className="w-full sm:w-auto"
+                            >
+                                Download PPTX
+                            </Button>
+                        </div>
+                    </div>
+                    <Button variant="ghost" onClick={() => setResult(null)} className="mt-4 text-sm">
+                        Convert Another
+                    </Button>
+                </GlassCard>
+            )}
+
+            {file && !result && (
                 <GlassCard className="p-6 mb-8">
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div className="text-center sm:text-left">

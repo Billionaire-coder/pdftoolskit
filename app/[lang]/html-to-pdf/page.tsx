@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Globe, Download, Code } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { ProgressBar } from '@/components/shared/ProgressBar';
@@ -22,6 +22,14 @@ export default function HTMLToPDFPage() {
     const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('portrait');
     const [processing, setProcessing] = useState(false);
     const [progress, setProgress] = useState(0);
+    const [result, setResult] = useState<{ blob: Blob; fileName: string } | null>(null);
+    const [downloadFileName, setDownloadFileName] = useState('');
+
+    useEffect(() => {
+        if (result?.fileName) {
+            setDownloadFileName(result.fileName);
+        }
+    }, [result]);
 
     const handleConvert = async () => {
         if (!url) {
@@ -77,7 +85,8 @@ export default function HTMLToPDFPage() {
             // Extract domain name for filename (fallback if header missing)
             const domain = new URL(targetUrl).hostname;
             const filename = `${domain}_capture.pdf`;
-            downloadFile(blob, filename);
+
+            setResult({ blob, fileName: filename });
 
             toast.success('Website captured to PDF!');
             setUrl('');
@@ -100,111 +109,147 @@ export default function HTMLToPDFPage() {
                 color="from-blue-400 to-indigo-500"
             />
 
-            {/* URL Input Section */}
-            <GlassCard className="p-8 mb-8">
-                <div className="flex flex-col gap-6">
-                    <div>
-                        <label className="block text-white font-medium mb-3 ml-1">
-                            Enter Website URL
-                        </label>
-                        <div className="flex flex-col sm:flex-row gap-3">
+            {/* Result Card */}
+            {result && (
+                <GlassCard className="p-6 mb-8 text-center animate-in zoom-in-95 duration-500 max-w-md mx-auto">
+                    <div className="mx-auto w-16 h-16 bg-blue-400/20 rounded-full flex items-center justify-center mb-4">
+                        <Globe className="w-8 h-8 text-blue-400" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2">Website Captured!</h3>
+
+                    <div className="flex justify-center mt-6">
+                        <div className="flex flex-col sm:flex-row gap-3 items-center w-full">
                             <input
-                                type="url"
-                                value={url}
-                                onChange={(e) => setUrl(e.target.value)}
-                                placeholder="https://example.com"
-                                className="flex-1 px-5 py-4 bg-white border border-white/10 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary transition-all text-lg"
-                                disabled={processing}
-                                onKeyDown={(e) => e.key === 'Enter' && handleConvert()}
+                                type="text"
+                                value={downloadFileName}
+                                onChange={(e) => setDownloadFileName(e.target.value)}
+                                className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-400 w-full flex-grow text-center sm:text-left"
+                                placeholder="Filename"
                             />
                             <Button
                                 variant="primary"
-                                onClick={handleConvert}
-                                loading={processing}
                                 size="lg"
-                                className="min-w-[180px]"
+                                onClick={() => downloadFile(result.blob, downloadFileName || result.fileName)}
                                 icon={<Download className="w-5 h-5" />}
+                                className="w-full sm:w-auto"
                             >
-                                Convert to PDF
+                                Download PDF
                             </Button>
                         </div>
                     </div>
-
-                    {/* PDF Options */}
-                    <div className="flex flex-wrap gap-6 pt-4 border-t border-white/10">
-                        <div className="flex-1 min-w-[200px]">
-                            <label className="block text-sm text-slate-300 mb-2 ml-1">Page Format</label>
-                            <div className="grid grid-cols-2 gap-2 bg-background-light p-1 rounded-lg border border-white/5">
-                                <button
-                                    onClick={() => setFormat('a4')}
-                                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${format === 'a4'
-                                        ? 'bg-primary text-white shadow-lg'
-                                        : 'text-slate-400 hover:text-white hover:bg-white/5'
-                                        }`}
-                                >
-                                    A4 (ISO)
-                                </button>
-                                <button
-                                    onClick={() => setFormat('letter')}
-                                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${format === 'letter'
-                                        ? 'bg-primary text-white shadow-lg'
-                                        : 'text-slate-400 hover:text-white hover:bg-white/5'
-                                        }`}
-                                >
-                                    Letter (US)
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="flex-1 min-w-[200px]">
-                            <label className="block text-sm text-slate-300 mb-2 ml-1">Orientation</label>
-                            <div className="grid grid-cols-2 gap-2 bg-background-light p-1 rounded-lg border border-white/5">
-                                <button
-                                    onClick={() => setOrientation('portrait')}
-                                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${orientation === 'portrait'
-                                        ? 'bg-primary text-white shadow-lg'
-                                        : 'text-slate-400 hover:text-white hover:bg-white/5'
-                                        }`}
-                                >
-                                    Portrait
-                                </button>
-                                <button
-                                    onClick={() => setOrientation('landscape')}
-                                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${orientation === 'landscape'
-                                        ? 'bg-primary text-white shadow-lg'
-                                        : 'text-slate-400 hover:text-white hover:bg-white/5'
-                                        }`}
-                                >
-                                    Landscape
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <p className="text-xs text-slate-500 ml-1">
-                        Note: Some websites may block access due to security policies (CORS).
-                    </p>
-                </div>
-            </GlassCard>
-
-            {processing && (
-                <div className="mb-8">
-                    <ProgressBar progress={progress} label="Fetching and Rendering Website..." />
-                </div>
+                    <Button variant="ghost" onClick={() => setResult(null)} className="mt-4 text-sm">
+                        Capture Another
+                    </Button>
+                </GlassCard>
             )}
 
-            <GlassCard className="p-6 mb-8">
-                <div className="flex items-start space-x-3">
-                    <Code className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
-                    <div>
-                        <h3 className="text-white font-semibold mb-2">How it works</h3>
-                        <p className="text-sm text-slate-300 mb-3">
-                            We fetch the HTML content of the website and render it locally in your browser
-                            to create a high-quality PDF capture. You can customize the page size and orientation.
+            {/* URL Input Section */}
+            {!result && (<>
+                <GlassCard className="p-8 mb-8">
+                    <div className="flex flex-col gap-6">
+                        <div>
+                            <label className="block text-white font-medium mb-3 ml-1">
+                                Enter Website URL
+                            </label>
+                            <div className="flex flex-col sm:flex-row gap-3">
+                                <input
+                                    type="url"
+                                    value={url}
+                                    onChange={(e) => setUrl(e.target.value)}
+                                    placeholder="https://example.com"
+                                    className="flex-1 px-5 py-4 bg-white border border-white/10 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary transition-all text-lg"
+                                    disabled={processing}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleConvert()}
+                                />
+                                <Button
+                                    variant="primary"
+                                    onClick={handleConvert}
+                                    loading={processing}
+                                    size="lg"
+                                    className="min-w-[180px]"
+                                    icon={<Download className="w-5 h-5" />}
+                                >
+                                    Convert to PDF
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* PDF Options */}
+                        <div className="flex flex-wrap gap-6 pt-4 border-t border-white/10">
+                            <div className="flex-1 min-w-[200px]">
+                                <label className="block text-sm text-slate-300 mb-2 ml-1">Page Format</label>
+                                <div className="grid grid-cols-2 gap-2 bg-background-light p-1 rounded-lg border border-white/5">
+                                    <button
+                                        onClick={() => setFormat('a4')}
+                                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${format === 'a4'
+                                            ? 'bg-primary text-white shadow-lg'
+                                            : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                            }`}
+                                    >
+                                        A4 (ISO)
+                                    </button>
+                                    <button
+                                        onClick={() => setFormat('letter')}
+                                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${format === 'letter'
+                                            ? 'bg-primary text-white shadow-lg'
+                                            : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                            }`}
+                                    >
+                                        Letter (US)
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="flex-1 min-w-[200px]">
+                                <label className="block text-sm text-slate-300 mb-2 ml-1">Orientation</label>
+                                <div className="grid grid-cols-2 gap-2 bg-background-light p-1 rounded-lg border border-white/5">
+                                    <button
+                                        onClick={() => setOrientation('portrait')}
+                                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${orientation === 'portrait'
+                                            ? 'bg-primary text-white shadow-lg'
+                                            : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                            }`}
+                                    >
+                                        Portrait
+                                    </button>
+                                    <button
+                                        onClick={() => setOrientation('landscape')}
+                                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${orientation === 'landscape'
+                                            ? 'bg-primary text-white shadow-lg'
+                                            : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                            }`}
+                                    >
+                                        Landscape
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p className="text-xs text-slate-500 ml-1">
+                            Note: Some websites may block access due to security policies (CORS).
                         </p>
                     </div>
-                </div>
-            </GlassCard>
+                </GlassCard>
+
+                {processing && (
+                    <div className="mb-8">
+                        <ProgressBar progress={progress} label="Fetching and Rendering Website..." />
+                    </div>
+                )}
+
+                <GlassCard className="p-6 mb-8">
+                    <div className="flex items-start space-x-3">
+                        <Code className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                        <div>
+                            <h3 className="text-white font-semibold mb-2">How it works</h3>
+                            <p className="text-sm text-slate-300 mb-3">
+                                We fetch the HTML content of the website and render it locally in your browser
+                                to create a high-quality PDF capture. You can customize the page size and orientation.
+                            </p>
+                        </div>
+                    </div>
+                </GlassCard>
+            </>)}
             <QuickGuide steps={toolGuides['/html-to-pdf']} />
             <ToolContent toolName="/html-to-pdf" />
             <RelatedTools currentToolHref="/html-to-pdf" />

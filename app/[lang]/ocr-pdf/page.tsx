@@ -25,6 +25,13 @@ export default function OCRPDFPage() {
     const [extractedText, setExtractedText] = useState('');
     const [searchablePdfBytes, setSearchablePdfBytes] = useState<Uint8Array | null>(null);
     const [status, setStatus] = useState('Ready');
+    const [downloadFileName, setDownloadFileName] = useState('');
+
+    useEffect(() => {
+        if (file) {
+            setDownloadFileName(file.name.split('.')[0]);
+        }
+    }, [file]);
 
     const handleFileSelected = (files: File[]) => {
         const selectedFile = files[0];
@@ -205,15 +212,15 @@ export default function OCRPDFPage() {
 
     const downloadText = () => {
         const blob = new Blob([extractedText as any], { type: 'text/plain' });
-        const baseName = file ? file.name.split('.')[0] : 'ocr_result';
-        downloadFile(blob, `${baseName}_extracted.txt`);
+        const finalName = downloadFileName ? `${downloadFileName}_extracted.txt` : 'ocr_result.txt';
+        downloadFile(blob, finalName);
     };
 
     const downloadSearchablePDF = () => {
         if (!searchablePdfBytes) return;
         const blob = new Blob([searchablePdfBytes as any], { type: 'application/pdf' });
-        const baseName = file ? file.name.split('.')[0] : 'ocr_result';
-        downloadFile(blob, `${baseName}_searchable.pdf`);
+        const finalName = downloadFileName ? `${downloadFileName}_searchable.pdf` : 'ocr_result.pdf';
+        downloadFile(blob, finalName);
     };
 
     return (
@@ -268,36 +275,45 @@ export default function OCRPDFPage() {
                 {extractedText && (
                     <div className="space-y-6">
                         <GlassCard className="p-6">
-                            <div className="flex justify-between items-center mb-4">
+                            <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
                                 <h3 className="text-xl font-bold text-white">Extracted Text</h3>
-                                <div className="flex gap-2">
-                                    <Button
-                                        variant="secondary"
-                                        size="sm"
-                                        onClick={copyToClipboard}
-                                        icon={<Copy className="w-4 h-4" />}
-                                    >
-                                        Copy
-                                    </Button>
-                                    <Button
-                                        variant="primary"
-                                        size="sm"
-                                        onClick={downloadText}
-                                        icon={<Download className="w-4 h-4" />}
-                                    >
-                                        Download txt
-                                    </Button>
-                                    {searchablePdfBytes && (
+                                <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                                    <input
+                                        type="text"
+                                        value={downloadFileName}
+                                        onChange={(e) => setDownloadFileName(e.target.value)}
+                                        className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-teal-400 w-full sm:w-48"
+                                        placeholder="Filename prefix"
+                                    />
+                                    <div className="flex gap-2">
+                                        <Button
+                                            variant="secondary"
+                                            size="sm"
+                                            onClick={copyToClipboard}
+                                            icon={<Copy className="w-4 h-4" />}
+                                        >
+                                            Copy
+                                        </Button>
                                         <Button
                                             variant="primary"
                                             size="sm"
-                                            onClick={downloadSearchablePDF}
-                                            icon={<FileText className="w-4 h-4" />}
-                                            className="bg-emerald-600 hover:bg-emerald-700"
+                                            onClick={downloadText}
+                                            icon={<Download className="w-4 h-4" />}
                                         >
-                                            Download Searchable PDF
+                                            Save .txt
                                         </Button>
-                                    )}
+                                        {searchablePdfBytes && (
+                                            <Button
+                                                variant="primary"
+                                                size="sm"
+                                                onClick={downloadSearchablePDF}
+                                                icon={<FileText className="w-4 h-4" />}
+                                                className="bg-emerald-600 hover:bg-emerald-700"
+                                            >
+                                                Save .pdf
+                                            </Button>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                             <div className="bg-slate-900/50 rounded-lg p-4 max-h-[500px] overflow-y-auto font-mono text-sm text-slate-300 whitespace-pre-wrap border border-slate-700">

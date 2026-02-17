@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Image as ImageIcon, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 import JSZip from 'jszip';
@@ -26,6 +26,14 @@ export default function PDFtoJPGPage() {
     const [progress, setProgress] = useState(0);
     const [quality, setQuality] = useState<'low' | 'standard' | 'high'>('standard');
     const [format, setFormat] = useState<'jpeg' | 'png'>('jpeg');
+    const [result, setResult] = useState<{ blob: Blob; fileName: string } | null>(null);
+    const [downloadFileName, setDownloadFileName] = useState('');
+
+    useEffect(() => {
+        if (result?.fileName) {
+            setDownloadFileName(result.fileName);
+        }
+    }, [result]);
 
     const handleFileSelected = (files: File[]) => {
         const validation = validatePDFFile(files[0]);
@@ -81,14 +89,14 @@ export default function PDFtoJPGPage() {
 
             // Download Logic
             if (convertedFiles.length === 1) {
-                downloadFile(convertedFiles[0], convertedFiles[0].name);
+                setResult({ blob: convertedFiles[0], fileName: convertedFiles[0].name });
                 toast.success(`Converted to ${format.toUpperCase()}!`);
             } else if (convertedFiles.length > 1) {
                 const zip = new JSZip();
                 convertedFiles.forEach((f) => zip.file(f.name, f));
                 const zipBlob = await zip.generateAsync({ type: 'blob' });
-                downloadFile(zipBlob, `${file.name.replace('.pdf', '')}_images.zip`);
-                toast.success(`Converted ${convertedFiles.length} pages! Downloaded as ZIP.`);
+                setResult({ blob: zipBlob, fileName: `${file.name.replace('.pdf', '')}_images.zip` });
+                toast.success(`Converted ${convertedFiles.length} pages! Ready to download.`);
             }
 
             setFile(null);
@@ -128,7 +136,41 @@ export default function PDFtoJPGPage() {
                 </div>
             )}
 
-            {file && !processing && (
+            {/* Result Card */}
+            {result && (
+                <GlassCard className="p-6 mb-8 text-center animate-in zoom-in-95 duration-500 max-w-md mx-auto">
+                    <div className="mx-auto w-16 h-16 bg-orange-500/20 rounded-full flex items-center justify-center mb-4">
+                        <ImageIcon className="w-8 h-8 text-orange-500" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2">Conversion Complete!</h3>
+
+                    <div className="flex justify-center mt-6">
+                        <div className="flex flex-col sm:flex-row gap-3 items-center w-full">
+                            <input
+                                type="text"
+                                value={downloadFileName}
+                                onChange={(e) => setDownloadFileName(e.target.value)}
+                                className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-orange-500 w-full flex-grow text-center sm:text-left"
+                                placeholder="Filename"
+                            />
+                            <Button
+                                variant="primary"
+                                size="lg"
+                                onClick={() => downloadFile(result.blob, downloadFileName || result.fileName)}
+                                icon={<Download className="w-5 h-5" />}
+                                className="w-full sm:w-auto"
+                            >
+                                Download
+                            </Button>
+                        </div>
+                    </div>
+                    <Button variant="ghost" onClick={() => setResult(null)} className="mt-4 text-sm">
+                        Convert Another
+                    </Button>
+                </GlassCard>
+            )}
+
+            {file && !processing && !result && (
                 <GlassCard className="p-6 mb-8">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                         <div className="w-full md:w-auto">

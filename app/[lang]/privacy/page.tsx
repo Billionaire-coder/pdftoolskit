@@ -1,5 +1,4 @@
 import React from 'react';
-import { getDictionary } from '@/lib/i18n';
 import { Locale } from '@/i18n-config';
 
 export async function generateMetadata({ params: { lang } }: { params: { lang: Locale } }) {

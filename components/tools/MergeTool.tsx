@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FileText, Download, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
@@ -22,6 +22,14 @@ export function MergeTool({ initialFiles = [] }: MergeToolProps) {
     const [files, setFiles] = useState<File[]>(initialFiles);
     const [processing, setProcessing] = useState(false);
     const [progress, setProgress] = useState(0);
+    const [result, setResult] = useState<{ blob: Blob; fileName: string } | null>(null);
+    const [downloadFileName, setDownloadFileName] = useState('');
+
+    useEffect(() => {
+        if (result?.fileName) {
+            setDownloadFileName(result.fileName);
+        }
+    }, [result]);
 
     const handleFilesSelected = (newFiles: File[]) => {
         const validFiles: File[] = [];
@@ -66,8 +74,9 @@ export function MergeTool({ initialFiles = [] }: MergeToolProps) {
 
             // @ts-expect-error - Uint8Array is compatible with BlobPart
             const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
-            downloadFile(blob, 'merged.pdf');
+            // downloadFile(blob, 'merged.pdf'); // Moved to handleDownload
 
+            setResult({ blob, fileName: 'merged.pdf' });
             toast.success(t('toasts.mergeSuccess'));
             setFiles([]);
             setProgress(0);
@@ -98,7 +107,7 @@ export function MergeTool({ initialFiles = [] }: MergeToolProps) {
                 </div>
             )}
 
-            {files.length > 0 && (
+            {files.length > 0 && !result && (
                 <GlassCard className="p-4 border-purple-500/20">
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div className="text-center sm:text-left text-xs">
@@ -128,6 +137,36 @@ export function MergeTool({ initialFiles = [] }: MergeToolProps) {
                                 className="text-xs py-1.5 h-auto min-h-0"
                             >
                                 {t('toolPages.merge.button')}
+                            </Button>
+                        </div>
+                    </div>
+                </GlassCard>
+            )}
+
+            {result && (
+                <GlassCard className="p-6 text-center animate-in zoom-in-95 duration-500">
+                    <div className="mx-auto w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mb-4">
+                        <Download className="w-6 h-6 text-green-500" />
+                    </div>
+                    <h3 className="text-lg font-bold text-white mb-2">PDFs Merged Successfully!</h3>
+                    <div className="flex justify-center mt-4">
+                        <div className="flex flex-col sm:flex-row gap-3 items-center">
+                            <input
+                                type="text"
+                                value={downloadFileName}
+                                onChange={(e) => setDownloadFileName(e.target.value)}
+                                className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-green-500 w-64 text-center sm:text-left"
+                                placeholder="Filename"
+                            />
+                            <Button
+                                variant="primary"
+                                onClick={() => downloadFile(result.blob, downloadFileName || result.fileName)}
+                                icon={<Download className="w-5 h-5" />}
+                            >
+                                Download Merged PDF
+                            </Button>
+                            <Button variant="ghost" onClick={() => setResult(null)}>
+                                Merge Another
                             </Button>
                         </div>
                     </div>

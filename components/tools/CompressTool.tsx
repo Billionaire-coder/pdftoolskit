@@ -138,9 +138,18 @@ function CompressToolContent({ initialParams }: CompressToolProps) {
         }
     };
 
+    // Renaming State
+    const [downloadFileName, setDownloadFileName] = useState('');
+
+    useEffect(() => {
+        if (result?.fileName) {
+            setDownloadFileName(result.fileName);
+        }
+    }, [result]);
+
     const handleDownload = () => {
         if (result?.blob) {
-            downloadFile(result.blob, result.fileName);
+            downloadFile(result.blob, downloadFileName || result.fileName);
             toast.success('Download started!');
         }
     };
@@ -291,9 +300,18 @@ function CompressToolContent({ initialParams }: CompressToolProps) {
                         <span className="text-green-400 font-bold">{formatFileSize(result.compressedSize)}</span>
                     </div>
                     <div className="flex gap-3 justify-center">
-                        <Button variant="primary" onClick={handleDownload} icon={<Download className="w-5 h-5" />}>
-                            {t('toolPages.compress.downloadButton')}
-                        </Button>
+                        <div className="flex flex-col sm:flex-row gap-3 items-center">
+                            <input
+                                type="text"
+                                value={downloadFileName}
+                                onChange={(e) => setDownloadFileName(e.target.value)}
+                                className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-green-500 w-64 text-center sm:text-left"
+                                placeholder="Filename"
+                            />
+                            <Button variant="primary" onClick={handleDownload} icon={<Download className="w-5 h-5" />}>
+                                {t('toolPages.compress.downloadButton')}
+                            </Button>
+                        </div>
                         <Button variant="outline" onClick={reset}>
                             {t('toolPages.compress.anotherButton')}
                         </Button>
