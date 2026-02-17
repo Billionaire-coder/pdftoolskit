@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
             userAgent: '*',
             allow: '/',
         },
-        sitemap: 'https://pdftoolkit.com/sitemap.xml',
+        sitemap: 'https://pdftoolskit.vercel.app/sitemap.xml',
     };
 }
