@@ -31,6 +31,9 @@ const nextConfig = {
             fs: false,
             path: false,
             child_process: false,
+            'aws-sdk': false,
+            'nock': false,
+            'mock-aws-s3': false,
         };
 
         return config;
