@@ -155,3 +155,12 @@ export async function executeHealAction(file: File): Promise<{ data: Uint8Array;
         return { data: rasterData, report };
     }
 }
+
+/**
+ * Simple wrapper for repair functionality, returning just the bytes.
+ * Used by scripts and potential simple UI calls.
+ */
+export async function repairPDF(file: File): Promise<Uint8Array> {
+    const result = await executeHealAction(file);
+    return result.data;
+}
