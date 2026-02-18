@@ -3,14 +3,6 @@ import { applyBranding } from '../core';
 import { rasterizeAndCompressPDF } from './compression';
 
 /**
- * Deep Repair using PDF.js rasterization (Scale 2.0, Quality 0.95)
- */
-async function deepRepairPDF(file: File): Promise<Uint8Array> {
-    // console.log('Attempting Deep Repair (Rasterization)...');
-    return await rasterizeAndCompressPDF(file, 0.95, 2.0);
-}
-
-/**
  * Tiered Repair Strategy: 
  * Tier 1: Header Recovery & Structural Rebuild
  * Tier 2: Metadata Sanitization
@@ -105,7 +97,6 @@ export async function executeHealAction(file: File): Promise<{ data: Uint8Array;
     // --- TIER 2: Structural Analysis ---
     // Count raw page objects via regex to detect orphans
     // Note: This is an approximation as it matches content streams too, but good for warning
-    const textDecoder = new TextDecoder();
     // Sampling specifically for /Type /Page logic requires full string search which is heavy. 
     // We'll trust pdf-lib's page count vs our error count.
 
