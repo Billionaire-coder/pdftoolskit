@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, Suspense } from 'react';
 import { useIDKitRequest } from '@worldcoin/idkit';
 import type { IDKitResult } from '@worldcoin/idkit';
 import { useSearchParams } from 'next/navigation';
@@ -12,7 +12,7 @@ import { SignalingService } from '@/lib/services/p2p/signalingService';
 
 type InkColor = 'black' | 'blue' | 'red';
 
-export default function RemoteSignPage() {
+function RemoteSignContent() {
     const searchParams = useSearchParams();
     const [sessionId, setSessionId] = useState<string | null>(null);
 
@@ -359,4 +359,16 @@ export default function RemoteSignPage() {
 
 function cn(...classes: any[]) {
     return classes.filter(Boolean).join(' ');
+}
+
+export default function RemoteSignPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+            </div>
+        }>
+            <RemoteSignContent />
+        </Suspense>
+    );
 }
