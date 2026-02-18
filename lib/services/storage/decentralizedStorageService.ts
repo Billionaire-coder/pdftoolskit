@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export interface StorageResult {
     cid: string;
     gatewayUrl: string;
@@ -15,10 +16,12 @@ export class DecentralizedStorageService {
      * This is the lightweight alternative to uploading full PDFs,
      * allowing for massive scaling within free storage tiers.
      */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     static async uploadReceipt(receipt: any): Promise<StorageResult> {
         const pinataJwt = process.env.NEXT_PUBLIC_PINATA_JWT;
 
         if (!pinataJwt) {
+            // eslint-disable-next-line no-console
             console.warn(`[Storage] Pinata JWT not found. Simulating Metadata upload...`);
             return new Promise((resolve) => {
                 setTimeout(() => {
@@ -33,6 +36,7 @@ export class DecentralizedStorageService {
             });
         }
 
+        // eslint-disable-next-line no-console
         console.log(`[Storage] Scaling Mode: Uploading JSON Audit Receipt to IPFS...`);
 
         try {
@@ -62,6 +66,7 @@ export class DecentralizedStorageService {
                 timestamp: new Date().toISOString()
             };
         } catch (error) {
+            // eslint-disable-next-line no-console
             console.error('[Storage] IPFS Metadata Upload Error:', error);
             throw error;
         }
@@ -75,6 +80,7 @@ export class DecentralizedStorageService {
         const pinataJwt = process.env.NEXT_PUBLIC_PINATA_JWT;
 
         if (!pinataJwt) {
+            // eslint-disable-next-line no-console
             console.warn(`[Storage] Pinata JWT not found. Falling back to simulation...`);
             return new Promise((resolve) => {
                 setTimeout(() => {
@@ -89,10 +95,12 @@ export class DecentralizedStorageService {
             });
         }
 
+        // eslint-disable-next-line no-console
         console.log(`[Storage] Sovereign persistence: Uploading ${docBytes.length} bytes to Pinata IPFS...`);
 
         try {
             const formData = new FormData();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const blob = new Blob([new Uint8Array(docBytes) as any], { type: 'application/pdf' });
             formData.append('file', blob, 'signed_document.pdf');
 
@@ -116,6 +124,7 @@ export class DecentralizedStorageService {
                 timestamp: new Date().toISOString()
             };
         } catch (error) {
+            // eslint-disable-next-line no-console
             console.error('[Storage] IPFS Upload Error:', error);
             throw error;
         }
@@ -133,12 +142,14 @@ export class DecentralizedStorageService {
      * This fulfills the 'Sovereign Storage' requirement where files never touch your server.
      */
     static async saveToUserCloud(docBytes: Uint8Array, provider: 'google' | 'dropbox' | 'onedrive'): Promise<{ success: boolean; path: string }> {
+        // eslint-disable-next-line no-console
         console.log(`[Sovereign Storage] Direct Browser-to-Cloud Upload started for: ${provider.toUpperCase()}`);
 
         return new Promise((resolve) => {
             // In a real implementation, this would use the provider's SDK (e.g. gapi.client.drive)
             setTimeout(() => {
                 const mockPath = `/${provider.toUpperCase()}_ROOT/Signatures/signed_doc_${Date.now()}.pdf`;
+                // eslint-disable-next-line no-console
                 console.log(`[Sovereign Storage] Successfully pushed to user's private ${provider} instance.`);
                 resolve({ success: true, path: mockPath });
             }, 2500);

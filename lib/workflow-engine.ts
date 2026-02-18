@@ -1,4 +1,4 @@
-import { PDFDocument } from 'pdf-lib';
+// import { PDFDocument } from 'pdf-lib';
 import { addWatermark, addPageNumbers } from './services/pdf/manipulators/enrichment';
 import { compressPDF } from './services/pdf/manipulators/compression';
 import { protectPDF, unlockPDF } from './services/pdf/security';

@@ -45,9 +45,9 @@ export async function wordToPdf(file: File): Promise<Uint8Array> {
             hotfixes: ['px_scaling']
         });
 
-        await new Promise<void>((resolve, reject) => {
+        await new Promise<void>((resolve) => {
             doc.html(container, {
-                callback: (pdf) => {
+                callback: () => {
                     resolve();
                 },
                 x: 0,
