@@ -128,8 +128,8 @@ export async function executeWorkflow(
     files: File[],
     steps: WorkflowStep[],
     onProgress?: (current: number, total: number, status: string) => void
-): Promise<Blob[]> {
-    const results: Blob[] = [];
+): Promise<File[]> {
+    const results: File[] = [];
     const total = files.length;
 
     for (let i = 0; i < total; i++) {
@@ -142,9 +142,10 @@ export async function executeWorkflow(
         try {
             const result = await workflowEngine.execute(file, steps);
 
-            // Create a Blob from the result bytes
-            const blob = new Blob([result.pdfBytes as any], { type: 'application/pdf' });
-            results.push(blob);
+            // Create a File from the result bytes
+            // We reuse the original filename, effectively modifying it "in place" for the next step or output
+            const processedFile = new File([result.pdfBytes as any], file.name, { type: 'application/pdf', lastModified: Date.now() });
+            results.push(processedFile);
 
         } catch (error) {
             console.error(`Failed to process file ${file.name}:`, error);
