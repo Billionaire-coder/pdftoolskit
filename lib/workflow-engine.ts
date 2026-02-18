@@ -119,3 +119,44 @@ export class WorkflowEngine {
 }
 
 export const workflowEngine = new WorkflowEngine();
+
+/**
+ * Batch processes files through the workflow engine.
+ * Used by the job queue to handle multiple files and report progress.
+ */
+export async function executeWorkflow(
+    files: File[],
+    steps: WorkflowStep[],
+    onProgress?: (current: number, total: number, status: string) => void
+): Promise<Blob[]> {
+    const results: Blob[] = [];
+    const total = files.length;
+
+    for (let i = 0; i < total; i++) {
+        const file = files[i];
+
+        if (onProgress) {
+            onProgress(i, total, `Processing ${file.name}...`);
+        }
+
+        try {
+            const result = await workflowEngine.execute(file, steps);
+
+            // Create a Blob from the result bytes
+            const blob = new Blob([result.pdfBytes as any], { type: 'application/pdf' });
+            results.push(blob);
+
+        } catch (error) {
+            console.error(`Failed to process file ${file.name}:`, error);
+            // We might want to throw here or continue with partial results?
+            // For now, let's throw to fail the job if a file fails
+            throw error;
+        }
+    }
+
+    if (onProgress) {
+        onProgress(total, total, 'Completed');
+    }
+
+    return results;
+}
