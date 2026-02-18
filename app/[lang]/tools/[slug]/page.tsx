@@ -74,7 +74,7 @@ export default function PSEOPage({ params }: Props) {
                                 <Zap className="w-5 h-5 text-yellow-400" />
                                 Quick Start: {page.heading}
                             </h2>
-                            <CompressTool initialParams={page.toolParams as any} />
+                            <CompressTool />
                         </GlassCard>
                     </div>
                 )}
