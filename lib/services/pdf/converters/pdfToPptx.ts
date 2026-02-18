@@ -87,7 +87,7 @@ export class PptxService {
                     slide.addText(item.str, {
                         x: x / 72,
                         y: y / 72,
-                        w: item.width ? item.width / 72 : 'auto',
+                        w: item.width ? item.width / 72 : undefined,
                         h: item.height ? item.height / 72 : 0.3,
                         fontSize: (item.transform[0] || 10), // Approx font size from matrix scale
                         color: '333333', // Default, we could extract color from operatorList in future
