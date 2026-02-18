@@ -1,13 +1,13 @@
 import React from 'react';
-import { WorkflowActionType } from '@/lib/workflow-engine';
+import { WorkflowAction } from '@/lib/workflow-engine';
 import { Plus, Maximize, RotateCw, FileInput, Shield, ShieldAlert, Key, Hash, ArrowUpDown, FileText } from 'lucide-react';
 
 interface StepControlsProps {
-    onAddStep: (type: WorkflowActionType) => void;
+    onAddStep: (type: WorkflowAction) => void;
 }
 
 export function StepControls({ onAddStep }: StepControlsProps) {
-    const actions: { type: WorkflowActionType; label: string; icon: React.ReactNode; group: string }[] = [
+    const actions: { type: WorkflowAction; label: string; icon: React.ReactNode; group: string }[] = [
         { type: 'merge', label: 'Merge All', icon: <Maximize className="w-4 h-4" />, group: 'Basic' },
         { type: 'compress', label: 'Compress', icon: <FileInput className="w-4 h-4 text-amber-400" />, group: 'Basic' },
         { type: 'rotate', label: 'Rotate', icon: <RotateCw className="w-4 h-4 text-blue-400" />, group: 'Organize' },

@@ -12,7 +12,13 @@ export type WorkflowAction =
     | 'unlock'
     | 'compress'
     | 'rotate'
-    | 'flatten';
+    | 'flatten'
+    | 'merge'
+    | 'reorder'
+    | 'metadata'
+    | 'extract'
+    | 'split'
+    | 'pdfToImage';
 
 export interface WorkflowStep {
     id: string;
@@ -89,6 +95,14 @@ export class WorkflowEngine {
                     case 'flatten':
                         // flattenPDF(file, options)
                         currentPdfBytes = await flattenPDF(currentFile, step.params.options);
+                        break;
+                    case 'merge':
+                    case 'reorder':
+                    case 'metadata':
+                    case 'extract':
+                    case 'split':
+                    case 'pdfToImage':
+                        this.log(`Action ${step.action} is not yet implemented in the engine.`);
                         break;
                     default:
                         this.log(`Unknown action: ${step.action}`);
