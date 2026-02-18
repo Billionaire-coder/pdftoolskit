@@ -62,7 +62,7 @@ export default function PDFToPowerPointPage() {
             clearInterval(interval);
             setProgress(100);
 
-            const blob = new Blob([pptxBytes], {
+            const blob = new Blob([pptxBytes as any], {
                 type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
             });
             const filename = file.name.replace('.pdf', `.pptx`);
