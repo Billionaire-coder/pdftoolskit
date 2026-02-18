@@ -42,7 +42,7 @@ export async function excelToPdf(
         doc.text(sheetName, 14, 15);
 
         // Map styles if requested
-        let bodyStyles: any = {};
+        const bodyStyles: any = {};
         if (options.preserveStyles) {
             // Simplified style mapping: detect if a row is likely a header or has colors
             // Real Excel style mapping is complex with SheetJS/jsPDF-AutoTable

@@ -48,7 +48,7 @@ export async function imageToPdf(
     for (const file of files) {
         let imageBytes: Uint8Array;
         let isJpg = file.type === 'image/jpeg' || file.type === 'image/jpg';
-        let isWebP = file.type === 'image/webp';
+        const isWebP = file.type === 'image/webp';
 
         if (isWebP) {
             imageBytes = await processWebP(file);
