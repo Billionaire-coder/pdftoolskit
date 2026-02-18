@@ -1,4 +1,4 @@
-import { PDFDocument } from 'pdf-lib';
+// import { PDFDocument } from 'pdf-lib';
 
 export interface SealingResult {
     signature: Uint8Array;

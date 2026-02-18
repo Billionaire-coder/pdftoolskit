@@ -29,7 +29,7 @@ export class ForensicService {
 
         const velocities: number[] = [];
         const pressures: number[] = [];
-        let totalDistance = 0;
+        // let totalDistance = 0;
 
         for (let i = 1; i < points.length; i++) {
             const p1 = points[i - 1];
@@ -37,13 +37,13 @@ export class ForensicService {
             const dt = p2.timestamp - p1.timestamp;
             const dx = p2.x - p1.x;
             const dy = p2.y - p1.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
+            // const dist = Math.sqrt(dx * dx + dy * dy);
 
             if (dt > 0) {
-                velocities.push(dist / dt);
+                velocities.push(Math.sqrt(dx * dx + dy * dy) / dt);
             }
             pressures.push(p2.pressure);
-            totalDistance += dist;
+            // totalDistance += dist;
         }
 
         // 1. Calculate Entropy (Variation in movement)

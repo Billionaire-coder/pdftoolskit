@@ -1,4 +1,4 @@
-import { Document, Paragraph, TextRun, Packer, AlignmentType } from 'docx';
+import { Document, Paragraph, TextRun, Packer } from 'docx';
 import { initOCRWorker, performOCR } from '@/lib/ocr-utils';
 import type { Worker } from 'tesseract.js';
 
@@ -37,7 +37,7 @@ export async function pdfToWord(file: File): Promise<{ data: Uint8Array; isScann
         for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
             const page = await pdfDoc.getPage(pageNum);
             const textContent = await page.getTextContent();
-            const viewport = page.getViewport({ scale: 1.0 });
+            // const viewport = page.getViewport({ scale: 1.0 });
 
             // 1. Group items into lines
             const lines: Line[] = [];

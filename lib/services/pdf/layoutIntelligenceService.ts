@@ -66,7 +66,7 @@ export class LayoutIntelligenceService {
      * Placeholder for ONNX-based visual inference.
      * In the next step of Batch 1.2, we will integrate onnxruntime-web here.
      */
-    static async performAIInference(pageImage: Blob): Promise<DetectedField[]> {
+    static async performAIInference(_pageImage: Blob): Promise<DetectedField[]> {
         // AI Model (YOLOv10/DocLayNet) would be loaded here
         console.log('AI Inference triggered for page image...');
         return [];

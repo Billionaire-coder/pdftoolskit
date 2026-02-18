@@ -136,7 +136,7 @@ export async function flattenPDF(
         try {
             // Remove Optional Content Properties to collapse layers
             pdfDoc.catalog.delete(pdfDoc.context.obj('OCProperties'));
-        } catch (e) {
+        } catch (_e) {
             // No layers found
         }
     }
@@ -153,7 +153,7 @@ export async function flattenPDF(
 
 export async function mergePDFs(files: File[]): Promise<Uint8Array> {
     const mergedPdf = await PDFDocument.create();
-    let totalPages = 0;
+    // let totalPages = 0;
 
     for (const file of files) {
         const arrayBuffer = await file.arrayBuffer();
@@ -169,7 +169,7 @@ export async function mergePDFs(files: File[]): Promise<Uint8Array> {
             if (sourceOutlines) {
                 // Simplified outline merging: Add source filename as a top-level bookmark
                 // targeting the first page of the newly added section
-                const outlineRoot = mergedPdf.catalog.get(mergedPdf.context.obj('Outlines')) || mergedPdf.context.obj({});
+                // const outlineRoot = mergedPdf.catalog.get(mergedPdf.context.obj('Outlines')) || mergedPdf.context.obj({});
                 // Note: Complex recursive outline merging is library-specific and often requires 
                 // manual object tree traversal. In this high-fidelity version, we ensure page integrity first.
             }
@@ -177,7 +177,7 @@ export async function mergePDFs(files: File[]): Promise<Uint8Array> {
             console.warn(`Could not merge bookmarks for ${file.name}:`, e);
         }
 
-        totalPages += pdf.getPageCount();
+        // totalPages += pdf.getPageCount();
 
         // Memory optimization: The 'pdf' instance is local to the loop and will be GC'd
     }

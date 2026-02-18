@@ -1,7 +1,7 @@
 /**
  * Computes a Perspective Transform matrix (Homography)
  */
-export function getPerspectiveTransform(srcCorners: { x: number; y: number }[], dstWidth: number, dstHeight: number) {
+export function getPerspectiveTransform(srcCorners: { x: number; y: number }[], _dstWidth: number, _dstHeight: number) {
     // Simplified 4-point homography solver for Canvas
     // Map src corners (polygon) to rect [0,0, dstW, dstH]
     return srcCorners; // Placeholder for logic
@@ -43,6 +43,7 @@ export function applyScanFilter(ctx: CanvasRenderingContext2D, width: number, he
 /**
  * Normalizes a scan result into a standard A4 ratio if close enough
  */
+// import { PDFDocument } from 'pdf-lib';
 export function normalizePageDimensions(width: number, height: number) {
     const ratio = width / height;
     const a4Ratio = 1 / 1.414; // Portrait
