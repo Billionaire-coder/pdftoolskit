@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { PenTool, Download, Type, Image as ImageIcon, Check, Layers, Undo, Redo, Trash2, Square, Circle, Minus, MousePointer2, Pencil, Highlighter, Stamp, Ban, RotateCw, Calendar, X, PenLine, ArrowUp, ArrowDown, Copy, CheckSquare, QrCode, Star, Heart, AlertTriangle, Info, ArrowRight, AlignCenter, AlignHorizontalJustifyCenter, FileText } from 'lucide-react';
+import { PenTool, Download, Type, Image as ImageIcon, Check, Layers, Undo, Redo, Trash2, Square, Circle, Minus, MousePointer2, Pencil, Highlighter, Stamp, Ban, RotateCw, Calendar, X, PenLine, ArrowUp, ArrowDown, Copy, CheckSquare, QrCode, Star, Heart, AlertTriangle, Info, ArrowRight, AlignCenter, AlignHorizontalJustifyCenter, FileText, FormInput } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
 import { Button } from '@/components/ui/Button';
@@ -19,14 +19,15 @@ import { Search, Replace, TextSelect } from 'lucide-react';
 import { ToolHeader } from '@/components/shared/ToolHeader';
 
 
-type EditMode = 'text' | 'image' | 'draw' | 'shape' | 'stamp' | 'sign' | 'form' | 'qr' | 'icon' | 'edit-text' | 'search';
+type EditMode = 'text' | 'image' | 'draw' | 'shape' | 'stamp' | 'sign' | 'form' | 'qr' | 'icon' | 'edit-text' | 'search' | 'field';
 type ShapeType = 'rectangle' | 'circle' | 'line';
 
 type UIModification = PDFModification & {
     id: string; // Unique ID for UI management
+    zIndex?: number;
 };
 
-const FONTS: FontName[] = ['Helvetica', 'Times Roman', 'Courier', 'Symbol'];
+const FONTS: FontName[] = ['Helvetica', 'Times Roman', 'Courier', 'Symbol', 'Inter'];
 const STAMPS = ['APPROVED', 'DRAFT', 'CONFIDENTIAL', 'FINAL', 'VOID', 'PAID'];
 
 const SVG_ICONS = {
@@ -76,6 +77,12 @@ export default function EditPDFPage() {
     // Image State
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
     const [uploadedImageBytes, setUploadedImageBytes] = useState<Uint8Array | null>(null);
+
+    // Form Field Props
+    const [fieldType, setFieldType] = useState<'text' | 'checkbox'>('text');
+    const [fieldName, setFieldName] = useState('');
+    const [fieldRequired, setFieldRequired] = useState(false);
+    const [fieldReadOnly, setFieldReadOnly] = useState(false);
 
     // Active Page State
     const [pageIndex, setPageIndex] = useState(1);
@@ -128,6 +135,9 @@ export default function EditPDFPage() {
             setAllPagesText([]);
         }
     }, [file]);
+
+    const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    const [smartGuides, setSmartGuides] = useState<{ type: 'v' | 'h', pos: number }[]>([]);
 
     useEffect(() => {
         if (searchQuery && allPagesText.length > 0) {
@@ -235,6 +245,10 @@ export default function EditPDFPage() {
         }
     };
 
+    // Dragging State
+    const [isDraggingObject, setIsDraggingObject] = useState(false);
+    const [dragStartPos, setDragStartPos] = useState({ x: 0, y: 0 });
+
     const handleFileSelected = (files: File[]) => {
         const validation = validatePDFFile(files[0]);
         if (validation.valid) {
@@ -254,6 +268,164 @@ export default function EditPDFPage() {
             drawCanvasRef.current.width = w;
             drawCanvasRef.current.height = h;
         }
+    };
+
+    const toggleSelectObject = (id: string, multi = false) => {
+        if (multi) {
+            setSelectedIds(prev =>
+                prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+            );
+        } else {
+            setSelectedIds([id]);
+        }
+    };
+
+    const alignSelected = (type: 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom') => {
+        if (selectedIds.length === 0) return;
+
+        const newMods = [...modifications];
+        const selectedMods = newMods.filter(m => selectedIds.includes(m.id));
+
+        if (selectedMods.length === 0) return;
+
+        // If multiple selected, align relative to the bounding box of selection
+        // If one selected, align relative to page
+        const usePage = selectedMods.length === 1;
+
+        let targetValue = 0;
+
+        if (usePage) {
+            const mod = selectedMods[0];
+            const w = mod.width || 100;
+            const h = mod.height || 100;
+
+            if (type === 'left') targetValue = 0;
+            if (type === 'center') targetValue = (pageDims.width - w) / 2;
+            if (type === 'right') targetValue = pageDims.width - w;
+            if (type === 'top') targetValue = 0;
+            if (type === 'middle') targetValue = (pageDims.height - h) / 2;
+            if (type === 'bottom') targetValue = pageDims.height - h;
+        } else {
+            // Group alignment logic (align all to the leftmost, topmost, etc.)
+            const minX = Math.min(...selectedMods.map(m => m.x));
+            const maxX = Math.max(...selectedMods.map(m => m.x + (m.width || 0)));
+            const minY = Math.min(...selectedMods.map(m => m.y));
+            const maxY = Math.max(...selectedMods.map(m => m.y + (m.height || 0)));
+
+            if (type === 'left') targetValue = minX;
+            if (type === 'center') targetValue = minX + (maxX - minX) / 2;
+            if (type === 'right') targetValue = maxX;
+            if (type === 'top') targetValue = minY;
+            if (type === 'middle') targetValue = minY + (maxY - minY) / 2;
+            if (type === 'bottom') targetValue = maxY;
+        }
+
+        selectedMods.forEach(mod => {
+            const index = newMods.findIndex(m => m.id === mod.id);
+            if (index === -1) return;
+
+            const w = mod.width || 100;
+            const h = mod.height || 100;
+
+            if (type === 'left') newMods[index] = { ...mod, x: targetValue };
+            if (type === 'center') newMods[index] = { ...mod, x: targetValue - w / 2 };
+            if (type === 'right') newMods[index] = { ...mod, x: targetValue - w };
+            if (type === 'top') newMods[index] = { ...mod, y: targetValue };
+            if (type === 'middle') newMods[index] = { ...mod, y: targetValue - h / 2 };
+            if (type === 'bottom') newMods[index] = { ...mod, y: targetValue - h };
+        });
+
+        pushToHistory(newMods);
+        toast.success(`Aligned objects to ${type}`);
+    };
+
+    useEffect(() => {
+        const handleGlobalUp = () => {
+            if (isDraggingObject) {
+                setIsDraggingObject(false);
+                finalizeMove();
+            }
+        };
+        window.addEventListener('mouseup', handleGlobalUp);
+        return () => window.removeEventListener('mouseup', handleGlobalUp);
+    }, [isDraggingObject]);
+
+    const moveSelected = (dx: number, dy: number) => {
+        if (selectedIds.length === 0) return;
+        const newMods = [...modifications];
+        let guides: { type: 'v' | 'h', pos: number }[] = [];
+
+        selectedIds.forEach(id => {
+            const index = newMods.findIndex(m => m.id === id);
+            if (index !== -1) {
+                const mod = newMods[index];
+                const newX = mod.x + dx;
+                const newY = mod.y + dy;
+                const snapThreshold = 5;
+                let snappedX = newX;
+                let snappedY = newY;
+
+                if (Math.abs(newX + (mod.width || 0) / 2 - pageDims.width / 2) < snapThreshold) {
+                    snappedX = pageDims.width / 2 - (mod.width || 0) / 2;
+                    guides.push({ type: 'v', pos: pageDims.width / 2 });
+                }
+                if (Math.abs(newY + (mod.height || 0) / 2 - pageDims.height / 2) < snapThreshold) {
+                    snappedY = pageDims.height / 2 - (mod.height || 0) / 2;
+                    guides.push({ type: 'h', pos: pageDims.height / 2 });
+                }
+
+                // Neighbor Snapping Logic
+                modifications.forEach(other => {
+                    if (selectedIds.includes(other.id)) return;
+
+                    // Snap X to other's X
+                    if (Math.abs(newX - other.x) < snapThreshold) {
+                        snappedX = other.x;
+                        guides.push({ type: 'v', pos: other.x });
+                    }
+                    // Snap X + W to other's X + W
+                    if (Math.abs(newX + (mod.width || 0) - (other.x + (other.width || 0))) < snapThreshold) {
+                        snappedX = other.x + (other.width || 0) - (mod.width || 0);
+                        guides.push({ type: 'v', pos: other.x + (other.width || 0) });
+                    }
+                    // Snap Y to other's Y
+                    if (Math.abs(newY - other.y) < snapThreshold) {
+                        snappedY = other.y;
+                        guides.push({ type: 'h', pos: other.y });
+                    }
+                });
+
+                newMods[index] = { ...mod, x: snappedX, y: snappedY };
+            }
+        });
+        setSmartGuides(guides);
+        // During drag, we update the state directly but don't push to history yet
+        const newHistory = [...history];
+        newHistory[historyIndex] = newMods;
+        setHistory(newHistory);
+    };
+
+    const finalizeMove = () => {
+        pushToHistory([...modifications]);
+        setSmartGuides([]);
+    };
+
+    const reorderSelection = (direction: 'front' | 'back') => {
+        if (selectedIds.length === 0) return;
+        const newMods = [...modifications].sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0));
+
+        const minZ = Math.min(...newMods.map(m => m.zIndex || 0));
+        const maxZ = Math.max(...newMods.map(m => m.zIndex || 0));
+
+        selectedIds.forEach(id => {
+            const index = newMods.findIndex(m => m.id === id);
+            if (index !== -1) {
+                newMods[index].zIndex = direction === 'front' ? maxZ + 1 : minZ - 1;
+            }
+        });
+
+        pushToHistory(newMods);
+        toast.success(direction === 'front' ? 'Brought to front' : 'Sent to back');
     };
 
     const handleTextLayerLoaded = (items: any[]) => {
@@ -546,6 +718,25 @@ export default function EditPDFPage() {
                 rotate: rotation
             });
         }
+        else if (mode === 'field') {
+            newModsToAdd.push({
+                id: Math.random().toString(36),
+                type: 'field',
+                fieldType: fieldType,
+                fieldName: fieldName || undefined, // Backend will auto-generate if empty
+                required: fieldRequired,
+                readOnly: fieldReadOnly,
+                pageIndex: pageIndex - 1,
+                x: selection.x, y: selection.y,
+                width: fieldType === 'checkbox' ? 20 : 200,
+                height: fieldType === 'checkbox' ? 20 : 30,
+                strokeColor: '#000000',
+                fillColor: '#FFFFFF', // White background for fields usually
+                strokeWidth: 1,
+                opacity: 1
+            });
+            setFieldName(''); // Reset name after adding
+        }
 
         if (newModsToAdd.length > 0) {
             pushToHistory([...modifications, ...newModsToAdd]);
@@ -709,7 +900,8 @@ export default function EditPDFPage() {
                                     <ToolBtn id="shape" icon={Square} label="Shape" />
                                     <ToolBtn id="draw" icon={Pencil} label="Draw" />
                                     <ToolBtn id="stamp" icon={Stamp} label="Stamp" />
-                                    <ToolBtn id="form" icon={CheckSquare} label="Forms" />
+                                    <ToolBtn id="form" icon={CheckSquare} label="Marks" />
+                                    <ToolBtn id="field" icon={FormInput} label="Fields" />
                                     <ToolBtn id="sign" icon={PenLine} label="Sign" onClick={() => { setMode('sign'); setIsSigning(true); }} />
                                     <ToolBtn id="qr" icon={QrCode} label="QRCode" />
                                     <ToolBtn id="icon" icon={Star} label="Icons" />
@@ -721,8 +913,11 @@ export default function EditPDFPage() {
                             </div>
 
                             {/* CENTER: VIEWER */}
-                            <div className="col-span-8 lg:col-span-8 bg-slate-900/50 rounded-2xl border border-slate-700 relative flex items-start justify-center p-8 min-h-[600px]">
-                                <div className="relative shadow-2xl inline-block sticky top-24">
+                            <div
+                                className="col-span-8 lg:col-span-8 bg-slate-900/50 rounded-2xl border border-slate-700 relative flex items-start justify-center p-8 min-h-[600px] overflow-auto select-none"
+                                onClick={() => setSelectedIds([])}
+                            >
+                                <div className="relative shadow-2xl inline-block sticky top-24" onClick={(e) => e.stopPropagation()}>
                                     <PDFPageViewer
                                         file={file}
                                         pageNumber={pageIndex}
@@ -758,59 +953,172 @@ export default function EditPDFPage() {
                                             />
                                         ))}
 
-                                        {currentMods.map((mod) => (
-                                            mod.type === 'drawing' ? (
-                                                <svg key={mod.id} className="absolute inset-0 w-full h-full">
-                                                    {mod.svgPath ? (
-                                                        <path
-                                                            d={mod.svgPath}
-                                                            fill="none"
-                                                            stroke={mod.strokeColor}
-                                                            strokeWidth={mod.strokeWidth}
-                                                            strokeOpacity={mod.opacity}
-                                                            transform={`translate(${mod.x}, ${mod.y}) scale(${mod.scale || 1.5}) rotate(${mod.rotate || 0})`}
-                                                            strokeLinecap="round"
-                                                            strokeLinejoin="round"
-                                                        />
-                                                    ) : (
-                                                        <path
-                                                            d={`M ${mod.pathPoints?.map(p => `${p.x} ${p.y}`).join(' L ')}`}
-                                                            fill="none"
-                                                            stroke={mod.strokeColor}
-                                                            strokeWidth={mod.strokeWidth}
-                                                            strokeOpacity={mod.opacity}
-                                                            strokeLinecap="round"
-                                                        />
-                                                    )}
-                                                </svg>
-                                            ) : (
-                                                <div
-                                                    key={mod.id}
-                                                    className="absolute border border-blue-400/30 bg-blue-400/10 flex items-center justify-center overflow-hidden"
-                                                    style={{
-                                                        left: mod.x, top: mod.y,
-                                                        width: mod.width || (mod.text ? 'auto' : 50),
-                                                        height: mod.height || (mod.text ? 'auto' : 50),
-                                                        color: mod.textColor,
-                                                        fontSize: mod.textSize,
-                                                        fontFamily: mod.font,
-                                                        whiteSpace: 'nowrap',
-                                                        borderRadius: mod.shapeType === 'circle' ? '50%' : 0,
-                                                        transform: `rotate(${mod.rotate || 0}deg)`,
-                                                        backgroundColor: mod.fillColor,
-                                                        borderColor: mod.strokeColor,
-                                                        borderWidth: mod.strokeWidth && mod.type === 'shape' ? `${mod.strokeWidth}px` : undefined,
-                                                        borderStyle: mod.shapeType ? 'solid' : 'none',
-                                                        zIndex: 1
-                                                    }}
-                                                >
-                                                    {mod.text && <span className="px-1">{mod.text}</span>}
-                                                    {mod.type === 'image' && mod.imageData && (
-                                                        <img src={URL.createObjectURL(new Blob([mod.imageData as any]))} className="w-full h-full object-contain" />
-                                                    )}
-                                                </div>
-                                            )
-                                        ))}
+                                        {modifications
+                                            .filter(m => m.pageIndex === pageIndex - 1)
+                                            .sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0))
+                                            .map((mod) => (
+                                                mod.type === 'drawing' ? (
+                                                    <svg
+                                                        key={mod.id}
+                                                        className={cn(
+                                                            "absolute inset-0 w-full h-full pointer-events-auto cursor-pointer transition-all",
+                                                            selectedIds.includes(mod.id) && "z-30 ring-2 ring-blue-500 ring-offset-2 ring-offset-slate-900"
+                                                        )}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            toggleSelectObject(mod.id, e.shiftKey);
+                                                        }}
+                                                        onMouseDown={(e) => {
+                                                            if (selectedIds.includes(mod.id)) {
+                                                                setIsDraggingObject(true);
+                                                                setDragStartPos({ x: e.clientX, y: e.clientY });
+                                                            }
+                                                        }}
+                                                        onMouseMove={(e) => {
+                                                            if (isDraggingObject && selectedIds.includes(mod.id)) {
+                                                                const dx = e.clientX - dragStartPos.x;
+                                                                const dy = e.clientY - dragStartPos.y;
+                                                                moveSelected(dx, dy);
+                                                                setDragStartPos({ x: e.clientX, y: e.clientY });
+                                                            }
+                                                        }}
+                                                        onMouseUp={() => {
+                                                            if (isDraggingObject) {
+                                                                setIsDraggingObject(false);
+                                                                finalizeMove();
+                                                            }
+                                                        }}
+                                                    >
+                                                        {mod.svgPath ? (
+                                                            <path
+                                                                d={mod.svgPath}
+                                                                fill="none"
+                                                                stroke={mod.strokeColor}
+                                                                strokeWidth={mod.strokeWidth}
+                                                                strokeOpacity={mod.opacity}
+                                                                transform={`translate(${mod.x}, ${mod.y}) scale(${mod.scale || 1.5}) rotate(${mod.rotate || 0})`}
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                            />
+                                                        ) : (
+                                                            <path
+                                                                d={`M ${mod.pathPoints?.map(p => `${p.x} ${p.y}`).join(' L ')}`}
+                                                                fill="none"
+                                                                stroke={mod.strokeColor}
+                                                                strokeWidth={mod.strokeWidth}
+                                                                strokeOpacity={mod.opacity}
+                                                                strokeLinecap="round"
+                                                            />
+                                                        )}
+                                                    </svg>
+                                                ) : mod.type === 'field' ? (
+                                                    <div
+                                                        key={mod.id}
+                                                        className={cn(
+                                                            "absolute border-2 border-dashed flex items-center justify-center overflow-hidden cursor-pointer transition-all group",
+                                                            selectedIds.includes(mod.id)
+                                                                ? "z-30 border-blue-500 bg-blue-500/10 ring-2 ring-blue-500 ring-offset-2 ring-offset-slate-900"
+                                                                : "border-indigo-400/50 bg-indigo-400/5"
+                                                        )}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            toggleSelectObject(mod.id, e.shiftKey);
+                                                        }}
+                                                        onMouseDown={(e) => {
+                                                            if (selectedIds.includes(mod.id)) {
+                                                                setIsDraggingObject(true);
+                                                                setDragStartPos({ x: e.clientX, y: e.clientY });
+                                                            }
+                                                        }}
+                                                        onMouseMove={(e) => {
+                                                            if (isDraggingObject && selectedIds.includes(mod.id)) {
+                                                                const dx = e.clientX - dragStartPos.x;
+                                                                const dy = e.clientY - dragStartPos.y;
+                                                                moveSelected(dx, dy);
+                                                                setDragStartPos({ x: e.clientX, y: e.clientY });
+                                                            }
+                                                        }}
+                                                        onMouseUp={() => {
+                                                            if (isDraggingObject) {
+                                                                setIsDraggingObject(false);
+                                                                finalizeMove();
+                                                            }
+                                                        }}
+                                                        style={{
+                                                            left: mod.x, top: mod.y,
+                                                            width: mod.width || 200,
+                                                            height: mod.height || 30,
+                                                            zIndex: mod.zIndex || 0
+                                                        }}
+                                                    >
+                                                        <div className="text-[10px] text-indigo-300 font-mono bg-slate-900/80 px-1 rounded absolute top-0 left-0 -mt-2.5">
+                                                            {mod.fieldName || mod.fieldType}
+                                                        </div>
+                                                        {mod.fieldType === 'text' && <div className="w-full h-full bg-white/10" />}
+                                                        {mod.fieldType === 'checkbox' && (
+                                                            <div className="w-full h-full border border-indigo-400 rounded-sm flex items-center justify-center">
+                                                                {mod.checked && <Check className="w-3 h-3 text-indigo-400" />}
+                                                            </div>
+                                                        )}
+                                                        {mod.required && <span className="absolute top-0 right-0 text-red-500 text-xs font-bold leading-none px-0.5">*</span>}
+                                                    </div>
+                                                ) : (
+                                                    <div
+                                                        key={mod.id}
+                                                        className={cn(
+                                                            "absolute border flex items-center justify-center overflow-hidden cursor-pointer transition-all",
+                                                            selectedIds.includes(mod.id)
+                                                                ? "z-30 border-blue-500 bg-blue-500/20 ring-2 ring-blue-500 ring-offset-2 ring-offset-slate-900"
+                                                                : "border-blue-400/30 bg-blue-400/10"
+                                                        )}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            toggleSelectObject(mod.id, e.shiftKey);
+                                                        }}
+                                                        onMouseDown={(e) => {
+                                                            if (selectedIds.includes(mod.id)) {
+                                                                setIsDraggingObject(true);
+                                                                setDragStartPos({ x: e.clientX, y: e.clientY });
+                                                            }
+                                                        }}
+                                                        onMouseMove={(e) => {
+                                                            if (isDraggingObject && selectedIds.includes(mod.id)) {
+                                                                const dx = e.clientX - dragStartPos.x;
+                                                                const dy = e.clientY - dragStartPos.y;
+                                                                moveSelected(dx, dy);
+                                                                setDragStartPos({ x: e.clientX, y: e.clientY });
+                                                            }
+                                                        }}
+                                                        onMouseUp={() => {
+                                                            if (isDraggingObject) {
+                                                                setIsDraggingObject(false);
+                                                                finalizeMove();
+                                                            }
+                                                        }}
+                                                        style={{
+                                                            left: mod.x, top: mod.y,
+                                                            width: mod.width || (mod.text ? 'auto' : 50),
+                                                            height: mod.height || (mod.text ? 'auto' : 50),
+                                                            color: mod.textColor,
+                                                            fontSize: mod.textSize,
+                                                            fontFamily: mod.font === 'Inter' ? 'var(--font-inter)' : mod.font,
+                                                            whiteSpace: 'nowrap',
+                                                            borderRadius: mod.shapeType === 'circle' ? '50%' : 0,
+                                                            transform: `rotate(${mod.rotate || 0}deg)`,
+                                                            backgroundColor: mod.fillColor,
+                                                            borderColor: mod.strokeColor,
+                                                            borderWidth: mod.strokeWidth && mod.type === 'shape' ? `${mod.strokeWidth}px` : undefined,
+                                                            borderStyle: mod.shapeType ? 'solid' : 'none',
+                                                            zIndex: mod.zIndex || 0
+                                                        }}
+                                                    >
+                                                        {mod.text && <span className="px-1">{mod.text}</span>}
+                                                        {mod.type === 'image' && mod.imageData && (
+                                                            <img src={URL.createObjectURL(new Blob([mod.imageData as any]))} className="w-full h-full object-contain pointer-events-none" alt="" />
+                                                        )}
+                                                    </div>
+                                                )
+                                            ))}
                                     </div>
 
                                     {/* Interaction */}
@@ -844,29 +1152,40 @@ export default function EditPDFPage() {
                                     )}
                                 </div>
 
-                                {/* Signature Modal Overlay */}
-                                {isSigning && (
-                                    <div className="absolute inset-0 z-[100] bg-black/60 flex items-center justify-center">
-                                        <div className="bg-slate-800 p-4 rounded-xl shadow-2xl border border-slate-700 w-96">
-                                            <h3 className="text-white font-bold mb-2">Draw Signature</h3>
-                                            <div className="bg-white rounded h-40 relative cursor-crosshair overflow-hidden">
-                                                <canvas
-                                                    ref={signCanvasRef}
-                                                    width={350}
-                                                    height={160}
-                                                    className="absolute inset-0"
-                                                    onMouseDown={startDrawing}
-                                                    onMouseMove={drawMove}
-                                                    onMouseUp={stopDrawing}
-                                                    onMouseLeave={stopDrawing}
-                                                />
-                                            </div>
-                                            <div className="flex justify-end gap-2 mt-4">
-                                                <Button variant="ghost" size="sm" onClick={() => setIsSigning(false)}>Cancel</Button>
-                                                <Button variant="outline" size="sm" onClick={clearSignature}>Clear</Button>
-                                                <Button variant="primary" size="sm" onClick={saveSignature}>Save Signature</Button>
-                                            </div>
-                                        </div>
+                                {/* Smart Guides */}
+                                {smartGuides.map((g, i) => (
+                                    <div
+                                        key={`guide-${i}`}
+                                        className={cn(
+                                            "absolute bg-blue-500/50 z-[60] pointer-events-none",
+                                            g.type === 'v' ? "w-px h-full" : "h-px w-full"
+                                        )}
+                                        style={{
+                                            left: g.type === 'v' ? g.pos : 0,
+                                            top: g.type === 'h' ? g.pos : 0
+                                        }}
+                                    />
+                                ))}
+
+                                {/* Floating HUD */}
+                                {selectedIds.length > 0 && (
+                                    <div
+                                        className="absolute z-[70] bg-slate-800 border border-slate-700 shadow-2xl rounded-lg p-1 flex gap-1 pointer-events-auto animate-in fade-in slide-in-from-bottom-2"
+                                        style={{
+                                            left: Math.min(...modifications.filter(m => selectedIds.includes(m.id)).map(m => m.x)),
+                                            top: Math.min(...modifications.filter(m => selectedIds.includes(m.id)).map(m => m.y)) - 50
+                                        }}
+                                    >
+                                        <button onClick={() => alignSelected('left')} className="p-2 hover:bg-slate-700 text-slate-400 hover:text-white rounded" title="Align Left"><AlignHorizontalJustifyCenter className="-rotate-90 w-4 h-4" /></button>
+                                        <button onClick={() => alignSelected('center')} className="p-2 hover:bg-slate-700 text-slate-400 hover:text-white rounded" title="Center Horizontal"><AlignCenter className="w-4 h-4" /></button>
+                                        <button onClick={() => alignSelected('right')} className="p-2 hover:bg-slate-700 text-slate-400 hover:text-white rounded" title="Align Right"><AlignHorizontalJustifyCenter className="rotate-90 w-4 h-4" /></button>
+                                        <div className="w-px bg-slate-700 mx-1" />
+                                        <button onClick={() => reorderSelection('front')} className="p-2 hover:bg-slate-700 text-slate-400 hover:text-white rounded" title="Bring to Front"><ArrowUp className="w-4 h-4" /></button>
+                                        <button onClick={() => reorderSelection('back')} className="p-2 hover:bg-slate-700 text-slate-400 hover:text-white rounded" title="Send to Back"><ArrowDown className="w-4 h-4" /></button>
+                                        <div className="w-px bg-slate-700 mx-1" />
+                                        <button onClick={() => duplicateLayer(modifications.find(m => selectedIds.includes(m.id))!)} className="p-2 hover:bg-slate-700 text-slate-400 hover:text-white rounded" title="Duplicate"><Copy className="w-4 h-4" /></button>
+                                        <button onClick={() => { selectedIds.forEach(id => removeModification(id)); setSelectedIds([]); }} className="p-2 hover:bg-red-500/20 text-slate-400 hover:text-red-500 rounded" title="Delete"><Trash2 className="w-4 h-4" /></button>
+                                        <button onClick={() => setSelectedIds([])} className="p-2 hover:bg-slate-700 text-slate-400 hover:text-white rounded" title="Close"><X className="w-4 h-4" /></button>
                                     </div>
                                 )}
                             </div>
@@ -1142,6 +1461,61 @@ export default function EditPDFPage() {
                                                     <Button variant="outline" size="sm" onClick={() => setIsSigning(true)} className="w-full">
                                                         {savedSignature ? 'Redraw Signature' : 'Draw Signature'}
                                                     </Button>
+                                                </div>
+                                            )}
+
+                                            {mode === 'field' && (
+                                                <div className="space-y-4">
+                                                    <div>
+                                                        <label className="text-xs text-slate-400 mb-1 block">Field Type</label>
+                                                        <div className="flex bg-slate-800 p-1 rounded-lg">
+                                                            <button
+                                                                onClick={() => setFieldType('text')}
+                                                                className={cn("flex-1 py-1 text-xs rounded", fieldType === 'text' ? "bg-blue-600 text-white" : "text-slate-400")}
+                                                            >
+                                                                Text Field
+                                                            </button>
+                                                            <button
+                                                                onClick={() => setFieldType('checkbox')}
+                                                                className={cn("flex-1 py-1 text-xs rounded", fieldType === 'checkbox' ? "bg-blue-600 text-white" : "text-slate-400")}
+                                                            >
+                                                                Checkbox
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <div>
+                                                        <label className="text-xs text-slate-400 mb-1 block">Field Name (ID)</label>
+                                                        <input
+                                                            type="text"
+                                                            value={fieldName}
+                                                            onChange={(e) => setFieldName(e.target.value)}
+                                                            placeholder="e.g. full_name"
+                                                            className="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white text-sm"
+                                                        />
+                                                        <p className="text-[10px] text-slate-500 mt-1">Unique identifier for the form data.</p>
+                                                    </div>
+
+                                                    <div className="space-y-2 pt-2 border-t border-slate-700">
+                                                        <label className="flex items-center gap-2 cursor-pointer">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={fieldRequired}
+                                                                onChange={(e) => setFieldRequired(e.target.checked)}
+                                                                className="rounded bg-slate-800 border-slate-600 text-blue-500"
+                                                            />
+                                                            <span className="text-sm text-slate-300">Required Field</span>
+                                                        </label>
+                                                        <label className="flex items-center gap-2 cursor-pointer">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={fieldReadOnly}
+                                                                onChange={(e) => setFieldReadOnly(e.target.checked)}
+                                                                className="rounded bg-slate-800 border-slate-600 text-blue-500"
+                                                            />
+                                                            <span className="text-sm text-slate-300">Read Only</span>
+                                                        </label>
+                                                    </div>
                                                 </div>
                                             )}
 

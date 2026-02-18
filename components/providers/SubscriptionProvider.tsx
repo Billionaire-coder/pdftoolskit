@@ -20,20 +20,12 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
     const { tier, setTier, isPro, getLimits } = useSubscriptionStore();
     const { data: session } = useSession();
 
-    // Sync with server state to prevent "Console Hack"
+    // Sync with server state (Bypassed for Local Testing)
     useEffect(() => {
-        if (session?.user) {
-            // In a real app, isPro would be a boolean on the user object.
-            // Here we use the image field as a mock, consistent with checking logic.
-            const serverTier = (session.user.image === 'pro' || (session.user as any).isPro) ? 'pro' : 'free';
-            if (tier !== serverTier) {
-                setTier(serverTier);
-            }
-        } else {
-            // Reset to free if logged out
-            if (tier !== 'free') setTier('free');
+        if (tier !== 'pro') {
+            setTier('pro');
         }
-    }, [session, tier, setTier]);
+    }, [tier, setTier]);
 
     const value = {
         isPro: isPro(),

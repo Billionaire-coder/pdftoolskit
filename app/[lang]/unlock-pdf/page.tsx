@@ -7,17 +7,14 @@ import { FileUpload } from '@/components/shared/FileUpload';
 import { ProgressBar } from '@/components/shared/ProgressBar';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { unlockPDF } from '@/lib/pdf-utils';
+import { unlockPDF, analyzeSecurity, SecurityAnalysis } from '@/lib/pdf-utils';
 import { downloadFile, validatePDFFile } from '@/lib/utils';
-import { toolGuides } from '@/data/guides';
-import { QuickGuide } from '@/components/shared/QuickGuide';
-import { RelatedTools } from '@/components/shared/RelatedTools';
-import { ToolContent } from '@/components/shared/ToolContent';
-import { useSubscription } from '@/components/providers/SubscriptionProvider';
 import { ToolHeader } from '@/components/shared/ToolHeader';
-
-
-
+import { QuickGuide } from '@/components/shared/QuickGuide';
+import { ToolContent } from '@/components/shared/ToolContent';
+import { RelatedTools } from '@/components/shared/RelatedTools';
+import { toolGuides } from '@/data/guides';
+import { useSubscription } from '@/components/providers/SubscriptionProvider';
 
 export default function UnlockPDFPage() {
     const { limits, isPro } = useSubscription();
@@ -29,6 +26,9 @@ export default function UnlockPDFPage() {
     const [result, setResult] = useState<{ blob: Blob; fileName: string } | null>(null);
     const [downloadFileName, setDownloadFileName] = useState('');
 
+    // Security Analysis State
+    const [securityStatus, setSecurityStatus] = useState<'analyzing' | 'open-locked' | 'owner-locked' | 'unlocked' | null>(null);
+
     useEffect(() => {
         if (result?.fileName) {
             setDownloadFileName(result.fileName);
@@ -39,8 +39,25 @@ export default function UnlockPDFPage() {
         if (files.length > 0) {
             const validation = validatePDFFile(files[0]);
             if (validation.valid) {
-                setFile(files[0]);
+                const selectedFile = files[0];
+                setFile(selectedFile);
                 toast.success('PDF file uploaded');
+
+                // Run Analysis
+                setSecurityStatus('analyzing');
+                analyzeSecurity(selectedFile).then((analysis) => {
+                    if (analysis.isOpenLocked) {
+                        setSecurityStatus('open-locked');
+                    } else if (analysis.isOwnerLocked) {
+                        setSecurityStatus('owner-locked');
+                    } else {
+                        setSecurityStatus('unlocked');
+                    }
+                }).catch(err => {
+                    console.error("Analysis failed", err);
+                    setSecurityStatus('open-locked'); // Assume worst case
+                });
+
             } else {
                 toast.error(validation.error || 'Invalid PDF file');
             }
@@ -77,8 +94,7 @@ export default function UnlockPDFPage() {
             clearInterval(progressInterval);
             setProgress(100);
 
-            // @ts-expect-error - Uint8Array is compatible with BlobPart
-            const blob = new Blob([unlockedPdfBytes], { type: 'application/pdf' });
+            const blob = new Blob([unlockedPdfBytes as any], { type: 'application/pdf' });
             const filename = file.name.replace('.pdf', '_unlocked.pdf');
 
             setResult({ blob, fileName: filename });
@@ -118,50 +134,93 @@ export default function UnlockPDFPage() {
                 />
             </div>
 
-            {/* Password Input */}
+            {/* Password Input / Security Status */}
             {file && !processing && !result && (
                 <GlassCard className="p-6 mb-8">
                     <div className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-white mb-2">
-                                Enter PDF Password (Optional)
-                            </label>
-                            <p className="text-xs text-slate-400 mb-2">
-                                Leave blank if the file opens without a password but has printing/editing restrictions.
-                            </p>
-                            <div className="relative">
-                                <input
-                                    type={showPassword ? "text" : "password"}
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="Password (if required to open)"
-                                    className="w-full px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary transition-all pr-12"
-                                    disabled={processing}
-                                    onKeyPress={(e) => {
-                                        if (e.key === 'Enter') {
-                                            handleUnlockPDF();
-                                        }
-                                    }}
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
-                                >
-                                    {showPassword ? (
-                                        <EyeOff className="w-5 h-5" />
-                                    ) : (
-                                        <Eye className="w-5 h-5" />
-                                    )}
-                                </button>
+                        {securityStatus === 'analyzing' && (
+                            <div className="flex items-center justify-center p-4">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+                                <span className="ml-3 text-slate-400">Analyzing security level...</span>
                             </div>
-                        </div>
+                        )}
+
+                        {securityStatus === 'open-locked' && (
+                            <div className="animate-in fade-in slide-in-from-bottom-2">
+                                <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-4 flex items-center gap-3">
+                                    <Key className="w-5 h-5 text-red-400" />
+                                    <div>
+                                        <p className="text-sm font-medium text-red-200">Password Required</p>
+                                        <p className="text-xs text-red-300/70">This file is encrypted and cannot be opened without a password.</p>
+                                    </div>
+                                </div>
+
+                                <label className="block text-sm font-medium text-white mb-2">
+                                    Enter Open Password
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        placeholder="Enter password to unlock"
+                                        className="w-full px-4 py-3 bg-white/10 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all pr-12"
+                                        disabled={processing}
+                                        onKeyPress={(e) => {
+                                            if (e.key === 'Enter') {
+                                                handleUnlockPDF();
+                                            }
+                                        }}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                                    >
+                                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {securityStatus === 'owner-locked' && (
+                            <div className="animate-in fade-in slide-in-from-bottom-2">
+                                <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-3 mb-4 flex items-center gap-3">
+                                    <Unlock className="w-5 h-5 text-orange-400" />
+                                    <div>
+                                        <p className="text-sm font-medium text-orange-200">Restricted Access Detected</p>
+                                        <p className="text-xs text-orange-300/70">
+                                            This file can be opened, but has restrictions (e.g., printing disabled).
+                                            We can remove these restrictions instantly.
+                                        </p>
+                                    </div>
+                                </div>
+                                {/* Optional Password field for owner locked, usually not needed if we just strip it */}
+                                <div className="text-xs text-slate-500 text-center">
+                                    Ready to strip security layer. No password required.
+                                </div>
+                            </div>
+                        )}
+
+                        {securityStatus === 'unlocked' && (
+                            <div className="animate-in fade-in slide-in-from-bottom-2">
+                                <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3 mb-4 flex items-center gap-3">
+                                    <Unlock className="w-5 h-5 text-emerald-400" />
+                                    <div>
+                                        <p className="text-sm font-medium text-emerald-200">No Encryption Detected</p>
+                                        <p className="text-xs text-emerald-300/70">
+                                            This file is not encrypted. You can still process it to ensure it's clean.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Security Notice */}
                         <div className="flex items-start space-x-2 text-sm text-slate-400">
                             <Key className="w-4 h-4 mt-0.5 flex-shrink-0" />
                             <p>
-                                Your password is processed locally in your browser. We never see or store your password.
+                                Decryption happens locally in your browser. zero-knowledge privacy.
                             </p>
                         </div>
                     </div>

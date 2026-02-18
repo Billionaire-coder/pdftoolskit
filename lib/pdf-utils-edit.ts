@@ -1,10 +1,10 @@
 import { PDFDocument, rgb, StandardFonts, PDFPage, degrees } from 'pdf-lib';
 import { applyBranding } from './pdf-utils';
 
-export type FontName = 'Helvetica' | 'Times Roman' | 'Courier' | 'Symbol';
+export type FontName = 'Helvetica' | 'Times Roman' | 'Courier' | 'Symbol' | 'Inter';
 
 export type PDFModification = {
-    type: 'text' | 'image' | 'shape' | 'drawing';
+    type: 'text' | 'image' | 'shape' | 'drawing' | 'field';
     pageIndex: number;
     x: number;
     y: number; // Top-left relative from UI
@@ -29,6 +29,17 @@ export type PDFModification = {
     // SVG Path (for icons/signatures)
     svgPath?: string;
     scale?: number;
+    zIndex?: number;
+
+    // Field (New Form Builder)
+    fieldType?: 'text' | 'checkbox' | 'dropdown';
+    fieldName?: string;
+    fieldValue?: string;
+    readOnly?: boolean;
+    required?: boolean;
+    multiline?: boolean;
+    checked?: boolean;
+    options?: string[]; // For dropdowns
 };
 
 export async function editPDF(
@@ -38,23 +49,45 @@ export async function editPDF(
     const arrayBuffer = await file.arrayBuffer();
     const pdfDoc = await PDFDocument.load(arrayBuffer);
 
-    // Embed standard fonts once
-    const fonts = {
+    const fonts: Record<string, any> = {
         'Helvetica': await pdfDoc.embedFont(StandardFonts.Helvetica),
         'Times Roman': await pdfDoc.embedFont(StandardFonts.TimesRoman),
         'Courier': await pdfDoc.embedFont(StandardFonts.Courier),
         'Symbol': await pdfDoc.embedFont(StandardFonts.Symbol),
     };
 
+    // Try to embed Inter if used
+    if (modifications.some(m => m.font === 'Inter')) {
+        try {
+            // Fetch font from public directory
+            const fontUrl = 'https://pdftoolskit.vercel.app/fonts/Inter-Regular.ttf'; // Using absolute for browser-side or handling accordingly
+            // Since we are server-side in this utility context (or client side with fetch)
+            const fontRes = await fetch(new URL('/fonts/Inter-Regular.ttf', window.location.origin));
+            const fontBytes = await fontRes.arrayBuffer();
+            fonts['Inter'] = await pdfDoc.embedFont(fontBytes);
+        } catch (e) {
+            console.warn("Failed to embed Inter font, falling back to Helvetica", e);
+            fonts['Inter'] = fonts['Helvetica'];
+        }
+    }
+
     const pages = pdfDoc.getPages();
 
-    for (const mod of modifications) {
+    // Sort modifications by zIndex for correct rendering order
+    const sortedMods = [...modifications].sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0));
+
+    const form = pdfDoc.getForm();
+
+    for (const mod of sortedMods) {
         if (mod.pageIndex < 0 || mod.pageIndex >= pages.length) continue;
         const page = pages[mod.pageIndex];
         const { height: pageHeight } = page.getSize();
 
         // Color helpers
         const getRgb = (hex?: string) => hex ? hexToRgb(hex) : undefined;
+
+        // Ensure unique field name if not provided
+        const fieldName = mod.fieldName || `field_${mod.type}_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
 
         const options = {
             opacity: mod.opacity ?? 1,
@@ -64,7 +97,55 @@ export async function editPDF(
             rotate: mod.rotate ? degrees(mod.rotate) : undefined
         };
 
-        if (mod.type === 'text' && mod.text) {
+        if (mod.type === 'field') {
+            const pdfY = pageHeight - mod.y - (mod.height || 20);
+
+            if (mod.fieldType === 'text') {
+                try {
+                    const textField = form.createTextField(fieldName);
+                    textField.setText(mod.fieldValue || '');
+                    textField.addToPage(page, {
+                        x: mod.x,
+                        y: pdfY,
+                        width: mod.width || 200,
+                        height: mod.height || 20,
+                        textColor: getRgb(mod.textColor) || rgb(0, 0, 0),
+                        backgroundColor: getRgb(mod.fillColor),
+                        borderColor: getRgb(mod.strokeColor),
+                        borderWidth: mod.strokeWidth ?? 1,
+                    });
+                    if (mod.readOnly) textField.enableReadOnly();
+                    if (mod.required) textField.enableRequired();
+                    if (mod.multiline) textField.enableMultiline();
+                } catch (e) {
+                    console.error("Failed to create text field", e);
+                }
+            } else if (mod.fieldType === 'checkbox') {
+                try {
+                    const checkBox = form.createCheckBox(fieldName);
+                    checkBox.addToPage(page, {
+                        x: mod.x,
+                        y: pdfY,
+                        width: mod.width || 20,
+                        height: mod.height || 20,
+                        textColor: getRgb(mod.textColor) || rgb(0, 0, 0),
+                        backgroundColor: getRgb(mod.fillColor),
+                        borderColor: getRgb(mod.strokeColor),
+                        borderWidth: mod.strokeWidth ?? 1,
+                    });
+                    if (mod.fieldValue === 'true' || mod.checked) checkBox.check();
+                    if (mod.readOnly) checkBox.enableReadOnly();
+                    if (mod.required) checkBox.enableRequired();
+                } catch (e) {
+                    console.error("Failed to create checkbox", e);
+                }
+            }
+            else if (mod.fieldType === 'dropdown' && mod.options) { // Example expansion
+                // Dropdown logic could go here
+            }
+
+        } else if (mod.type === 'text' && mod.text) {
+            // ... (Existing Text Logic)
             const size = mod.textSize || 12;
             const color = mod.textColor ? hexToRgb(mod.textColor) : rgb(0, 0, 0);
             const font = fonts[mod.font || 'Helvetica'];
@@ -78,11 +159,12 @@ export async function editPDF(
                 size: size,
                 font: font,
                 color: color,
-                opacity: options.opacity,
+                opacity: mod.opacity ?? 1, // Fix: Use direct mod access or options
                 rotate: options.rotate
             });
         }
         else if (mod.type === 'image' && mod.imageData) {
+            // ... (Existing Image Logic)
             let image;
             try {
                 image = await pdfDoc.embedPng(mod.imageData);
@@ -103,11 +185,12 @@ export async function editPDF(
                 y: pdfY,
                 width: w,
                 height: h,
-                opacity: options.opacity,
+                opacity: mod.opacity ?? 1,
                 rotate: options.rotate
             });
         }
         else if (mod.type === 'shape') {
+            // ... (Existing Shape Logic)
             const pdfY = pageHeight - mod.y - (mod.height || 0);
 
             if (mod.shapeType === 'rectangle') {
@@ -137,6 +220,7 @@ export async function editPDF(
             }
         }
         else if (mod.type === 'drawing') {
+            // ... (Existing Drawing Logic)
             if (mod.svgPath) {
                 // SVG Path Rendering
                 const pdfY = pageHeight - mod.y - (mod.height || 50);

@@ -1,71 +1,107 @@
-/* eslint-disable */
-import { WORKFLOW_STRATEGIES } from './workflow/strategies';
+import { PDFDocument } from 'pdf-lib';
+import { addWatermark, addPageNumbers } from './services/pdf/manipulators/enrichment';
+import { compressPDF } from './services/pdf/manipulators/compression';
+import { protectPDF, unlockPDF } from './services/pdf/security';
+import { rotatePDF } from './services/pdf/manipulators/organization';
+import { flattenPDF } from './services/pdf/manipulators/basic';
 
-export type WorkflowActionType =
-    | 'merge'
-    | 'rotate'
-    | 'compress'
-    | 'protect'
+export type WorkflowAction =
     | 'watermark'
     | 'pageNumbers'
-    | 'metadata'
-    | 'reorder'
-    | 'extract'
-    | 'split'
-    | 'pdfToImage';
+    | 'protect'
+    | 'unlock'
+    | 'compress'
+    | 'rotate'
+    | 'flatten';
 
 export interface WorkflowStep {
     id: string;
-    type: WorkflowActionType;
-    settings: any;
+    action: WorkflowAction;
+    params: any;
 }
 
-export interface WorkflowStepResult {
-    fileName: string;
-    data: Uint8Array;
+export interface WorkflowResult {
+    pdfBytes: Uint8Array;
+    logs: string[];
 }
 
-export type ProgressCallback = (stepIndex: number, totalSteps: number, status: string) => void;
+export class WorkflowEngine {
+    private logs: string[] = [];
 
-/**
- * Executes a defined workflow on a given list of files.
- */
-export async function executeWorkflow(
-    files: File[],
-    steps: WorkflowStep[],
-    onProgress?: ProgressCallback
-): Promise<File[]> {
-    if (files.length === 0) throw new Error("No files provided");
-    if (steps.length === 0) return files;
+    private log(message: string) {
+        this.logs.push(`[${new Date().toISOString()}] ${message}`);
+    }
 
-    let currentFiles = [...files];
+    async execute(file: File, steps: WorkflowStep[]): Promise<WorkflowResult> {
+        this.logs = [];
+        this.log(`Starting workflow with ${steps.length} steps.`);
 
-    for (let i = 0; i < steps.length; i++) {
-        const step = steps[i];
-        if (onProgress) onProgress(i, steps.length, `Running ${step.type}...`);
+        let currentPdfBytes: any = new Uint8Array(await file.arrayBuffer());
+        // For tools that need a File object, we might need to reconstruct it?
+        // Most tools in this codebase take `File`. 
+        // We should construct a File from the bytes for each step if the tool requires it,
+        // OR refactor tools to accept `Uint8Array`.
+        // Refactoring is cleaner but risky.
+        // Creating a File object is safer for compatibility.
 
-        console.log(`[Workflow] Step ${i + 1}: ${step.type}`, step.settings);
+        let currentFilename = file.name;
 
-        try {
-            currentFiles = await processStep(currentFiles, step);
-        } catch (error) {
-            console.error(`[Workflow] Error in step ${step.type}:`, error);
-            throw new Error(`Step ${i + 1} (${step.type}) failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        for (let index = 0; index < steps.length; index++) {
+            const step = steps[index];
+            this.log(`Step ${index + 1}: Executing ${step.action}...`);
+
+            // Create a File object for the current step
+            const currentFile = new File([currentPdfBytes], currentFilename, { type: 'application/pdf' });
+
+            try {
+                switch (step.action) {
+                    case 'watermark':
+                        currentPdfBytes = await addWatermark(currentFile, step.params.text, step.params.options);
+                        break;
+                    case 'pageNumbers':
+                        currentPdfBytes = await addPageNumbers(currentFile, {
+                            position: step.params.location,
+                            startFrom: step.params.startNumber,
+                            textPattern: step.params.textPattern,
+                            margin: step.params.margin,
+                            mirror: step.params.mirror
+                        });
+                        break;
+                    case 'protect':
+                        // protectPDF(file, options)
+                        currentPdfBytes = await protectPDF(currentFile, {
+                            userPassword: step.params.password,
+                            ...step.params.settings
+                        });
+                        break;
+                    case 'unlock':
+                        // unlockPDF(file, password)
+                        currentPdfBytes = await unlockPDF(currentFile, step.params.password);
+                        break;
+                    case 'compress':
+                        // compressPDF(file, quality)
+                        currentPdfBytes = await compressPDF(currentFile, step.params.quality);
+                        break;
+                    case 'rotate':
+                        // rotatePDF(file, rotation)
+                        currentPdfBytes = await rotatePDF(currentFile, step.params.rotation as 90 | 180 | 270);
+                        break;
+                    case 'flatten':
+                        // flattenPDF(file, options)
+                        currentPdfBytes = await flattenPDF(currentFile, step.params.options);
+                        break;
+                    default:
+                        this.log(`Unknown action: ${step.action}`);
+                }
+            } catch (error) {
+                this.log(`Error in step ${step.action}: ${error}`);
+                throw error;
+            }
         }
-    }
 
-    if (onProgress) onProgress(steps.length, steps.length, 'Completed');
-    return currentFiles;
+        this.log('Workflow completed successfully.');
+        return { pdfBytes: currentPdfBytes, logs: this.logs };
+    }
 }
 
-async function processStep(files: File[], step: WorkflowStep): Promise<File[]> {
-    const { type, settings } = step;
-    const strategy = WORKFLOW_STRATEGIES[type];
-
-    if (!strategy) {
-        console.warn(`Unknown step type: ${type}`);
-        return files;
-    }
-
-    return await strategy.execute(files, settings);
-}
+export const workflowEngine = new WorkflowEngine();

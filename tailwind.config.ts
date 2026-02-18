@@ -55,6 +55,9 @@ const config: Config = {
                 'shimmer': 'shimmer 2s linear infinite',
                 'fade-in': 'fadeIn 0.5s ease-out',
                 'slide-up': 'slideUp 0.5s ease-out',
+                'scan': 'scan 4s linear infinite',
+                'spin-slow': 'spin 12s linear infinite',
+                'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
             },
             keyframes: {
                 float: {
@@ -76,6 +79,15 @@ const config: Config = {
                 slideUp: {
                     '0%': { transform: 'translateY(30px)', opacity: '0' },
                     '100%': { transform: 'translateY(0)', opacity: '1' },
+                },
+                scan: {
+                    '0%, 100%': { transform: 'translateY(0)', opacity: '0' },
+                    '10%, 90%': { opacity: '1' },
+                    '50%': { transform: 'translateY(300px)' },
+                },
+                pulseGlow: {
+                    '0%, 100%': { opacity: '0.4', transform: 'scale(1)' },
+                    '50%': { opacity: '1', transform: 'scale(1.05)' },
                 },
             },
         },

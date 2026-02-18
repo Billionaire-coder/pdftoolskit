@@ -24,8 +24,8 @@ export default function PDFtoJPGPage() {
     const [file, setFile] = useState<File | null>(null);
     const [processing, setProcessing] = useState(false);
     const [progress, setProgress] = useState(0);
-    const [quality, setQuality] = useState<'low' | 'standard' | 'high'>('standard');
-    const [format, setFormat] = useState<'jpeg' | 'png'>('jpeg');
+    const [dpi, setDpi] = useState(150);
+    const [format, setFormat] = useState<'jpeg' | 'png' | 'webp'>('jpeg');
     const [result, setResult] = useState<{ blob: Blob; fileName: string } | null>(null);
     const [downloadFileName, setDownloadFileName] = useState('');
 
@@ -55,22 +55,11 @@ export default function PDFtoJPGPage() {
 
         try {
             // 1. Determine Scale and Quality based on selection
-            let scale = 2.0;
-            let qualityValue = 0.85;
-
-            if (quality === 'low') {
-                scale = 1.0;
-                qualityValue = 0.7;
-            } else if (quality === 'high') {
-                scale = 4.16; // ~300 DPI
-                qualityValue = 0.95;
-            }
-
             const { convertPDFToImages } = await import('@/lib/services/pdf/manipulators/organization');
             const generator = convertPDFToImages(file, {
                 format,
-                scale,
-                quality: qualityValue
+                scale: dpi / 72,
+                quality: 0.9
             });
 
             const convertedFiles: File[] = [];
@@ -172,29 +161,33 @@ export default function PDFtoJPGPage() {
 
             {file && !processing && !result && (
                 <GlassCard className="p-6 mb-8">
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                        <div className="w-full md:w-auto">
-                            <label className="block text-sm font-medium text-slate-300 mb-2">Image Quality</label>
-                            <div className="flex gap-2 bg-white/5 p-1 rounded-lg">
-                                {(['low', 'standard', 'high'] as const).map((q) => (
-                                    <button
-                                        key={q}
-                                        onClick={() => setQuality(q)}
-                                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${quality === q
-                                            ? 'bg-gradient-primary text-white shadow-lg'
-                                            : 'text-slate-400 hover:text-white'
-                                            }`}
-                                    >
-                                        {q.charAt(0).toUpperCase() + q.slice(1)}
-                                    </button>
-                                ))}
+                    <div className="flex flex-col md:flex-row items-end justify-between gap-6">
+                        <div className="w-full flex-grow">
+                            <div className="flex justify-between items-center mb-2">
+                                <label className="block text-sm font-medium text-slate-300">Resolution (DPI)</label>
+                                <span className="text-orange-500 font-bold">{dpi} DPI {dpi >= 300 && '🚀'}</span>
+                            </div>
+                            <input
+                                type="range"
+                                min="72"
+                                max="600"
+                                step="1"
+                                value={dpi}
+                                onChange={(e) => setDpi(parseInt(e.target.value))}
+                                className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-orange-500"
+                            />
+                            <div className="flex justify-between text-[10px] text-slate-500 mt-1">
+                                <span>72 (Web)</span>
+                                <span>150 (Standard)</span>
+                                <span>300 (Print)</span>
+                                <span>600 (Ultra-High)</span>
                             </div>
                         </div>
 
                         <div className="w-full md:w-auto">
                             <label className="block text-sm font-medium text-slate-300 mb-2">Format</label>
                             <div className="flex gap-2 bg-white/5 p-1 rounded-lg">
-                                {(['jpeg', 'png'] as const).map((f) => (
+                                {(['jpeg', 'png', 'webp'] as const).map((f) => (
                                     <button
                                         key={f}
                                         onClick={() => setFormat(f)}

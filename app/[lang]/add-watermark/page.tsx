@@ -50,6 +50,7 @@ export default function AddWatermarkPage() {
     // Rotation is harder to visualize with current Overlay, let's keep it simple (45deg fixed or slider?)
     // pdf-utils default was 45. Let's make it configurable?
     const [rotation, setRotation] = useState(45);
+    const [layoutMode, setLayoutMode] = useState<'single' | 'mosaic'>('single');
 
     // Position (Percent or Pixels? logic below uses pixels relative to current view)
     // We treat the "Selection" as the watermark bounds?
@@ -95,100 +96,31 @@ export default function AddWatermarkPage() {
                 setProgress((prev) => Math.min(prev + 10, 90));
             }, 200);
 
-            // We apply to ALL pages by default based on the visual placement on Page 1?
-            // Or only current page? The previous tool applied to all.
-            // Let's keep "Apply availability to ALL pages" as the main feature.
+            // Calculate relative position based on Page 1 dims
+            // selection coordinates are relative to the viewer image
+            const refW = pageDims.width || 100;
+            const refH = pageDims.height || 100;
 
-            // We need to convert UI Rect (x,y,w,h) to PDF coordinates.
-            // But `addWatermark` in `pdf-utils` was previously "Center of Page, Fixed".
-            // We need to update `pdf-utils` or pass the params.
-            // The existing function signature is:
-            // addWatermark(file, text, options: { opacity, size, color }) -> It centers it by default.
+            const uiCenterX = selection.x + (selection.width / 2);
+            const uiCenterY = selection.y + (selection.height / 2);
 
-            // We need a more advanced function if we want custom position.
-            // For this iteration, let's stick to the existing "Center" logic but expose the Style Options visually,
-            // OR ignore the visual drag position and just use the style controls?
-            // "Visual Customization" implies drag/drop.
-            // Let's Respect the visual placement.
+            const relX = uiCenterX / refW;
+            const relY = uiCenterY / refH;
 
-            // Wait, I can't easily modify `pdf-utils` without potentially breaking other things or making this task huge.
-            // Let's check `addWatermark` implementation again.
-            /* 
-               page.drawText(watermarkText, {
-                   x: (width / 2) - (textWidth / 2), ...
-           */
-            // Ideally should support x/y.
-            // I'll update `addWatermark` to accept x,y in options if provided?
-            // Or just override it locally.
-
-            // Actually, I should use `pdf-lib` directly here or update the util?
-            // Updating the util makes sense. I'll modify `pdf-utils.ts` in separate step if needed.
-            // Wait, I am in one shot. I should probably just implement `customAddWatermark` here using imports,
-            // OR Assume I update `pdf-utils` too.
-            // Let's update `pdf-utils`? No, that file is huge.
-            // Let's write the logic here inside `handleAddWatermark` to use `pdf-lib`.
-
-            const arrayBuffer = await file.arrayBuffer();
-            const { PDFDocument, rgb, degrees, StandardFonts } = await import('pdf-lib');
-            const pdfDoc = await PDFDocument.load(arrayBuffer);
-            const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica); // Or Bold?
-
-            const pages = pdfDoc.getPages();
-
-            // hex to rgb
+            // Extract RGB
             const r = parseInt(color.slice(1, 3), 16) / 255;
             const g = parseInt(color.slice(3, 5), 16) / 255;
             const b = parseInt(color.slice(5, 7), 16) / 255;
-            const pdfColor = rgb(r, g, b);
 
-            for (const page of pages) {
-                const { width, height } = page.getSize();
-                // Map UI Selection to Percentages to apply to all pages (in case sizes differ)
-                // Use `pageDims` (Viewer Page 1) as reference
-
-                // If we assume Visual Placement is "Center":
-                // x = selection.x + selection.width/2
-                // y = selection.y + selection.height/2
-
-                // But PDF coordinates Y is inverted (0 at bottom).
-                // Viewer Y is 0 at top.
-
-                // If user placed it at Top 100px.
-                // PDF Y = height - 100px.
-
-                // Let's calculate centroid relative to Page 1
-                const refW = pageDims.width || width;
-                const refH = pageDims.height || height;
-
-                const uiCenterX = selection.x + (selection.width / 2);
-                const uiCenterY = selection.y + (selection.height / 2);
-
-                const percentX = uiCenterX / refW;
-                const percentY = uiCenterY / refH;
-
-                // Target Page
-                const targetX = width * percentX;
-                const targetY = height - (height * percentY); // Invert Y
-
-                // Offset text by half its width/height to center at target
-                const textWidth = helveticaFont.widthOfTextAtSize(text, size);
-                const textHeight = helveticaFont.heightAtSize(size);
-
-                page.drawText(text, {
-                    x: targetX - (textWidth / 2),
-                    y: targetY - (textHeight / 2),
-                    size: size,
-                    font: helveticaFont,
-                    color: pdfColor,
-                    opacity: opacity,
-                    rotate: degrees(rotation), // negative for CW? pdf-lib uses CCW degrees usually?
-                    // pdf-lib rotation is CCW. CSS rotation is CW.
-                    // If UI shows 45deg CW (standard), PDF needs -45?
-                    // Viewer uses standard CSS transform.
-                });
-            }
-
-            const newPdfBytes = await pdfDoc.save();
+            const newPdfBytes = await addWatermark(file, text, {
+                opacity,
+                size,
+                color: { r, g, b },
+                rotation,
+                layout: layoutMode, // 'single' | 'mosaic'
+                x: relX,
+                y: relY
+            });
 
             clearInterval(progressInterval);
             setProgress(100);
@@ -284,36 +216,69 @@ export default function AddWatermarkPage() {
                             />
                             {pageDims.width > 0 && (
                                 <div
-                                    className="absolute"
+                                    className="absolute inset-0 pointer-events-none"
                                     style={{ width: pageDims.width, height: pageDims.height }}
                                 >
-                                    <InteractiveOverlay
-                                        width={pageDims.width}
-                                        height={pageDims.height}
-                                        selection={selection}
-                                        onSelectionChange={setSelection}
-                                        label=""
-                                        color={color}
-                                    // Custom render content inside the box
-                                    >
-                                        <div className="w-full h-full flex items-center justify-center overflow-hidden"
-                                            style={{
-                                                transform: `rotate(${rotation}deg)`,
-                                                opacity: opacity
-                                            }}>
-                                            <span
-                                                style={{
-                                                    fontSize: `${size}px`,
-                                                    color: color,
-                                                    fontWeight: 'bold',
-                                                    whiteSpace: 'nowrap',
-                                                    fontFamily: 'Helvetica, sans-serif'
-                                                }}
+                                    {layoutMode === 'single' ? (
+                                        <div className="pointer-events-auto w-full h-full">
+                                            <InteractiveOverlay
+                                                width={pageDims.width}
+                                                height={pageDims.height}
+                                                selection={selection}
+                                                onSelectionChange={setSelection}
+                                                label=""
+                                                color={color}
                                             >
-                                                {text}
-                                            </span>
+                                                <div className="w-full h-full flex items-center justify-center overflow-hidden"
+                                                    style={{
+                                                        transform: `rotate(${rotation}deg)`,
+                                                        opacity: opacity
+                                                    }}>
+                                                    <span
+                                                        style={{
+                                                            fontSize: `${size}px`,
+                                                            color: color,
+                                                            fontWeight: 'bold',
+                                                            whiteSpace: 'nowrap',
+                                                            fontFamily: 'Helvetica, sans-serif'
+                                                        }}
+                                                    >
+                                                        {text}
+                                                    </span>
+                                                </div>
+                                            </InteractiveOverlay>
                                         </div>
-                                    </InteractiveOverlay>
+                                    ) : (
+                                        <div className="w-full h-full p-4 overflow-hidden relative">
+                                            {/* Simplified CSS Mosaic Preview */}
+                                            {Array.from({ length: 12 }).map((_, i) => (
+                                                <div
+                                                    key={i}
+                                                    className="absolute flex items-center justify-center"
+                                                    style={{
+                                                        left: `${(i % 3) * 33}%`,
+                                                        top: `${Math.floor(i / 3) * 25}%`,
+                                                        width: '33%',
+                                                        height: '25%',
+                                                        transform: `rotate(${rotation}deg)`,
+                                                        opacity: opacity
+                                                    }}
+                                                >
+                                                    <span
+                                                        style={{
+                                                            fontSize: `${size}px`,
+                                                            color: color,
+                                                            fontWeight: 'bold',
+                                                            whiteSpace: 'nowrap',
+                                                            fontFamily: 'Helvetica, sans-serif'
+                                                        }}
+                                                    >
+                                                        {text}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -335,6 +300,28 @@ export default function AddWatermarkPage() {
                                     onChange={(e) => setText(e.target.value)}
                                     className="w-full px-3 py-2 rounded-lg glass text-white focus-ring"
                                 />
+                            </div>
+
+                            {/* Layout Mode Switcher */}
+                            <div className="bg-slate-700/50 p-1 rounded-lg flex">
+                                <button
+                                    onClick={() => setLayoutMode('single')}
+                                    className={cn(
+                                        "flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors",
+                                        layoutMode === 'single' ? "bg-violet-500 text-white shadow-sm" : "text-slate-400 hover:text-white"
+                                    )}
+                                >
+                                    Single
+                                </button>
+                                <button
+                                    onClick={() => setLayoutMode('mosaic')}
+                                    className={cn(
+                                        "flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors",
+                                        layoutMode === 'mosaic' ? "bg-violet-500 text-white shadow-sm" : "text-slate-400 hover:text-white"
+                                    )}
+                                >
+                                    Mosaic (Tile)
+                                </button>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">

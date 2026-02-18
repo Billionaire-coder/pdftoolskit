@@ -82,10 +82,45 @@ export function InteractiveOverlay({
         const h = Math.abs(currentPos.y - startPos.y);
 
         // Constrain to container
-        const constrainedX = Math.max(0, x);
-        const constrainedY = Math.max(0, y);
-        const constrainedW = Math.min(w, width - constrainedX);
-        const constrainedH = Math.min(h, height - constrainedY);
+        let constrainedX = Math.max(0, x);
+        let constrainedY = Math.max(0, y);
+        let constrainedW = Math.min(w, width - constrainedX);
+        let constrainedH = Math.min(h, height - constrainedY);
+
+        // --- SMART SNAPPING (Pillar 3) ---
+        const SNAP_THRESHOLD = 12;
+
+        // 1. Snap to Document Center & Edges
+        const centerX = width / 2;
+
+        // Horizontal Center
+        if (Math.abs(constrainedX + constrainedW / 2 - centerX) < SNAP_THRESHOLD) {
+            constrainedX = centerX - constrainedW / 2;
+        }
+
+        // Left/Right Edges (with margin)
+        const margin = 40;
+        if (Math.abs(constrainedX - margin) < SNAP_THRESHOLD) constrainedX = margin;
+        if (Math.abs(constrainedX + constrainedW - (width - margin)) < SNAP_THRESHOLD) {
+            constrainedX = width - margin - constrainedW;
+        }
+
+        // 2. Snap to Standard Signature Widths (150px, 200px, 300px)
+        const standardWidths = [150, 200, 300];
+        for (const sw of standardWidths) {
+            if (Math.abs(constrainedW - sw) < SNAP_THRESHOLD) {
+                constrainedW = sw;
+            }
+        }
+
+        // 3. Aspect Ratio Preservation (Sig-Standard 3:1)
+        const targetRatio = 3; // 3:1 width to height
+        if (constrainedW > 0) {
+            const hFromW = constrainedW / targetRatio;
+            if (Math.abs(constrainedH - hFromW) < SNAP_THRESHOLD) {
+                constrainedH = hFromW;
+            }
+        }
 
         onSelectionChange({
             x: constrainedX,
@@ -99,11 +134,12 @@ export function InteractiveOverlay({
         setIsDragging(false);
     };
 
-    const handleTouchStart = (e: any) => {
+    const handleTouchStart = (e: React.TouchEvent) => {
         if (mode !== 'draw') return;
-        // logic for touch...
-        // For now let's just use mouse events, touch is tricky with scrolling
-        // We can expand later if needed.
+        const pos = getMousePos(e.nativeEvent as any);
+        setStartPos(pos);
+        setIsDragging(true);
+        onSelectionChange({ x: pos.x, y: pos.y, width: 0, height: 0 });
     };
 
     return (

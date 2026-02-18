@@ -9,7 +9,7 @@ export async function POST(request: Request) {
     }
 
     try {
-        const { url, format = 'a4', orientation = 'portrait' } = await request.json();
+        const { url, format = 'a4', orientation = 'portrait', viewport = 'desktop', cleanShot = true } = await request.json();
 
         if (!url) {
             return NextResponse.json({ error: 'URL is required' }, { status: 400 });
@@ -35,6 +35,8 @@ export async function POST(request: Request) {
             url: targetUrl,
             format: format as any,
             orientation: orientation as any,
+            viewport: viewport as any,
+            cleanShot: !!cleanShot,
             browserlessToken: process.env.BROWSERLESS_TOKEN
         });
 

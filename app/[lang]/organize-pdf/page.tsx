@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { GripVertical, Download, ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
+import { GripVertical, Download, ArrowLeft, ArrowRight, CheckCircle, Check, X, Move, LayoutDashboard, Bookmark, Link as LinkIcon, Info, RotateCw, RotateCcw, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
 import { ProgressBar } from '@/components/shared/ProgressBar';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { organizePDF } from '@/lib/pdf-utils';
-import { downloadFile, validatePDFFile, getBaseFileName } from '@/lib/utils';
+import { downloadFile, validatePDFFile, getBaseFileName, cn } from '@/lib/utils';
 import { PDFGrid } from '@/components/pdf/PDFGrid';
 import { PDFThumbnail } from '@/components/pdf/PDFThumbnail';
 import { toolGuides } from '@/data/guides';
@@ -25,7 +25,15 @@ import { Grid } from 'react-window';
 import { AutoSizer } from 'react-virtualized-auto-sizer';
 
 // Sortable Item Component
-function SortablePage({ id, index, file, originalPageIndex }: { id: number, index: number, file: File, originalPageIndex: number }) {
+function SortablePage({ id, index, file, originalPageIndex, selected, onSelect, rotation }: {
+    id: number,
+    index: number,
+    file: File,
+    originalPageIndex: number,
+    selected: boolean,
+    onSelect: (e: React.MouseEvent) => void,
+    rotation?: number
+}) {
     const {
         attributes,
         listeners,
@@ -47,30 +55,51 @@ function SortablePage({ id, index, file, originalPageIndex }: { id: number, inde
     };
 
     return (
-        <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="relative group cursor-grab active:cursor-grabbing touch-none">
+        <div
+            ref={setNodeRef}
+            style={style}
+            {...attributes}
+            {...listeners}
+            onClick={onSelect}
+            className={cn(
+                "relative group cursor-grab active:cursor-grabbing touch-none transition-all duration-200",
+                selected && "scale-95"
+            )}
+        >
             <PDFThumbnail
                 file={file}
                 pageNumber={originalPageIndex + 1}
+                selected={selected}
+                rotation={rotation}
                 overlayIcon={
-                    <div className="absolute top-2 left-2 bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow-md z-10">
+                    <div className={cn(
+                        "absolute top-2 left-2 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow-md z-10 transition-colors",
+                        selected ? "bg-cyan-500 text-white" : "bg-slate-800 text-slate-300"
+                    )}>
                         {index + 1}
                     </div>
                 }
-                overlayColor="bg-transparent"
-                className="hover:scale-102 transition-transform duration-200"
+                overlayColor={selected ? "bg-cyan-500/10" : "bg-transparent"}
+                className={cn(
+                    "hover:scale-102 transition-transform duration-200",
+                    selected && "ring-2 ring-cyan-500"
+                )}
             />
         </div>
     );
 }
 
+
+
 // Virtualized Grid Cell Component
-function PDFCell({ columnIndex, rowIndex, style, items, onRenderItem, columnCount }: {
+function PDFCell({ columnIndex, rowIndex, style, items, onRenderItem, columnCount, metadata }: {
     columnIndex: number,
     rowIndex: number,
     style: React.CSSProperties,
     items: number[],
-    onRenderItem: (id: number, index: number) => React.ReactNode,
-    columnCount: number
+    onRenderItem: (id: number, index: number, metadata?: { hasLinks: boolean; hasBookmarks: boolean }) => React.ReactNode,
+    columnCount: number,
+    metadata: Record<number, { hasLinks: boolean; hasBookmarks: boolean }>
 }) {
     const index = rowIndex * columnCount + columnIndex;
     if (index >= items.length) return null;
@@ -83,13 +112,18 @@ function PDFCell({ columnIndex, rowIndex, style, items, onRenderItem, columnCoun
             display: 'flex',
             justifyContent: 'center'
         }}>
-            {onRenderItem(id, index)}
+            {onRenderItem(id, index, metadata[id])}
         </div>
     );
 }
 
 // Virtualized Grid Component
-function VirtualizedGrid({ items, file, onRenderItem }: { items: number[], file: File, onRenderItem: (id: number, index: number) => React.ReactNode }) {
+function VirtualizedGrid({ items, file, onRenderItem, metadata }: {
+    items: number[],
+    file: File,
+    onRenderItem: (id: number, index: number, metadata?: { hasLinks: boolean; hasBookmarks: boolean }) => React.ReactNode,
+    metadata: Record<number, { hasLinks: boolean; hasBookmarks: boolean }>
+}) {
     return (
         <div style={{ height: '600px', width: '100%' }}>
             <AutoSizer
@@ -108,7 +142,7 @@ function VirtualizedGrid({ items, file, onRenderItem }: { items: number[], file:
                             rowHeight={280}
                             style={{ height: h, width: w }}
                             cellComponent={PDFCell as any}
-                            cellProps={{ items, onRenderItem, columnCount } as any}
+                            cellProps={{ items, onRenderItem, columnCount, metadata } as any}
                         />
                     );
                 }}
@@ -127,6 +161,10 @@ export default function OrganizePDFPage() {
 
     // Core state: Array of original page indices in their NEW order
     const [pageOrder, setPageOrder] = useState<number[]>([]);
+    const [pageRotations, setPageRotations] = useState<Record<number, number>>({});
+    const [pageMetadata, setPageMetadata] = useState<Record<number, { hasLinks: boolean; hasBookmarks: boolean }>>({});
+    const [selectedPages, setSelectedPages] = useState<number[]>([]); // Array of original page indices
+    const [lastClickedIndex, setLastClickedIndex] = useState<number | null>(null);
     const [activeId, setActiveId] = useState<number | null>(null);
 
     const [result, setResult] = useState<{ blob: Blob; fileName: string } | null>(null);
@@ -157,18 +195,54 @@ export default function OrganizePDFPage() {
 
             try {
                 const arrayBuffer = await files[0].arrayBuffer();
-                const { PDFDocument } = await import('pdf-lib');
+                const { PDFDocument, PDFName } = await import('pdf-lib');
                 const doc = await PDFDocument.load(arrayBuffer);
                 const count = doc.getPageCount();
+
+                // Structural Scanning
+                const metadata: Record<number, { hasLinks: boolean; hasBookmarks: boolean }> = {};
+                const hasGlobalOutlines = !!doc.catalog.get(PDFName.of('Outlines'));
+
+                const pages = doc.getPages();
+                pages.forEach((page, i) => {
+                    const annots = page.node.Annots();
+                    const hasLinks = annots ? annots.size() > 0 : false;
+                    metadata[i] = {
+                        hasLinks,
+                        hasBookmarks: hasGlobalOutlines // Simplify: if outlines exist, pages are considered part of the structure
+                    };
+                });
+
+                setPageMetadata(metadata);
                 setPageCount(count);
-                // Initialize order as 0..N-1
                 setPageOrder(Array.from({ length: count }, (_, i) => i));
+                setPageRotations({});
+                setSelectedPages([]);
+                setLastClickedIndex(null);
             } catch (e) {
                 console.error("Failed to load PDF", e);
             }
         } else {
             toast.error(validation.error || 'Invalid file');
         }
+    };
+
+    const handlePageClick = (e: React.MouseEvent, pageIdx: number) => {
+        const orderIdx = pageOrder.indexOf(pageIdx);
+
+        if (e.shiftKey && lastClickedIndex !== null) {
+            const start = Math.min(lastClickedIndex, orderIdx);
+            const end = Math.max(lastClickedIndex, orderIdx);
+            const range = pageOrder.slice(start, end + 1);
+            setSelectedPages(prev => Array.from(new Set([...prev, ...range])));
+        } else if (e.ctrlKey || e.metaKey) {
+            setSelectedPages(prev =>
+                prev.includes(pageIdx) ? prev.filter(p => p !== pageIdx) : [...prev, pageIdx]
+            );
+        } else {
+            setSelectedPages([pageIdx]);
+        }
+        setLastClickedIndex(orderIdx);
     };
 
     const handleDragStart = (event: any) => {
@@ -178,15 +252,56 @@ export default function OrganizePDFPage() {
     const handleDragEnd = (event: any) => {
         const { active, over } = event;
 
-        if (active.id !== over.id) {
+        if (over && active.id !== over.id) {
             setPageOrder((items) => {
                 const oldIndex = items.indexOf(active.id);
                 const newIndex = items.indexOf(over.id);
+
+                // If active item is part of selection, move the whole selection
+                if (selectedPages.includes(active.id as number)) {
+                    const otherItems = items.filter(item => !selectedPages.includes(item));
+                    const selectedItemsInOrder = items.filter(item => selectedPages.includes(item));
+
+                    // Calculate where to insert the selection block
+                    const actualNewIndex = newIndex > oldIndex
+                        ? items.slice(0, newIndex + 1).filter(item => !selectedPages.includes(item)).length
+                        : items.slice(0, newIndex).filter(item => !selectedPages.includes(item)).length;
+
+                    const result = [...otherItems];
+                    result.splice(actualNewIndex, 0, ...selectedItemsInOrder);
+                    announce(`Moved ${selectedPages.length} pages to position ${newIndex + 1}.`);
+                    return result;
+                }
+
                 announce(`Moved page ${items[oldIndex] + 1} to position ${newIndex + 1}.`);
                 return arrayMove(items, oldIndex, newIndex);
             });
         }
         setActiveId(null);
+    };
+
+    const handleRotate = (direction: 'left' | 'right') => {
+        const pagesToRotate = selectedPages.length > 0 ? selectedPages : pageOrder; // If nothing selected, rotate all? No, logical fallback is usually nothing or current page. Let's say selected or nothing.
+        if (pagesToRotate.length === 0) return;
+
+        setPageRotations(prev => {
+            const next = { ...prev };
+            pagesToRotate.forEach(pageIndex => {
+                const current = next[pageIndex] || 0;
+                next[pageIndex] = (current + (direction === 'right' ? 90 : -90)) % 360;
+            });
+            return next;
+        });
+        toast.success(`Rotated ${pagesToRotate.length} pages`);
+    };
+
+    const handleDelete = () => {
+        if (selectedPages.length === 0) return;
+
+        const newOrder = pageOrder.filter(p => !selectedPages.includes(p));
+        setPageOrder(newOrder);
+        setSelectedPages([]);
+        toast.success(`Removed ${selectedPages.length} pages`);
     };
 
     const handleOrganizePDF = async () => {
@@ -200,7 +315,12 @@ export default function OrganizePDFPage() {
                 setProgress((prev) => Math.min(prev + 10, 90));
             }, 200);
 
-            const organizedPdfBytes = await organizePDF(file, pageOrder);
+            const config = pageOrder.map(index => ({
+                index,
+                rotation: pageRotations[index] || 0
+            }));
+
+            const organizedPdfBytes = await organizePDF(file, config);
             clearInterval(progressInterval);
             setProgress(100);
 
@@ -214,6 +334,7 @@ export default function OrganizePDFPage() {
             toast.success('PDF pages reorganized!');
             setFile(null);
             setPageOrder([]);
+            setPageRotations({});
             setProgress(0);
         } catch (error) {
             console.error('Error organizing PDF:', error);
@@ -246,25 +367,124 @@ export default function OrganizePDFPage() {
 
             {file && !processing && !result && (
                 <div className="space-y-8 select-none">
-                    <GlassCard className="p-4 sticky top-24 z-30 flex items-center justify-between backdrop-blur-xl border-blue-500/30">
-                        <div className="flex items-center gap-3">
-                            <div className="bg-blue-500/20 p-2 rounded-lg">
-                                <GripVertical className="w-5 h-5 text-blue-400" />
+                    <div className="flex flex-col gap-4">
+                        <GlassCard className="p-4 sticky top-24 z-30 flex items-center justify-between backdrop-blur-xl border-cyan-500/30 shadow-lg shadow-cyan-500/10">
+                            <div className="flex items-center gap-3">
+                                <div className="bg-cyan-500/20 p-2 rounded-lg">
+                                    <LayoutDashboard className="w-5 h-5 text-cyan-400" />
+                                </div>
+                                <div className="text-white font-semibold flex flex-col">
+                                    <span className="text-sm">Document Architect</span>
+                                    <span className="text-[10px] font-normal text-slate-400 uppercase tracking-wider">{pageOrder.length} Pages Loaded</span>
+                                </div>
                             </div>
-                            <div className="text-white font-semibold">
-                                Visual Sorter
-                                <span className="text-xs font-normal text-slate-400 ml-2 block sm:inline">({pageOrder.length} Pages)</span>
+
+                            <div className="flex items-center gap-3">
+                                {selectedPages.length > 0 && (
+                                    <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-cyan-950/50 border border-cyan-500/30 rounded-full animate-in fade-in slide-in-from-right-4">
+                                        <span className="text-xs font-bold text-cyan-400">{selectedPages.length} Selected</span>
+                                        <div className="w-px h-3 bg-slate-700 mx-1" />
+                                        <button
+                                            onClick={() => setSelectedPages([])}
+                                            className="text-xs text-slate-400 hover:text-white transition-colors flex items-center gap-1"
+                                        >
+                                            <X className="w-3 h-3" /> Clear
+                                        </button>
+                                    </div>
+                                )}
+
+                                <Button
+                                    variant="primary"
+                                    onClick={handleOrganizePDF}
+                                    loading={processing}
+                                    icon={<Download className="w-5 h-5" />}
+                                    className="bg-cyan-500 hover:bg-cyan-600 shadow-lg shadow-cyan-500/20"
+                                >
+                                    Build Document
+                                </Button>
+                            </div>
+                        </GlassCard>
+
+                        {/* Batch Controls */}
+                        <div className="flex items-center justify-between px-2">
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setSelectedPages([...pageOrder])}
+                                    className="text-[10px] uppercase tracking-widest text-slate-400 hover:text-white"
+                                >
+                                    Select All
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                        const even = pageOrder.filter((_, i) => (i + 1) % 2 === 0);
+                                        setSelectedPages(even);
+                                    }}
+                                    className="text-[10px] uppercase tracking-widest text-slate-400 hover:text-white border-l border-slate-800 rounded-none pl-3"
+                                >
+                                    Select Evens
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                        const odd = pageOrder.filter((_, i) => (i + 1) % 2 !== 0);
+                                        setSelectedPages(odd);
+                                    }}
+                                    className="text-[10px] uppercase tracking-widest text-slate-400 hover:text-white border-l border-slate-800 rounded-none pl-3"
+                                >
+                                    Select Odds
+                                </Button>
+                            </div>
+
+                            <div className="text-[10px] text-slate-500 flex items-center gap-1">
+                                <Info className="w-3 h-3" />
+                                <span>Shift+Click to range select. Drag selection to reorder.</span>
+                            </div>
+                            <div className="text-[10px] text-slate-500 flex items-center gap-1">
+                                <Info className="w-3 h-3" />
+                                <span>Shift+Click to range select. Drag selection to reorder.</span>
                             </div>
                         </div>
-                        <Button
-                            variant="primary"
-                            onClick={handleOrganizePDF}
-                            loading={processing}
-                            icon={<Download className="w-5 h-5" />}
-                        >
-                            Save Order
-                        </Button>
-                    </GlassCard>
+                    </div>
+
+                    {/* Action Toolbar */}
+                    <div className="flex justify-center -mt-4 mb-4">
+                        <div className="bg-slate-800 p-1 rounded-lg flex gap-1 shadow-lg border border-slate-700">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleRotate('left')}
+                                disabled={selectedPages.length === 0}
+                                title="Rotate Left"
+                            >
+                                <RotateCcw className="w-4 h-4" />
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleRotate('right')}
+                                disabled={selectedPages.length === 0}
+                                title="Rotate Right"
+                            >
+                                <RotateCw className="w-4 h-4" />
+                            </Button>
+                            <div className="w-px bg-slate-700 mx-1" />
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={handleDelete}
+                                disabled={selectedPages.length === 0}
+                                className="text-red-400 hover:bg-red-500/10 hover:text-red-400"
+                                title="Delete Selected"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                            </Button>
+                        </div>
+                    </div>
 
                     <DndContext
                         sensors={sensors}
@@ -276,13 +496,17 @@ export default function OrganizePDFPage() {
                             <VirtualizedGrid
                                 items={pageOrder}
                                 file={file}
-                                onRenderItem={(id: number, index: number) => (
+                                metadata={pageMetadata}
+                                onRenderItem={(id: number, index: number, metadata) => (
                                     <SortablePage
                                         key={id}
                                         id={id}
                                         index={index}
                                         originalPageIndex={id}
                                         file={file}
+                                        selected={selectedPages.includes(id)}
+                                        onSelect={(e) => handlePageClick(e, id)}
+                                        rotation={pageRotations[id] || 0}
                                     />
                                 )}
                             />

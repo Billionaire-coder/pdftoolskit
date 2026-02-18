@@ -26,6 +26,9 @@ export default function AddPageNumbersPage() {
     const [progress, setProgress] = useState(0);
     const [position, setPosition] = useState<Position>('bottom-center');
     const [startFrom, setStartFrom] = useState<number>(1);
+    const [textPattern, setTextPattern] = useState<string>('{n}');
+    const [margin, setMargin] = useState<number>(20);
+    const [mirror, setMirror] = useState<boolean>(false);
     const [result, setResult] = useState<{ blob: Blob; fileName: string } | null>(null);
     const [downloadFileName, setDownloadFileName] = useState('');
 
@@ -59,6 +62,9 @@ export default function AddPageNumbersPage() {
             const newPdfBytes = await addPageNumbers(file, {
                 position,
                 startFrom,
+                textPattern,
+                margin,
+                mirror
             });
 
             clearInterval(progressInterval);
@@ -162,7 +168,7 @@ export default function AddPageNumbersPage() {
                         <label className="block text-white font-semibold mb-4">
                             Position
                         </label>
-                        <div className="grid grid-cols-3 gap-3">
+                        <div className="grid grid-cols-3 gap-3 mb-6">
                             <PositionButton pos="top-left" label="Top Left" />
                             <PositionButton pos="top-center" label="Top Center" />
                             <PositionButton pos="top-right" label="Top Right" />
@@ -170,22 +176,90 @@ export default function AddPageNumbersPage() {
                             <PositionButton pos="bottom-center" label="Bottom Center" />
                             <PositionButton pos="bottom-right" label="Bottom Right" />
                         </div>
+
+                        <div className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg border border-slate-700">
+                            <span className="text-sm text-slate-300">Mirror (Book Mode)</span>
+                            <button
+                                onClick={() => setMirror(!mirror)}
+                                className={clsx(
+                                    "w-12 h-6 rounded-full transition-colors relative",
+                                    mirror ? "bg-green-500" : "bg-slate-600"
+                                )}
+                            >
+                                <span className={clsx(
+                                    "absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform",
+                                    mirror ? "translate-x-6" : "translate-x-0"
+                                )} />
+                            </button>
+                        </div>
+                        <p className="text-xs text-slate-500 mt-2">
+                            Swaps Left/Right positions on even pages for double-sided printing.
+                        </p>
                     </GlassCard>
 
-                    <GlassCard className="p-6">
-                        <label className="block text-white font-semibold mb-4">
-                            Start Numbering From
-                        </label>
-                        <input
-                            type="number"
-                            min="1"
-                            value={startFrom}
-                            onChange={(e) => setStartFrom(parseInt(e.target.value) || 1)}
-                            className="w-full px-4 py-3 rounded-xl glass text-white placeholder-slate-500 focus-ring"
-                        />
-                        <p className="text-sm text-slate-400 mt-2">
-                            The number to display on the first page
-                        </p>
+                    <GlassCard className="p-6 space-y-6">
+                        <div>
+                            <label className="block text-white font-semibold mb-2">
+                                Text Pattern
+                            </label>
+                            <div className="flex gap-2 mb-2">
+                                <input
+                                    type="text"
+                                    value={textPattern}
+                                    onChange={(e) => setTextPattern(e.target.value)}
+                                    className="w-full px-4 py-3 rounded-xl glass text-white placeholder-slate-500 focus-ring"
+                                    placeholder="{n}"
+                                />
+                            </div>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => setTextPattern(p => p + "{n}")}
+                                    className="px-2 py-1 text-xs bg-slate-800 text-slate-300 rounded hover:bg-slate-700"
+                                >
+                                    + Page {"{n}"}
+                                </button>
+                                <button
+                                    onClick={() => setTextPattern(p => p + "{total}")}
+                                    className="px-2 py-1 text-xs bg-slate-800 text-slate-300 rounded hover:bg-slate-700"
+                                >
+                                    + Total {"{total}"}
+                                </button>
+                                <button
+                                    onClick={() => setTextPattern("Page {n} of {total}")}
+                                    className="px-2 py-1 text-xs bg-slate-800 text-slate-300 rounded hover:bg-slate-700"
+                                >
+                                    Preset: "1 of 10"
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-white font-semibold mb-2">
+                                    Start From
+                                </label>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    value={startFrom}
+                                    onChange={(e) => setStartFrom(parseInt(e.target.value) || 1)}
+                                    className="w-full px-4 py-3 rounded-xl glass text-white placeholder-slate-500 focus-ring"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-white font-semibold mb-2">
+                                    Margin (px)
+                                </label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="200"
+                                    value={margin}
+                                    onChange={(e) => setMargin(parseInt(e.target.value) || 0)}
+                                    className="w-full px-4 py-3 rounded-xl glass text-white placeholder-slate-500 focus-ring"
+                                />
+                            </div>
+                        </div>
                     </GlassCard>
                 </div>
             )}

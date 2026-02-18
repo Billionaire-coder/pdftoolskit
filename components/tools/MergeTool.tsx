@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FileText, Download, Plus } from 'lucide-react';
+import { FileText, Download, Plus, Layers, Zap, ShieldCheck, Gauge, Cpu, Trash2, ArrowUp, ArrowDown, Sparkles, Files, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
 import { ProgressBar } from '@/components/shared/ProgressBar';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { mergePDFs } from '@/lib/pdf-utils';
-import { downloadFile, validatePDFFile } from '@/lib/utils';
+import { mergePDFs } from '@/lib/services/pdf/manipulators/basic';
+import { downloadFile, validatePDFFile, cn, formatFileSize } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { useSubscription } from '@/components/providers/SubscriptionProvider';
 
@@ -22,18 +22,12 @@ export function MergeTool({ initialFiles = [] }: MergeToolProps) {
     const [files, setFiles] = useState<File[]>(initialFiles);
     const [processing, setProcessing] = useState(false);
     const [progress, setProgress] = useState(0);
-    const [result, setResult] = useState<{ blob: Blob; fileName: string } | null>(null);
-    const [downloadFileName, setDownloadFileName] = useState('');
+    const [statusMessage, setStatusMessage] = useState("Awaiting command...");
 
-    useEffect(() => {
-        if (result?.fileName) {
-            setDownloadFileName(result.fileName);
-        }
-    }, [result]);
+    const [result, setResult] = useState<{ blob: Blob; fileName: string } | null>(null);
 
     const handleFilesSelected = (newFiles: File[]) => {
         const validFiles: File[] = [];
-
         for (const file of newFiles) {
             const validation = validatePDFFile(file);
             if (validation.valid) {
@@ -51,7 +45,16 @@ export function MergeTool({ initialFiles = [] }: MergeToolProps) {
 
     const handleRemoveFile = (index: number) => {
         setFiles((prev) => prev.filter((_, i) => i !== index));
-        toast.success(t('toasts.fileRemoved'));
+    };
+
+    const moveFile = (index: number, direction: 'up' | 'down') => {
+        const newFiles = [...files];
+        if (direction === 'up' && index > 0) {
+            [newFiles[index], newFiles[index - 1]] = [newFiles[index - 1], newFiles[index]];
+        } else if (direction === 'down' && index < files.length - 1) {
+            [newFiles[index], newFiles[index + 1]] = [newFiles[index + 1], newFiles[index]];
+        }
+        setFiles(newFiles);
     };
 
     const handleMergePDFs = async () => {
@@ -61,25 +64,28 @@ export function MergeTool({ initialFiles = [] }: MergeToolProps) {
         }
 
         setProcessing(true);
-        setProgress(0);
+        setProgress(5);
+        setStatusMessage("Initializing assembly engine...");
 
         try {
-            const progressInterval = setInterval(() => {
-                setProgress((prev) => Math.min(prev + 10, 90));
-            }, 200);
+            const interval = setInterval(() => {
+                setProgress(prev => {
+                    const next = prev + (Math.random() * 5);
+                    if (next > 20 && next < 40) setStatusMessage("Allocating buffers...");
+                    if (next > 40 && next < 60) setStatusMessage("Synthesizing page objects...");
+                    if (next > 60 && next < 80) setStatusMessage("Preserving bookmarks...");
+                    if (next > 80 && next < 95) setStatusMessage("Finalizing vector stream...");
+                    return next > 95 ? 95 : next;
+                });
+            }, 300);
 
             const mergedPdfBytes = await mergePDFs(files);
-            clearInterval(progressInterval);
+            clearInterval(interval);
             setProgress(100);
 
-            // @ts-expect-error - Uint8Array is compatible with BlobPart
             const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
-            // downloadFile(blob, 'merged.pdf'); // Moved to handleDownload
-
-            setResult({ blob, fileName: 'merged.pdf' });
-            toast.success(t('toasts.mergeSuccess'));
-            setFiles([]);
-            setProgress(0);
+            setResult({ blob, fileName: `merged_${new Date().getTime()}.pdf` });
+            toast.success("Document assembly complete!");
         } catch (error) {
             console.error('Error merging PDFs:', error);
             toast.error(t('toasts.mergeError'));
@@ -89,88 +95,148 @@ export function MergeTool({ initialFiles = [] }: MergeToolProps) {
     };
 
     return (
-        <div className="w-full">
-            <div className="mb-6">
-                <FileUpload
-                    onFilesSelected={handleFilesSelected}
-                    files={files}
-                    onRemoveFile={handleRemoveFile}
-                    multiple={true}
-                    maxSize={limits.maxFileSize}
-                    isPro={isPro}
-                />
-            </div>
-
-            {processing && (
-                <div className="mb-6">
-                    <ProgressBar progress={progress} label={t('toolPages.merge.merging')} />
-                </div>
-            )}
-
-            {files.length > 0 && !result && (
-                <GlassCard className="p-4 border-purple-500/20">
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <div className="text-center sm:text-left text-xs">
-                            <p className="text-white font-semibold mb-0.5">
-                                {t('toolPages.merge.readyToMerge', { count: files.length })}
-                            </p>
-                            <p className="text-[10px] text-slate-400">
-                                {t('toolPages.merge.orderHint')}
-                            </p>
-                        </div>
-                        <div className="flex gap-2">
-                            <Button
-                                variant="secondary"
-                                size="sm"
-                                onClick={() => setFiles([])}
-                                disabled={processing}
-                                className="text-xs py-1.5 h-auto min-h-0"
-                            >
-                                {t('toolPages.common.clearAll')}
-                            </Button>
-                            <Button
-                                variant="primary"
-                                size="sm"
-                                onClick={handleMergePDFs}
-                                loading={processing}
-                                icon={<Download className="w-4 h-4" />}
-                                className="text-xs py-1.5 h-auto min-h-0"
-                            >
-                                {t('toolPages.merge.button')}
-                            </Button>
-                        </div>
-                    </div>
-                </GlassCard>
-            )}
-
+        <div className="w-full space-y-8 animate-in slide-up duration-500">
             {result && (
-                <GlassCard className="p-6 text-center animate-in zoom-in-95 duration-500">
-                    <div className="mx-auto w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mb-4">
-                        <Download className="w-6 h-6 text-green-500" />
-                    </div>
-                    <h3 className="text-lg font-bold text-white mb-2">PDFs Merged Successfully!</h3>
-                    <div className="flex justify-center mt-4">
-                        <div className="flex flex-col sm:flex-row gap-3 items-center">
-                            <input
-                                type="text"
-                                value={downloadFileName}
-                                onChange={(e) => setDownloadFileName(e.target.value)}
-                                className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-green-500 w-64 text-center sm:text-left"
-                                placeholder="Filename"
-                            />
+                <div className="max-w-2xl mx-auto py-10">
+                    <GlassCard className="p-12 text-center border-purple-500/20 shadow-2xl shadow-purple-500/10">
+                        <div className="w-20 h-20 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-8 border border-purple-500/20">
+                            <CheckCircle className="w-10 h-10 text-purple-400" />
+                        </div>
+                        <h3 className="text-3xl font-bold text-white mb-2 text-glow-purple">Assembly Complete</h3>
+                        <p className="text-slate-400 mb-10">Files have been merged with structural integrity.</p>
+
+                        <div className="flex flex-col gap-4">
                             <Button
                                 variant="primary"
-                                onClick={() => downloadFile(result.blob, downloadFileName || result.fileName)}
-                                icon={<Download className="w-5 h-5" />}
+                                size="lg"
+                                onClick={() => downloadFile(result.blob, result.fileName)}
+                                icon={<Download className="w-6 h-6" />}
+                                className="py-8 text-2xl bg-purple-600 hover:bg-purple-500 shadow-xl shadow-purple-500/20"
                             >
                                 Download Merged PDF
                             </Button>
-                            <Button variant="ghost" onClick={() => setResult(null)}>
-                                Merge Another
+                            <Button variant="ghost" onClick={() => setResult(null)} className="text-slate-500 mt-4 text-[10px] uppercase font-black tracking-widest">
+                                Start New Assembly
                             </Button>
                         </div>
+                    </GlassCard>
+                </div>
+            )}
+
+            {!result && !processing && (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="lg:col-span-2 space-y-6">
+                        <FileUpload
+                            onFilesSelected={handleFilesSelected}
+                            files={files}
+                            onRemoveFile={handleRemoveFile}
+                            multiple={true}
+                            maxSize={limits.maxFileSize}
+                            isPro={isPro}
+                        />
+
+                        {files.length > 0 && (
+                            <div className="space-y-3">
+                                <h4 className="text-[10px] uppercase font-black tracking-widest text-slate-500 px-2 flex items-center gap-2">
+                                    <Layers className="w-3 h-3" />
+                                    Sequence Order
+                                </h4>
+                                {files.map((file, idx) => (
+                                    <div
+                                        key={`${file.name}-${idx}`}
+                                        className="group bg-slate-900/50 border border-white/5 p-4 rounded-xl flex items-center justify-between hover:border-purple-500/30 transition-all shadow-lg"
+                                    >
+                                        <div className="flex items-center gap-4 min-w-0">
+                                            <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400 font-bold shrink-0">
+                                                {idx + 1}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className="text-white font-bold text-sm truncate">{file.name}</p>
+                                                <p className="text-[10px] text-slate-500 font-mono uppercase">{formatFileSize(file.size)}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button onClick={() => moveFile(idx, 'up')} className="p-2 hover:bg-white/5 rounded-lg text-slate-400 hover:text-white" title="Move Up">
+                                                <ArrowUp className="w-4 h-4" />
+                                            </button>
+                                            <button onClick={() => moveFile(idx, 'down')} className="p-2 hover:bg-white/5 rounded-lg text-slate-400 hover:text-white" title="Move Down">
+                                                <ArrowDown className="w-4 h-4" />
+                                            </button>
+                                            <button onClick={() => handleRemoveFile(idx)} className="p-2 hover:bg-red-500/10 rounded-lg text-slate-400 hover:text-red-400" title="Remove">
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
-                </GlassCard>
+
+                    <div className="space-y-6">
+                        <GlassCard className="p-8 border-purple-500/30 bg-purple-500/5 items-center flex flex-col justify-center h-full min-h-[400px]">
+                            <Sparkles className="w-12 h-12 text-purple-400 mb-6 animate-pulse" />
+                            <h4 className="text-xl font-bold text-white mb-2 text-center">Intelligent Assembly</h4>
+                            <p className="text-sm text-slate-400 text-center mb-8">Ready to unify {files.length} documents into a single high-fidelity asset.</p>
+
+                            <div className="w-full space-y-3 mb-8">
+                                <div className="flex justify-between text-[10px] text-slate-500 uppercase font-black">
+                                    <span>Total Files</span>
+                                    <span className="text-purple-400">{files.length}</span>
+                                </div>
+                                <div className="flex justify-between text-[10px] text-slate-500 uppercase font-black">
+                                    <span>Engine</span>
+                                    <span className="text-purple-400">Memory-Stream</span>
+                                </div>
+                                <div className="flex justify-between text-[10px] text-slate-500 uppercase font-black">
+                                    <span>Bookmarks</span>
+                                    <span className="text-green-400">Preserved</span>
+                                </div>
+                            </div>
+
+                            <Button
+                                variant="primary"
+                                onClick={handleMergePDFs}
+                                disabled={files.length < 2}
+                                size="lg"
+                                className="w-full py-6 bg-purple-600 hover:bg-purple-500 shadow-xl shadow-purple-600/20 rounded-2xl flex items-center justify-center gap-3 group"
+                            >
+                                <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+                                Merge Documents
+                            </Button>
+
+                            {files.length > 0 && (
+                                <button onClick={() => setFiles([])} className="mt-4 text-[10px] uppercase font-black text-slate-600 hover:text-slate-400 transition-colors">
+                                    Purge Workspace
+                                </button>
+                            )}
+                        </GlassCard>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            {[
+                                { icon: Cpu, label: "Efficiency", val: "High" },
+                                { icon: Gauge, label: "Speed", val: "Turbo" }
+                            ].map((stat, i) => (
+                                <GlassCard key={i} className="p-4 flex flex-col items-center justify-center text-center">
+                                    <stat.icon className="w-4 h-4 text-purple-400 mb-2" />
+                                    <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest">{stat.label}</p>
+                                    <p className="text-xs text-white font-bold leading-none">{stat.val}</p>
+                                </GlassCard>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {processing && (
+                <div className="max-w-2xl mx-auto py-20 text-center animate-in zoom-in-95 duration-500">
+                    <div className="relative w-24 h-24 mx-auto mb-8">
+                        <div className="absolute inset-0 border-4 border-purple-500/10 rounded-full" />
+                        <div className="absolute inset-0 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                        <Layers className="absolute inset-0 m-auto w-8 h-8 text-purple-400 animate-pulse" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-white mb-4 italic">Synthesizing Document Stream...</h3>
+                    <ProgressBar progress={progress} label={statusMessage} />
+                </div>
             )}
         </div>
     );

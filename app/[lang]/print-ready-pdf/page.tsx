@@ -25,6 +25,9 @@ export default function PrintReadyPdfPage() {
     const [isProcessing, setIsProcessing] = useState(false);
     const [dpi, setDpi] = useState(300);
     const [pageSize, setPageSize] = useState<PrintSize>('original');
+    const [bleed, setBleed] = useState(false);
+    const [cropMarks, setCropMarks] = useState(false);
+    const [colorBars, setColorBars] = useState(false);
 
     const handleFilesSelected = (newFiles: File[]) => {
         const validFiles = newFiles.filter(f => f.type.startsWith('image/'));
@@ -46,7 +49,13 @@ export default function PrintReadyPdfPage() {
                 }))
             );
 
-            const pdfBuffer = await convertImagesToPrintPdf(fileBuffers, { dpi, pageSize });
+            const pdfBuffer = await convertImagesToPrintPdf(fileBuffers, {
+                dpi,
+                pageSize,
+                bleed,
+                cropMarks,
+                colorBars
+            });
             const blob = new Blob([pdfBuffer as unknown as BlobPart], { type: 'application/pdf' });
 
             const id = crypto.randomUUID();
@@ -143,6 +152,48 @@ export default function PrintReadyPdfPage() {
                                         : 'Images will be scaled to fit within the selected page size.'}
                                 </p>
                             </div>
+
+                            {/* New Pro Options */}
+                            <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-700/50">
+                                <label className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg border border-slate-700 cursor-pointer hover:bg-slate-700/50 transition-colors">
+                                    <input
+                                        type="checkbox"
+                                        checked={bleed}
+                                        onChange={(e) => setBleed(e.target.checked)}
+                                        className="w-5 h-5 rounded border-slate-500 text-pink-500 focus:ring-pink-500 bg-slate-900"
+                                    />
+                                    <div>
+                                        <div className="font-medium text-white text-sm">Add 3mm Bleed</div>
+                                        <div className="text-xs text-slate-400">Extends margin for trimming</div>
+                                    </div>
+                                </label>
+
+                                <label className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg border border-slate-700 cursor-pointer hover:bg-slate-700/50 transition-colors">
+                                    <input
+                                        type="checkbox"
+                                        checked={cropMarks}
+                                        onChange={(e) => setCropMarks(e.target.checked)}
+                                        className="w-5 h-5 rounded border-slate-500 text-pink-500 focus:ring-pink-500 bg-slate-900"
+                                    />
+                                    <div>
+                                        <div className="font-medium text-white text-sm">Crop Marks</div>
+                                        <div className="text-xs text-slate-400">Corner trim guidelines</div>
+                                    </div>
+                                </label>
+
+                                <label className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg border border-slate-700 cursor-pointer hover:bg-slate-700/50 transition-colors">
+                                    <input
+                                        type="checkbox"
+                                        checked={colorBars}
+                                        onChange={(e) => setColorBars(e.target.checked)}
+                                        className="w-5 h-5 rounded border-slate-500 text-pink-500 focus:ring-pink-500 bg-slate-900"
+                                    />
+                                    <div>
+                                        <div className="font-medium text-white text-sm">Color Bars</div>
+                                        <div className="text-xs text-slate-400">CMYK density check</div>
+                                    </div>
+                                </label>
+                            </div>
                         </div>
 
                         <div className="flex justify-center pt-4">
@@ -157,8 +208,9 @@ export default function PrintReadyPdfPage() {
                             </Button>
                         </div>
                     </div>
-                )}
-            </GlassCard>
+                )
+                }
+            </GlassCard >
 
             <GlassCard className="mt-12 p-6 bg-yellow-500/5 border-yellow-500/20">
                 <div className="flex gap-4">
@@ -182,6 +234,6 @@ export default function PrintReadyPdfPage() {
             <QuickGuide steps={toolGuides['/print-ready-pdf']} />
             <ToolContent toolName="/print-ready-pdf" />
             <RelatedTools currentToolHref="/print-ready-pdf" />
-        </div>
+        </div >
     );
 }

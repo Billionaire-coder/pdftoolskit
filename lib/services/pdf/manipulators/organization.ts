@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, degrees } from 'pdf-lib';
 import { applyBranding } from '../core';
 
 export async function reversePDF(file: File): Promise<Uint8Array> {
@@ -74,7 +74,7 @@ export async function burstPDF(file: File): Promise<File[]> {
 export async function* convertPDFToImages(
     file: File,
     options: {
-        format?: 'png' | 'jpeg';
+        format?: 'png' | 'jpeg' | 'webp';
         scale?: number;
         quality?: number;
     } = {}
@@ -107,9 +107,10 @@ export async function* convertPDFToImages(
         );
 
         if (blob) {
+            const ext = format === 'jpeg' ? 'jpg' : format;
             yield new File(
                 [blob],
-                `${file.name.replace('.pdf', '')}_page_${i}.${format === 'jpeg' ? 'jpg' : 'png'}`,
+                `${file.name.replace('.pdf', '')}_page_${i}.${ext}`,
                 { type: `image/${format}` }
             );
         }
@@ -122,4 +123,18 @@ export async function* convertPDFToImages(
     }
 
     await pdf.destroy();
+}
+
+export async function rotatePDF(file: File, rotation: 90 | 180 | 270): Promise<Uint8Array> {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdfDoc = await PDFDocument.load(arrayBuffer);
+    const pages = pdfDoc.getPages();
+
+    pages.forEach((page) => {
+        const currentRotation = page.getRotation().angle;
+        page.setRotation(degrees((currentRotation + rotation) % 360));
+    });
+
+    applyBranding(pdfDoc);
+    return await pdfDoc.save();
 }

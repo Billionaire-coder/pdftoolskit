@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, PDFName, PDFRawStream } from 'pdf-lib';
 import { applyBranding } from './core';
 
 export interface OptimizationOptions {
@@ -7,6 +7,7 @@ export interface OptimizationOptions {
     targetSizeBytes?: number;
     scale?: number;
     stripMetadata?: boolean;
+    mode?: 'lossless' | 'balanced' | 'extreme';
 }
 
 export class OptimizationService {
@@ -14,7 +15,7 @@ export class OptimizationService {
      * Entry point for PDF optimization
      */
     static async optimize(file: File, options: OptimizationOptions = {}): Promise<Uint8Array> {
-        const { quality = 0.7, targetSizeBytes, stripMetadata = true } = options;
+        const { quality = 0.7, targetSizeBytes, stripMetadata = true, mode = 'balanced' } = options;
 
         const arrayBuffer = await file.arrayBuffer();
         const pdf = await PDFDocument.load(arrayBuffer);
@@ -24,28 +25,29 @@ export class OptimizationService {
             pdf.setAuthor('');
             pdf.setSubject('');
             pdf.setKeywords([]);
+            pdf.setProducer('PDFToolskit Optimization Engine');
+            pdf.setCreator('PDFToolskit');
         }
 
         applyBranding(pdf);
 
+        // 1. Structural Optimization (Object Streams)
         let compressed = await pdf.save({
             useObjectStreams: true,
             addDefaultPage: false,
-            objectsPerTick: 50,
         });
 
-        const reductionRatio = (file.size - compressed.length) / file.size;
-
-        // If standard compression didn't help much, and we're aiming for quality/size, try rasterization
-        if (!targetSizeBytes && reductionRatio < 0.05) {
-            if (quality <= 0.5) {
-                compressed = await this.rasterize(file, { quality: 0.5, scale: 1.0 });
-            } else if (quality <= 0.75) {
-                compressed = await this.rasterize(file, { quality: 0.7, scale: 1.5 });
+        // 2. Content-Aware Image Downsampling (The "Deepening")
+        if (mode !== 'lossless') {
+            try {
+                const optimizedPdf = await this.downsampleImages(arrayBuffer, mode === 'extreme' ? 0.5 : 0.75, mode === 'extreme' ? 0.6 : 1.0);
+                compressed = optimizedPdf;
+            } catch (err) {
+                console.warn("Selective downsampling failed, falling back to structural optimization.", err);
             }
         }
 
-        // If target size is specified, enter the optimization loop
+        // 3. Binary Search Target Optimization (Only if target size specified)
         if (targetSizeBytes && compressed.length > targetSizeBytes) {
             compressed = await this.runOptimizationLoop(file, targetSizeBytes, quality);
         }
@@ -54,7 +56,83 @@ export class OptimizationService {
     }
 
     /**
-     * Aggressively compress by rasterizing pages
+     * Selective Image Downsampling
+     * Traverses the PDF structure and re-encodes large XObjects
+     */
+    private static async downsampleImages(buffer: ArrayBuffer, quality: number, scale: number): Promise<Uint8Array> {
+        const pdfDoc = await PDFDocument.load(buffer);
+        const pages = pdfDoc.getPages();
+
+        for (const page of pages) {
+            const { node } = page as any;
+            const resources = node.Resources();
+            if (!resources) continue;
+
+            const xObjects = resources.get(PDFName.of('XObject'));
+            if (!xObjects) continue;
+
+            const xObjectDict = pdfDoc.context.lookup(xObjects);
+            if (!(xObjectDict instanceof Map)) continue;
+
+            for (const [name, ref] of (xObjectDict as any).entries()) {
+                const xObject = pdfDoc.context.lookup(ref);
+                if (!(xObject instanceof PDFRawStream)) continue;
+
+                const subtype = xObject.dict.get(PDFName.of('Subtype'));
+                if (subtype !== PDFName.of('Image')) continue;
+
+                const widthObj = xObject.dict.get(PDFName.of('Width'));
+                const heightObj = xObject.dict.get(PDFName.of('Height'));
+                const width = (widthObj as any)?.asNumber?.();
+                const height = (heightObj as any)?.asNumber?.();
+
+                // Only process large images (approx heuristic)
+                if (width && height && width * height > 500000) {
+                    try {
+                        const imageBytes = xObject.contents;
+                        // In browser, we use a hidden canvas to re-encode
+                        const newBytes = await this.reencodeImage(imageBytes, quality, scale);
+                        if (newBytes && newBytes.length < imageBytes.length) {
+                            const newImage = await pdfDoc.embedJpg(newBytes);
+                            (xObjectDict as any).set(name, (newImage as any).ref);
+                        }
+                    } catch (e) {
+                        console.error("Failed to re-encode XObject:", name, e);
+                    }
+                }
+            }
+        }
+
+        return await pdfDoc.save({ useObjectStreams: true });
+    }
+
+    private static async reencodeImage(bytes: Uint8Array, quality: number, scale: number): Promise<Uint8Array | null> {
+        return new Promise((resolve) => {
+            const blob = new Blob([bytes as any]);
+            const url = URL.createObjectURL(blob);
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width * scale;
+                canvas.height = img.height * scale;
+                const ctx = canvas.getContext('2d');
+                if (!ctx) return resolve(null);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                canvas.toBlob((resultBlob) => {
+                    if (!resultBlob) return resolve(null);
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(new Uint8Array(reader.result as ArrayBuffer));
+                    reader.readAsArrayBuffer(resultBlob);
+                }, 'image/jpeg', quality);
+                URL.revokeObjectURL(url);
+            };
+            img.onerror = () => resolve(null);
+            img.src = url;
+        });
+    }
+
+    /**
+     * Rasterization Fallback (Legacy/Extreme)
      */
     private static async rasterize(file: File, options: { quality: number; scale: number }): Promise<Uint8Array> {
         const { quality, scale } = options;
@@ -71,34 +149,21 @@ export class OptimizationService {
         for (let i = 1; i <= pdf.numPages; i++) {
             const page = await pdf.getPage(i);
             const viewport = page.getViewport({ scale });
-
             const canvas = document.createElement('canvas');
             canvas.width = viewport.width;
             canvas.height = viewport.height;
             const context = canvas.getContext('2d');
-            if (!context) throw new Error('Failed to create canvas context');
-
-            await page.render({ canvasContext: context, viewport }).promise;
-
-            const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
-            if (!blob) continue;
-
-            const imageBytes = await blob.arrayBuffer();
-            const embeddedImage = await newPdf.embedJpg(imageBytes);
-
-            const newPage = newPdf.addPage([viewport.width / scale, viewport.height / scale]);
-            newPage.drawImage(embeddedImage, {
-                x: 0,
-                y: 0,
-                width: viewport.width / scale,
-                height: viewport.height / scale,
-            });
-
-            // Cleanup
-            canvas.width = 0;
-            canvas.height = 0;
-            canvas.remove();
-            (page as any).cleanup();
+            if (context) {
+                await page.render({ canvasContext: context, viewport }).promise;
+                const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
+                if (blob) {
+                    const imageBytes = await blob.arrayBuffer();
+                    const embeddedImage = await newPdf.embedJpg(imageBytes);
+                    const newPage = newPdf.addPage([viewport.width / scale, viewport.height / scale]);
+                    newPage.drawImage(embeddedImage, { x: 0, y: 0, width: viewport.width / scale, height: viewport.height / scale });
+                }
+            }
+            canvas.width = 0; canvas.height = 0; canvas.remove();
         }
 
         applyBranding(newPdf);
@@ -107,36 +172,20 @@ export class OptimizationService {
         return result;
     }
 
-    /**
-     * Binary-ish search for the best quality/scale to hit target size
-     */
     private static async runOptimizationLoop(file: File, targetSize: number, initialQuality: number): Promise<Uint8Array> {
         let currentScale = 1.5;
         let currentQuality = initialQuality;
         let bestResult: Uint8Array | null = null;
         let attempts = 0;
-        const maxAttempts = 5;
-
-        // Fast estimation
-        const gapRatio = file.size / targetSize;
-        if (gapRatio > 5) { currentScale = 0.8; currentQuality = 0.4; }
-        else if (gapRatio > 3) { currentScale = 1.0; currentQuality = 0.5; }
-        else if (gapRatio > 2) { currentScale = 1.2; currentQuality = 0.6; }
+        const maxAttempts = 3;
 
         while (attempts < maxAttempts) {
             attempts++;
             const result = await this.rasterize(file, { quality: currentQuality, scale: currentScale });
-
-            if (!bestResult || result.length < bestResult.length) {
-                bestResult = result;
-            }
-
+            if (!bestResult || result.length < bestResult.length) bestResult = result;
             if (result.length <= targetSize) return result;
-
-            // Reduce parameters for next attempt
             currentQuality -= 0.15;
             currentScale -= 0.2;
-
             if (currentQuality < 0.1 || currentScale < 0.3) break;
         }
 

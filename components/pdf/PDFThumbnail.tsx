@@ -10,6 +10,8 @@ interface PDFThumbnailProps {
     pageNumber: number;
     width?: number;
     rotation?: number;
+    fineRotation?: number;
+    showGrid?: boolean;
     selected?: boolean;
     disabled?: boolean;
     className?: string;
@@ -25,6 +27,8 @@ export const PDFThumbnail = React.memo(function PDFThumbnail({
     pageNumber,
     width = 200,
     rotation = 0,
+    fineRotation = 0,
+    showGrid = false,
     selected = false,
     disabled = false,
     className,
@@ -155,15 +159,25 @@ export const PDFThumbnail = React.memo(function PDFThumbnail({
                         ref={canvasRef}
                         className="max-w-full h-auto"
                         style={{
-                            transform: `rotate(${rotation}deg)`,
+                            transform: `rotate(${rotation + (fineRotation || 0)}deg)`,
                             transition: 'transform 0.3s ease'
                         }}
                     />
 
+                    {/* Grid Overlay for Deskewing */}
+                    {showGrid && (
+                        <div className="absolute inset-0 pointer-events-none opacity-30 z-20"
+                            style={{
+                                backgroundImage: `linear-gradient(#475569 1px, transparent 1px), linear-gradient(90deg, #475569 1px, transparent 1px)`,
+                                backgroundSize: '20px 20px'
+                            }}
+                        />
+                    )}
+
                     {/* Overlay (Deletion / Selection / Custom) */}
                     {(selected || overlayIcon) && (
                         <div className={cn(
-                            "absolute inset-0 flex items-center justify-center transition-opacity",
+                            "absolute inset-0 flex items-center justify-center transition-opacity z-30",
                             overlayColor || (selected ? "bg-blue-500/20" : "")
                         )}>
                             {overlayIcon ? overlayIcon : (selected && <Check className="w-12 h-12 text-blue-500 drop-shadow-md" />)}

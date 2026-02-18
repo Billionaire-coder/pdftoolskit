@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { downloadFile, validatePDFFile, getBaseFileName } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { useSubscription } from '@/components/providers/SubscriptionProvider';
+import { pdfToWord } from '@/lib/services/pdf/converters/pdfToWord';
 
 export function PDFToWordTool() {
     const { t } = useTranslation('common');
@@ -16,6 +17,15 @@ export function PDFToWordTool() {
     const [file, setFile] = useState<File | null>(null);
     const [processing, setProcessing] = useState(false);
     const [progress, setProgress] = useState(0);
+
+    const [result, setResult] = useState<{ blob: Blob; fileName: string } | null>(null);
+    const [downloadFileName, setDownloadFileName] = useState('');
+
+    useEffect(() => {
+        if (result?.fileName) {
+            setDownloadFileName(result.fileName);
+        }
+    }, [result]);
 
     const handleFileSelected = (files: File[]) => {
         const validation = validatePDFFile(files[0]);
@@ -27,15 +37,6 @@ export function PDFToWordTool() {
         }
     };
 
-    const [result, setResult] = useState<{ blob: Blob; fileName: string } | null>(null);
-    const [downloadFileName, setDownloadFileName] = useState('');
-
-    useEffect(() => {
-        if (result?.fileName) {
-            setDownloadFileName(result.fileName);
-        }
-    }, [result]);
-
     const handleConvertToWord = async () => {
         if (!file) return;
 
@@ -44,23 +45,23 @@ export function PDFToWordTool() {
 
         try {
             const progressInterval = setInterval(() => {
-                setProgress((prev) => Math.min(prev + 10, 90));
-            }, 300);
+                setProgress((prev) => Math.min(prev + 5, 95));
+            }, 500);
 
-            // In a real app, this would be a server action or heavy client-side processing
-            // For this version, we simulate the logic as we don't have a reliable JS-only PDF->Docx lib
-            // normally we'd hit an API endpoint
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            const { data, isScanned } = await pdfToWord(file);
 
             clearInterval(progressInterval);
             setProgress(100);
 
-            // Mock download - in real app this would be the actual docx blob
+            if (isScanned) {
+                toast.success("Detected scanned PDF. Used OCR for better results.");
+            }
+
             const baseName = getBaseFileName(file.name);
             const outputName = `${baseName}.docx`;
-            const mockBlob = new Blob(['Mock Word Content'], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+            const blob = new Blob([data.buffer as any], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
 
-            setResult({ blob: mockBlob, fileName: outputName });
+            setResult({ blob, fileName: outputName });
 
             toast.success(t('toasts.convertSuccess'));
             setFile(null);

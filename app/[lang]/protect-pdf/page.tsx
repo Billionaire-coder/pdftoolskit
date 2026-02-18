@@ -24,6 +24,18 @@ export default function ProtectPDFPage() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+    // Advanced Security State
+    const [showAdvanced, setShowAdvanced] = useState(false);
+    const [ownerPassword, setOwnerPassword] = useState('');
+    const [showOwnerPassword, setShowOwnerPassword] = useState(false);
+    const [permissions, setPermissions] = useState({
+        printing: false,
+        copying: false,
+        modifying: false
+    });
+    const [encryptMetadata, setEncryptMetadata] = useState(true);
+
     const [processing, setProcessing] = useState(false);
     const [progress, setProgress] = useState(0);
     const [result, setResult] = useState<{ blob: Blob; fileName: string } | null>(null);
@@ -82,7 +94,20 @@ export default function ProtectPDFPage() {
                 setProgress((prev) => Math.min(prev + 10, 90));
             }, 150);
 
-            const protectedPdfBytes = await protectPDF(file, password);
+            const protectedPdfBytes = await protectPDF(file, {
+                userPassword: password,
+                ownerPassword: ownerPassword || undefined,
+                permissions: {
+                    printing: permissions.printing ? 'highResolution' : 'none',
+                    copying: permissions.copying,
+                    modifying: permissions.modifying,
+                    annotating: permissions.modifying,
+                    fillingForms: permissions.modifying,
+                    contentAccessibility: permissions.copying,
+                    documentAssembly: permissions.modifying
+                },
+                encryptMetadata
+            });
 
             clearInterval(progressInterval);
             setProgress(100);
@@ -132,65 +157,148 @@ export default function ProtectPDFPage() {
             {/* Password Input */}
             {file && !processing && !result && (
                 <GlassCard className="p-6 mb-8">
-                    <div className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-white mb-2">
-                                Enter Password
-                            </label>
-                            <div className="relative">
-                                <input
-                                    type={showPassword ? "text" : "password"}
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="Minimum 6 characters"
-                                    className="w-full px-4 py-3 bg-white/10 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary transition-all pr-12"
-                                    disabled={processing}
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
-                                >
-                                    {showPassword ? (
-                                        <EyeOff className="w-5 h-5" />
-                                    ) : (
-                                        <Eye className="w-5 h-5" />
-                                    )}
-                                </button>
+                    <div className="space-y-6">
+                        {/* Basic Security (User Password) */}
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-white mb-2">
+                                    Open Password (Required)
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        placeholder="Minimum 6 characters"
+                                        className="w-full px-4 py-3 bg-white/10 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary transition-all pr-12"
+                                        disabled={processing}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                                    >
+                                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-white mb-2">
-                                Confirm Password
-                            </label>
-                            <div className="relative">
-                                <input
-                                    type={showConfirmPassword ? "text" : "password"}
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    placeholder="Re-enter password"
-                                    className="w-full px-4 py-3 bg-white/10 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary transition-all pr-12"
-                                    disabled={processing}
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
-                                >
-                                    {showConfirmPassword ? (
-                                        <EyeOff className="w-5 h-5" />
-                                    ) : (
-                                        <Eye className="w-5 h-5" />
-                                    )}
-                                </button>
+                            <div>
+                                <label className="block text-sm font-medium text-white mb-2">
+                                    Confirm Open Password
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        type={showConfirmPassword ? "text" : "password"}
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        placeholder="Re-enter password"
+                                        className="w-full px-4 py-3 bg-white/10 border border-white/10 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary transition-all pr-12"
+                                        disabled={processing}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                                    >
+                                        {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Password Strength Indicator */}
-                        <div className="flex items-start space-x-2 text-sm text-slate-400">
-                            <Shield className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                        {/* Formatting Divider */}
+                        <div className="border-t border-white/10 pt-4">
+                            <div
+                                className="flex items-center justify-between cursor-pointer group"
+                                onClick={() => setShowAdvanced(!showAdvanced)}
+                            >
+                                <div className="flex items-center gap-2 text-white font-medium">
+                                    <Shield className="w-4 h-4 text-orange-400" />
+                                    <span>Advanced Security Options</span>
+                                </div>
+                                <div className={`text-slate-400 transition-transform duration-200 ${showAdvanced ? 'rotate-180' : ''}`}>
+                                    ▼
+                                </div>
+                            </div>
+
+                            {showAdvanced && (
+                                <div className="mt-4 space-y-4 animate-in slide-in-from-top-2 fade-in duration-300">
+                                    {/* Owner Password */}
+                                    <div>
+                                        <label className="block text-xs font-medium text-slate-400 mb-1">
+                                            Owner Password (Optional) - Grants full permissions
+                                        </label>
+                                        <div className="relative">
+                                            <input
+                                                type={showOwnerPassword ? "text" : "password"}
+                                                value={ownerPassword}
+                                                onChange={(e) => setOwnerPassword(e.target.value)}
+                                                placeholder="Different from Open Password"
+                                                className="w-full px-4 py-2 bg-slate-900/50 border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-orange-500 text-sm pr-10"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowOwnerPassword(!showOwnerPassword)}
+                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+                                            >
+                                                {showOwnerPassword ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Permissions Grid */}
+                                    <div className="bg-slate-900/30 rounded-lg p-4 border border-white/5 space-y-3">
+                                        <p className="text-xs text-orange-400 font-bold uppercase tracking-widest mb-2">Allowed Actions</p>
+
+                                        <label className="flex items-center gap-3 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                checked={permissions.printing}
+                                                onChange={(e) => setPermissions({ ...permissions, printing: e.target.checked })}
+                                                className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-orange-500 focus:ring-orange-500"
+                                            />
+                                            <span className="text-sm text-slate-300">High Quality Printing</span>
+                                        </label>
+
+                                        <label className="flex items-center gap-3 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                checked={permissions.copying}
+                                                onChange={(e) => setPermissions({ ...permissions, copying: e.target.checked })}
+                                                className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-orange-500 focus:ring-orange-500"
+                                            />
+                                            <span className="text-sm text-slate-300">Copying Text & Images</span>
+                                        </label>
+
+                                        <label className="flex items-center gap-3 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                checked={permissions.modifying}
+                                                onChange={(e) => setPermissions({ ...permissions, modifying: e.target.checked })}
+                                                className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-orange-500 focus:ring-orange-500"
+                                            />
+                                            <span className="text-sm text-slate-300">Modifying Document (Forms, Annotations)</span>
+                                        </label>
+                                    </div>
+
+                                    <label className="flex items-center gap-3 cursor-pointer pl-1">
+                                        <input
+                                            type="checkbox"
+                                            checked={encryptMetadata}
+                                            onChange={(e) => setEncryptMetadata(e.target.checked)}
+                                            className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-orange-500 focus:ring-orange-500"
+                                        />
+                                        <span className="text-xs text-slate-400">Encrypt Metadata (Title, Author)</span>
+                                    </label>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Footer Note */}
+                        <div className="flex items-start space-x-2 text-xs text-slate-500 pt-2">
+                            <Lock className="w-3 h-3 mt-0.5 flex-shrink-0 text-slate-400" />
                             <p>
-                                Your password is encrypted locally in your browser. We never see or store your password.
+                                Credentials are processed entirely in your browser using AES-256 (Banking Grade) encryption.
                             </p>
                         </div>
                     </div>
@@ -200,7 +308,7 @@ export default function ProtectPDFPage() {
             {/* Processing Progress */}
             {processing && (
                 <div className="mb-8">
-                    <ProgressBar progress={progress} label="Protecting PDF..." />
+                    <ProgressBar progress={progress} label="Applying Security Bunker..." />
                 </div>
             )}
 

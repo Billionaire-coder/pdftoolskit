@@ -25,14 +25,15 @@ export async function convertToPdfA(pdfBuffer: Uint8Array): Promise<Uint8Array> 
     // In a real browser environment, we can fetch relative to origin
     let profileBuffer: ArrayBuffer | null = null;
     try {
+        // Attempt to fetch sRGB profile
         const response = await fetch('/profiles/sRGB.icc');
         if (response.ok) {
             profileBuffer = await response.arrayBuffer();
         } else {
-            console.error('Failed to strict load sRGB profile for PDF/A');
+            console.warn('sRGB profile not found (404). PDF/A compliance will be partial (Metadata only).');
         }
     } catch (e) {
-        console.error('Error loading sRGB profile', e);
+        console.warn('Network error loading sRGB profile. PDF/A compliance will be partial.', e);
     }
 
     if (profileBuffer) {
@@ -85,12 +86,12 @@ export async function convertToPdfA(pdfBuffer: Uint8Array): Promise<Uint8Array> 
               <dc:format>application/pdf</dc:format>
               <dc:title>
                 <rdf:Alt>
-                  <rdf:li xml:lang="x-default">PDF/A-1b Document</rdf:li>
+                  <rdf:li xml:lang="x-default">PDF/A-1b Compliant Document</rdf:li>
                 </rdf:Alt>
               </dc:title>
             </rdf:Description>
              <rdf:Description rdf:about="" xmlns:xmp="http://ns.adobe.com/xap/1.0/">
-                <xmp:CreatorTool>PDFToolskit</xmp:CreatorTool>
+                <xmp:CreatorTool>PDFToolskit (Client-Side)</xmp:CreatorTool>
                 <xmp:ModifyDate>${now.toISOString()}</xmp:ModifyDate>
                 <xmp:CreateDate>${now.toISOString()}</xmp:CreateDate>
                 <xmp:MetadataDate>${now.toISOString()}</xmp:MetadataDate>

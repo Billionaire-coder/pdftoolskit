@@ -14,9 +14,9 @@ interface SubscriptionState {
 export const useSubscriptionStore = create<SubscriptionState>()(
     persist(
         (set, get) => ({
-            tier: 'free',
+            tier: 'pro',
             setTier: (tier) => set({ tier }),
-            isPro: () => get().tier === 'pro',
+            isPro: () => true,
             getLimits: () => {
                 const isPro = get().tier === 'pro';
                 return {

@@ -48,3 +48,24 @@ export async function checkWebGPU(): Promise<{ supported: boolean; hasF16: boole
         return { supported: false, hasF16: false };
     }
 }
+
+export async function streamChatCompletion(
+    messages: any[],
+    onUpdate: (text: string) => void,
+    modelId?: string
+) {
+    const engine = await getMLCEngine(undefined, modelId);
+    const chunks = await engine.chat.completions.create({
+        messages,
+        stream: true,
+    });
+
+    let fullText = '';
+    for await (const chunk of chunks) {
+        const content = chunk.choices[0]?.delta?.content || '';
+        fullText += content;
+        onUpdate(fullText);
+    }
+
+    return fullText;
+}
