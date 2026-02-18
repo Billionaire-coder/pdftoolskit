@@ -12,15 +12,15 @@ interface StepCardProps {
 export function StepCard({ step, index, onUpdate, onRemove }: StepCardProps) {
 
     const renderSettings = () => {
-        switch (step.type) {
+        switch (step.action) {
             case 'rotate':
                 return (
                     <div className="flex gap-4 items-center mt-3">
                         <label className="text-sm text-slate-400">Rotation:</label>
                         <select
-                            value={step.settings.rotation || 90}
+                            value={step.params.rotation || 90}
                             onChange={(e) => onUpdate(step.id, {
-                                settings: { ...step.settings, rotation: parseInt(e.target.value) }
+                                params: { ...step.params, rotation: parseInt(e.target.value) }
                             })}
                             className="bg-slate-800 border border-slate-700 text-white text-sm rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none"
                         >
@@ -36,9 +36,9 @@ export function StepCard({ step, index, onUpdate, onRemove }: StepCardProps) {
                     <div className="flex gap-4 items-center mt-3">
                         <label className="text-sm text-slate-400">Quality:</label>
                         <select
-                            value={step.settings.quality || 0.7}
+                            value={step.params.quality || 0.7}
                             onChange={(e) => onUpdate(step.id, {
-                                settings: { ...step.settings, quality: parseFloat(e.target.value) }
+                                params: { ...step.params, quality: parseFloat(e.target.value) }
                             })}
                             className="bg-slate-800 border border-slate-700 text-white text-sm rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none"
                         >
@@ -56,9 +56,9 @@ export function StepCard({ step, index, onUpdate, onRemove }: StepCardProps) {
                         <input
                             type="password"
                             placeholder="Enter password"
-                            value={step.settings.password || ''}
+                            value={step.params.password || ''}
                             onChange={(e) => onUpdate(step.id, {
-                                settings: { ...step.settings, password: e.target.value }
+                                params: { ...step.params, password: e.target.value }
                             })}
                             className="bg-slate-800 border border-slate-700 text-white text-sm rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none w-full max-w-[200px]"
                         />
@@ -73,9 +73,9 @@ export function StepCard({ step, index, onUpdate, onRemove }: StepCardProps) {
                             <input
                                 type="text"
                                 placeholder="Watermark text"
-                                value={step.settings.text || ''}
+                                value={step.params.text || ''}
                                 onChange={(e) => onUpdate(step.id, {
-                                    settings: { ...step.settings, text: e.target.value }
+                                    params: { ...step.params, text: e.target.value }
                                 })}
                                 className="bg-slate-800 border border-slate-700 text-white text-sm rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none flex-1"
                             />
@@ -87,13 +87,13 @@ export function StepCard({ step, index, onUpdate, onRemove }: StepCardProps) {
                                 min="0.1"
                                 max="1"
                                 step="0.1"
-                                value={step.settings.opacity || 0.5}
+                                value={step.params.opacity || 0.5}
                                 onChange={(e) => onUpdate(step.id, {
-                                    settings: { ...step.settings, opacity: parseFloat(e.target.value) }
+                                    params: { ...step.params, opacity: parseFloat(e.target.value) }
                                 })}
                                 className="flex-1 accent-blue-500"
                             />
-                            <span className="text-xs text-slate-500 w-8">{step.settings.opacity || 0.5}</span>
+                            <span className="text-xs text-slate-500 w-8">{step.params.opacity || 0.5}</span>
                         </div>
                     </div>
                 );
@@ -102,9 +102,9 @@ export function StepCard({ step, index, onUpdate, onRemove }: StepCardProps) {
                     <div className="flex gap-4 items-center mt-3">
                         <label className="text-sm text-slate-400">Position:</label>
                         <select
-                            value={step.settings.position || 'bottom-center'}
+                            value={step.params.position || 'bottom-center'}
                             onChange={(e) => onUpdate(step.id, {
-                                settings: { ...step.settings, position: e.target.value }
+                                params: { ...step.params, position: e.target.value }
                             })}
                             className="bg-slate-800 border border-slate-700 text-white text-sm rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none"
                         >
@@ -118,63 +118,10 @@ export function StepCard({ step, index, onUpdate, onRemove }: StepCardProps) {
                     </div>
                 );
 
-            case 'merge':
-                return (
-                    <div className="flex gap-4 items-center mt-3">
-                        <label className="text-sm text-slate-400">Output Name:</label>
-                        <input
-                            type="text"
-                            placeholder="merged_output.pdf"
-                            value={step.settings.outputFilename || ''}
-                            onChange={(e) => onUpdate(step.id, {
-                                settings: { ...step.settings, outputFilename: e.target.value }
-                            })}
-                            className="bg-slate-800 border border-slate-700 text-white text-sm rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none flex-1"
-                        />
-                        <span className="text-slate-500 text-sm">.pdf</span>
-                    </div>
-                );
-
-            case 'extract':
-                return (
-                    <div className="flex flex-col gap-3 mt-3">
-                        <label className="text-sm text-slate-400">Page Range (e.g., 1-5, 8, 11-13):</label>
-                        <input
-                            type="text"
-                            placeholder="e.g. 1-3, 5"
-                            value={step.settings.pageRange || ''}
-                            onChange={(e) => onUpdate(step.id, {
-                                settings: { ...step.settings, pageRange: e.target.value }
-                            })}
-                            className="bg-slate-800 border border-slate-700 text-white text-sm rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none"
-                        />
-                        <p className="text-xs text-slate-500">
-                            Enter page numbers or ranges separated by commas.
-                        </p>
-                    </div>
-                );
-
-            case 'split':
+            case 'flatten':
                 return (
                     <div className="mt-2 text-xs text-slate-500 italic">
-                        Splits PDF into individual single-page files.
-                    </div>
-                );
-
-            case 'pdfToImage':
-                return (
-                    <div className="flex gap-4 items-center mt-3">
-                        <label className="text-sm text-slate-400">Format:</label>
-                        <select
-                            value={step.settings.format || 'png'}
-                            onChange={(e) => onUpdate(step.id, {
-                                settings: { ...step.settings, format: e.target.value }
-                            })}
-                            className="bg-slate-800 border border-slate-700 text-white text-sm rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none"
-                        >
-                            <option value="png">PNG (High Quality)</option>
-                            <option value="jpeg">JPG (Smaller Size)</option>
-                        </select>
+                        Flattens form fields and annotations.
                     </div>
                 );
 
@@ -205,7 +152,7 @@ export function StepCard({ step, index, onUpdate, onRemove }: StepCardProps) {
                             {index + 1}
                         </span>
                         <h3 className="font-medium text-white capitalize">
-                            {step.type.replace(/([A-Z])/g, ' $1').trim()}
+                            {step.action.replace(/([A-Z])/g, ' $1').trim()}
                         </h3>
                     </div>
                     <button
