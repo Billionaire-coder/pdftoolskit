@@ -50,7 +50,7 @@ export class WorkflowEngine {
         // Refactoring is cleaner but risky.
         // Creating a File object is safer for compatibility.
 
-        let currentFilename = file.name;
+        const currentFilename = file.name;
 
         for (let index = 0; index < steps.length; index++) {
             const step = steps[index];
