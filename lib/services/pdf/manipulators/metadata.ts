@@ -91,7 +91,7 @@ export async function stripMetadata(file: File): Promise<Uint8Array> {
     // Wipe XMP explicitly
     try {
         pdfDoc.catalog.delete(pdfDoc.context.obj('Metadata'));
-    } catch (e) {
+    } catch (_e) {
         // Metadata not found or already deleted
     }
 
