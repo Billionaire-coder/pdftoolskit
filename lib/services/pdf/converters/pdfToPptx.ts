@@ -91,7 +91,6 @@ export class PptxService {
                         h: item.height ? item.height / 72 : 0.3,
                         fontSize: (item.transform[0] || 10), // Approx font size from matrix scale
                         color: '333333', // Default, we could extract color from operatorList in future
-                        transparent: true // Make text box transparent so background shows through
                     });
                 });
             }
