@@ -83,7 +83,7 @@ export function MergeTool({ initialFiles = [] }: MergeToolProps) {
             clearInterval(interval);
             setProgress(100);
 
-            const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
+            const blob = new Blob([mergedPdfBytes as any], { type: 'application/pdf' });
             setResult({ blob, fileName: `merged_${new Date().getTime()}.pdf` });
             toast.success("Document assembly complete!");
         } catch (error) {

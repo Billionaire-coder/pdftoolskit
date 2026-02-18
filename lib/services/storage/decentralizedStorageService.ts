@@ -93,7 +93,7 @@ export class DecentralizedStorageService {
 
         try {
             const formData = new FormData();
-            const blob = new Blob([new Uint8Array(docBytes)], { type: 'application/pdf' });
+            const blob = new Blob([new Uint8Array(docBytes) as any], { type: 'application/pdf' });
             formData.append('file', blob, 'signed_document.pdf');
 
             const response = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
