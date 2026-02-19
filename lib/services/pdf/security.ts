@@ -1,5 +1,5 @@
 import { PDFDocument, PDFPage } from 'pdf-lib';
-import { applyBranding, getGlobalPDFLib } from './core';
+import { applyBranding, getFileArrayBuffer, getGlobalPDFLib } from './core';
 
 export interface ProtectionOptions {
     userPassword: string;
@@ -18,7 +18,7 @@ export interface ProtectionOptions {
 
 export async function protectPDF(file: File, options: ProtectionOptions): Promise<Uint8Array> {
     try {
-        const arrayBuffer = await file.arrayBuffer();
+        const arrayBuffer = await getFileArrayBuffer(file);
         const PDFLib = await getGlobalPDFLib();
 
         const sourcePdf = await PDFLib.PDFDocument.load(arrayBuffer);
@@ -98,7 +98,7 @@ export interface SecurityAnalysis {
 }
 
 export async function analyzeSecurity(file: File): Promise<SecurityAnalysis> {
-    const arrayBuffer = await file.arrayBuffer();
+    const arrayBuffer = await getFileArrayBuffer(file);
     const PDFLib = await getGlobalPDFLib();
 
     try {
@@ -133,7 +133,7 @@ export async function analyzeSecurity(file: File): Promise<SecurityAnalysis> {
 }
 
 export async function unlockPDF(file: File, password?: string): Promise<Uint8Array> {
-    const arrayBuffer = await file.arrayBuffer();
+    const arrayBuffer = await getFileArrayBuffer(file);
     try {
         const PDFLib = await getGlobalPDFLib();
         let encryptedPdf;

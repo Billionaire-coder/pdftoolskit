@@ -1,5 +1,5 @@
-import { PDFDocument, StandardFonts, rgb, degrees } from 'pdf-lib';
-import { applyBranding } from '../core';
+import { PDFDocument, rgb, StandardFonts, degrees } from 'pdf-lib';
+import { applyBranding, getFileArrayBuffer } from '../core';
 import { AuditService, AuditRecord } from '../auditService';
 
 export async function addPageNumbers(
@@ -13,7 +13,7 @@ export async function addPageNumbers(
         mirror?: boolean; // If true, swaps left/right on even pages
     }
 ): Promise<Uint8Array> {
-    const arrayBuffer = await file.arrayBuffer();
+    const arrayBuffer = await getFileArrayBuffer(file);
     const pdfDoc = await PDFDocument.load(arrayBuffer);
     const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const pages = pdfDoc.getPages();
@@ -89,7 +89,7 @@ export async function addWatermark(
         y?: number; // 0-1 percentage relative to height (for single mode)
     } = {}
 ): Promise<Uint8Array> {
-    const arrayBuffer = await file.arrayBuffer();
+    const arrayBuffer = await getFileArrayBuffer(file);
     const pdfDoc = await PDFDocument.load(arrayBuffer);
     const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const pages = pdfDoc.getPages();
@@ -181,7 +181,7 @@ export async function addImageToPage(
         auditRecord?: AuditRecord;
     } = {}
 ): Promise<Uint8Array> {
-    const arrayBuffer = await file.arrayBuffer();
+    const arrayBuffer = await getFileArrayBuffer(file);
     const pdfDoc = await PDFDocument.load(arrayBuffer);
 
     let image;
@@ -236,7 +236,7 @@ export async function addRedaction(
         height: number;
     }
 ): Promise<Uint8Array> {
-    const arrayBuffer = await file.arrayBuffer();
+    const arrayBuffer = await getFileArrayBuffer(file);
     const pdfDoc = await PDFDocument.load(arrayBuffer);
 
     const pages = pdfDoc.getPages();

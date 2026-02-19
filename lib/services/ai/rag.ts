@@ -60,10 +60,12 @@ export function getRelevantContext(query: string, chunks: Chunk[], topN: number 
     const scoredChunks = chunks.map(chunk => {
         const lowerText = chunk.text.toLowerCase();
         let score = 0;
+        let tokenMatched = false;
 
         queryTokens.forEach(token => {
             const tf = (lowerText.match(new RegExp(token, 'g')) || []).length;
             if (tf > 0) {
+                tokenMatched = true;
                 // IDF approximation: log(total/docCount)
                 // eslint-disable-next-line security/detect-object-injection
                 const docCount = termDocCounts[token] || 1;
@@ -76,7 +78,10 @@ export function getRelevantContext(query: string, chunks: Chunk[], topN: number 
         });
 
         // Boost for chunks near the beginning (often more relevant in documents)
-        score += (1 / (chunk.pageIndex + 1)) * 5;
+        // Only apply boost if there was at least one keyword match to avoid irrelevant chunks surfacing
+        if (tokenMatched) {
+            score += (1 / (chunk.pageIndex + 1)) * 5;
+        }
 
         return { ...chunk, score };
     });

@@ -1,9 +1,8 @@
-/* eslint-disable */
-import { PDFDocument, degrees } from 'pdf-lib';
-import { applyBranding } from '../core';
+import { PDFDocument, degrees, PDFPage } from 'pdf-lib';
+import { applyBranding, getFileArrayBuffer } from '../core';
 
 export async function reversePDF(file: File): Promise<Uint8Array> {
-    const arrayBuffer = await file.arrayBuffer();
+    const arrayBuffer = await getFileArrayBuffer(file);
     const sourcePdf = await PDFDocument.load(arrayBuffer);
     const newPdf = await PDFDocument.create();
 
@@ -11,14 +10,14 @@ export async function reversePDF(file: File): Promise<Uint8Array> {
     const reverseIndices = Array.from({ length: totalPages }, (_, i) => totalPages - 1 - i);
 
     const copiedPages = await newPdf.copyPages(sourcePdf, reverseIndices);
-    copiedPages.forEach((page: any) => newPdf.addPage(page));
+    copiedPages.forEach((page: PDFPage) => newPdf.addPage(page));
 
     applyBranding(newPdf);
     return await newPdf.save();
 }
 
 export async function extractPages(file: File, pageRange: string): Promise<Uint8Array> {
-    const arrayBuffer = await file.arrayBuffer();
+    const arrayBuffer = await getFileArrayBuffer(file);
     const sourcePdf = await PDFDocument.load(arrayBuffer);
     const newPdf = await PDFDocument.create();
     const totalPages = sourcePdf.getPageCount();
@@ -46,14 +45,14 @@ export async function extractPages(file: File, pageRange: string): Promise<Uint8
     if (indices.length === 0) throw new Error("Invalid page range");
 
     const copiedPages = await newPdf.copyPages(sourcePdf, indices);
-    copiedPages.forEach((page: any) => newPdf.addPage(page));
+    copiedPages.forEach((page: PDFPage) => newPdf.addPage(page));
 
     applyBranding(newPdf);
     return await newPdf.save();
 }
 
 export async function burstPDF(file: File): Promise<File[]> {
-    const arrayBuffer = await file.arrayBuffer();
+    const arrayBuffer = await getFileArrayBuffer(file);
     const sourcePdf = await PDFDocument.load(arrayBuffer);
     const totalPages = sourcePdf.getPageCount();
     const files: File[] = [];
@@ -64,7 +63,7 @@ export async function burstPDF(file: File): Promise<File[]> {
         newPdf.addPage(copiedPage);
         applyBranding(newPdf);
         const bytes = await newPdf.save();
-        // @ts-ignore - Uint8Array is compatible with BlobPart in practice
+        // @ts-expect-error - Uint8Array is compatible with BlobPart in practice
         files.push(new File([bytes], `${file.name.replace('.pdf', '')}_page_${i + 1}.pdf`, { type: 'application/pdf' }));
     }
 
@@ -80,7 +79,7 @@ export async function* convertPDFToImages(
     } = {}
 ): AsyncGenerator<File> {
     const { format = 'png', scale = 2.0, quality = 0.85 } = options;
-    const arrayBuffer = await file.arrayBuffer();
+    const arrayBuffer = await getFileArrayBuffer(file);
     const pdfjsLib = await import('pdfjs-dist');
 
     if (typeof window !== 'undefined' && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
@@ -119,6 +118,7 @@ export async function* convertPDFToImages(
         canvas.width = 0;
         canvas.height = 0;
         canvas.remove();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (page as any).cleanup();
     }
 
@@ -126,7 +126,7 @@ export async function* convertPDFToImages(
 }
 
 export async function rotatePDF(file: File, rotation: 90 | 180 | 270): Promise<Uint8Array> {
-    const arrayBuffer = await file.arrayBuffer();
+    const arrayBuffer = await getFileArrayBuffer(file);
     const pdfDoc = await PDFDocument.load(arrayBuffer);
     const pages = pdfDoc.getPages();
 

@@ -1,5 +1,5 @@
-import { PDFDocument, degrees, rgb } from 'pdf-lib';
-import { applyBranding } from '../core';
+import { PDFDocument, rgb, degrees, PDFPage } from 'pdf-lib';
+import { applyBranding, getFileArrayBuffer } from '../core';
 import { parsePageRange } from '@/lib/utils';
 
 export async function cropPDF(
@@ -14,11 +14,10 @@ export async function cropPDF(
         anonymize?: boolean; // Set all boxes (Media, Crop, Art, Bleed) to the same
     }
 ): Promise<Uint8Array> {
-    const arrayBuffer = await file.arrayBuffer();
+    const arrayBuffer = await getFileArrayBuffer(file);
     const pdfDoc = await PDFDocument.load(arrayBuffer);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const updatePageBoxes = (page: any, newX: number, newY: number, newWidth: number, newHeight: number) => {
+    const updatePageBoxes = (page: PDFPage, newX: number, newY: number, newWidth: number, newHeight: number) => {
         if (options?.anonymize) {
             // Hard-Crop: Sync all boxes to prevent easy recovery
             page.setMediaBox(newX, newY, newWidth, newHeight);
@@ -69,8 +68,7 @@ export async function cropPDF(
         const pageIndices = parsePageRange(options?.pageRange || '', totalPages);
 
         const pages = pdfDoc.getPages();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        pages.forEach((page: any, index: number) => {
+        pages.forEach((page, index: number) => {
             if (!pageIndices.includes(index)) return;
 
             const { x, y, width, height } = page.getMediaBox();
@@ -91,15 +89,8 @@ export async function cropPDF(
 }
 
 
-export async function flattenPDF(
-    file: File,
-    options: {
-        forms?: boolean;
-        annotations?: boolean;
-        layers?: boolean;
-    } = { forms: true, annotations: true, layers: true }
-): Promise<Uint8Array> {
-    const arrayBuffer = await file.arrayBuffer();
+export async function flattenPDF(file: File, options: { forms?: boolean, annotations?: boolean, layers?: boolean } = {}): Promise<Uint8Array> {
+    const arrayBuffer = await getFileArrayBuffer(file);
     const pdfDoc = await PDFDocument.load(arrayBuffer);
 
     // 1. Flatten AcroForms
@@ -159,7 +150,7 @@ export async function mergePDFs(files: File[]): Promise<Uint8Array> {
     // let totalPages = 0;
 
     for (const file of files) {
-        const arrayBuffer = await file.arrayBuffer();
+        const arrayBuffer = await getFileArrayBuffer(file);
         const pdf = await PDFDocument.load(arrayBuffer);
 
         // Copy pages
@@ -194,7 +185,7 @@ export async function mergePDFs(files: File[]): Promise<Uint8Array> {
 }
 
 export async function splitPDF(file: File, pageRanges: { start: number; end: number }[]): Promise<Uint8Array[]> {
-    const arrayBuffer = await file.arrayBuffer();
+    const arrayBuffer = await getFileArrayBuffer(file);
     const sourcePdf = await PDFDocument.load(arrayBuffer);
     const results: Uint8Array[] = [];
 
@@ -213,7 +204,7 @@ export async function splitPDF(file: File, pageRanges: { start: number; end: num
 }
 
 export async function removePagesFromPDF(file: File, pageIndicesToRemove: number[]): Promise<Uint8Array> {
-    const arrayBuffer = await file.arrayBuffer();
+    const arrayBuffer = await getFileArrayBuffer(file);
     const pdf = await PDFDocument.load(arrayBuffer);
     const totalPages = pdf.getPageCount();
 
@@ -231,7 +222,7 @@ export async function removePagesFromPDF(file: File, pageIndicesToRemove: number
 
 
 export async function organizePDF(file: File, pages: { index: number; rotation?: number }[]): Promise<Uint8Array> {
-    const arrayBuffer = await file.arrayBuffer();
+    const arrayBuffer = await getFileArrayBuffer(file);
     const sourcePdf = await PDFDocument.load(arrayBuffer);
     const newPdf = await PDFDocument.create();
 

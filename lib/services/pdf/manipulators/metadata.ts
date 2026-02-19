@@ -1,5 +1,5 @@
 import { PDFDocument } from 'pdf-lib';
-import { applyBranding } from '../core';
+import { applyBranding, getFileArrayBuffer } from '../core';
 
 export interface PDFFullMetadata {
     title?: string;
@@ -57,7 +57,7 @@ function generateXMP(metadata: {
 }
 
 export async function getMetadata(file: File): Promise<PDFFullMetadata> {
-    const arrayBuffer = await file.arrayBuffer();
+    const arrayBuffer = await getFileArrayBuffer(file);
     const pdfDoc = await PDFDocument.load(arrayBuffer);
 
     return {
@@ -74,7 +74,7 @@ export async function getMetadata(file: File): Promise<PDFFullMetadata> {
 }
 
 export async function stripMetadata(file: File): Promise<Uint8Array> {
-    const arrayBuffer = await file.arrayBuffer();
+    const arrayBuffer = await getFileArrayBuffer(file);
     const pdfDoc = await PDFDocument.load(arrayBuffer);
 
     pdfDoc.setTitle('');
@@ -112,7 +112,7 @@ export async function updateMetadata(
         modificationDate?: Date;
     }
 ): Promise<Uint8Array> {
-    const arrayBuffer = await file.arrayBuffer();
+    const arrayBuffer = await getFileArrayBuffer(file);
     const pdfDoc = await PDFDocument.load(arrayBuffer);
 
     // 1. Update Info Dictionary (Legacy)

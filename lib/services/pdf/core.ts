@@ -50,3 +50,24 @@ export async function getGlobalPDFLib(): Promise<any> {
         document.head.appendChild(script);
     });
 }
+/**
+ * Robustly extracts an ArrayBuffer from a File/Blob, providing full compatibility 
+ * across environments (Browsers, Node.js, and Test JSDOM).
+ */
+export async function getFileArrayBuffer(file: File | Blob): Promise<ArrayBuffer> {
+    if (typeof file.arrayBuffer === 'function') {
+        try {
+            return await file.arrayBuffer();
+        } catch (_e) {
+            // Fall through to fallback if it exists but fails
+        }
+    }
+
+    // Fallback for environments lacking file.arrayBuffer (e.g. older JSDOM)
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as ArrayBuffer);
+        reader.onerror = () => reject(new Error('FileReader failed to read the file.'));
+        reader.readAsArrayBuffer(file);
+    });
+}

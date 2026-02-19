@@ -1,5 +1,5 @@
 import { PDFDocument } from 'pdf-lib';
-import { applyBranding } from '../core';
+import { applyBranding, getFileArrayBuffer } from '../core';
 import { rasterizeAndCompressPDF } from './compression';
 
 /**
@@ -26,7 +26,7 @@ export interface HealthReport {
  * Executes the professional "Heal" action with multi-stage recovery
  */
 export async function executeHealAction(file: File): Promise<{ data: Uint8Array; report: HealthReport }> {
-    let arrayBuffer = await file.arrayBuffer();
+    let arrayBuffer = await getFileArrayBuffer(file);
     const report: HealthReport = {
         integrityScore: 100,
         issuesFixed: [],

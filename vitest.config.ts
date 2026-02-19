@@ -9,7 +9,8 @@ export default defineConfig({
         environment: 'jsdom',
         exclude: ['**/node_modules/**', '**/dist/**', '**/e2e/**', '**/tests/browser/**'],
         globals: true,
-        setupFiles: [],
+        testTimeout: 15000,
+        setupFiles: ['./lib/workflow/__tests__/setup.ts'],
         alias: {
             '@': path.resolve(__dirname, './'),
         },
