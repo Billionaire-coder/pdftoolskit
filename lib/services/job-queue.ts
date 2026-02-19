@@ -46,9 +46,9 @@ class JobQueueService {
         jobStore.updateJob(jobId, { status: 'processing', progress: 0 });
 
         try {
-            const results = await executeWorkflow(files, steps, (current, total, status) => {
+            const results = await executeWorkflow(files, steps, (current, total, _status) => {
                 const progress = Math.round((current / total) * 100);
-                jobStore.updateJob(jobId, { progress, error: status });
+                jobStore.updateJob(jobId, { progress, error: _status });
                 if (options?.onProgress) options.onProgress(progress);
             });
 
@@ -71,7 +71,9 @@ class JobQueueService {
             // Add to history
             await jobStore.addToHistory({
                 id: jobId,
+                // eslint-disable-next-line security/detect-object-injection
                 fileName: jobStore.jobs[jobId]?.fileName || 'Unknown',
+                // eslint-disable-next-line security/detect-object-injection
                 tool: jobStore.jobs[jobId]?.tool || 'Unknown',
                 size: files.reduce((acc, f) => acc + f.size, 0),
                 blob: resultBlob

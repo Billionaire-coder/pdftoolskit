@@ -8,12 +8,12 @@ import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { ProgressBar } from '@/components/shared/ProgressBar';
 import { downloadFile } from '@/lib/utils';
-import { useTranslation } from 'react-i18next';
+
 import { applyScanFilter, ScanFilter } from '@/lib/services/pdf/scan/scan-utils';
 import { imagesToPdf } from '@/lib/services/pdf/converters/scanToPdf';
 
 export function ScanTool() {
-    const { t } = useTranslation('common');
+    // const { t } = useTranslation('common');
     const [stream, setStream] = useState<MediaStream | null>(null);
     const [capturedImages, setCapturedImages] = useState<string[]>([]);
     const [processing, setProcessing] = useState(false);
@@ -64,7 +64,7 @@ export function ScanTool() {
                 advanced: [{ torch: !torchActive }]
             });
             setTorchActive(!torchActive);
-        } catch (err) {
+        } catch (_err) {
             toast.error("Flash not supported on this device");
         }
     };
@@ -113,6 +113,7 @@ export function ScanTool() {
             const pdfBytes = await imagesToPdf(capturedImages, { addBranding: true });
             setProgress(90);
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
             setResult({ blob, fileName: `scan_${Date.now()}.pdf` });
             setProgress(100);

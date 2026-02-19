@@ -95,6 +95,8 @@ export const PDFThumbnail = React.memo(function PDFThumbnail({
             }
         };
 
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleMessage = (data: any) => {
             const { type, bitmap, message } = data;
             if (type === 'THUMBNAIL_SUCCESS') {

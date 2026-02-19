@@ -1,6 +1,6 @@
 import React from 'react';
 import { ToolHeader } from '@/components/shared/ToolHeader';
-import { Cookie, HelpCircle, Mail } from 'lucide-react';
+// import { Cookie, HelpCircle, Mail } from 'lucide-react';
 
 export default function CookiesPage() {
     return (

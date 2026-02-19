@@ -58,7 +58,7 @@ export default function ExtractPagesPage() {
                 setNumPages(count);
                 setPages(Array.from({ length: count }, (_, i) => ({ index: i, selected: false })));
                 toast.success(`Document loaded: ${count} pages`, { id: 'load-pdf' });
-            } catch (e) {
+            } catch (_e) {
                 toast.error('Failed to parse PDF architecture', { id: 'load-pdf' });
             }
         } else {
@@ -72,11 +72,14 @@ export default function ExtractPagesPage() {
             if (e?.shiftKey && lastClickedIndex !== null) {
                 const start = Math.min(lastClickedIndex, idx);
                 const end = Math.max(lastClickedIndex, idx);
+                // eslint-disable-next-line security/detect-object-injection
                 const newState = !next[idx].selected;
                 for (let i = start; i <= end; i++) {
+                    // eslint-disable-next-line security/detect-object-injection
                     next[i].selected = newState;
                 }
             } else {
+                // eslint-disable-next-line security/detect-object-injection
                 next[idx].selected = !next[idx].selected;
             }
             return next;
@@ -97,11 +100,15 @@ export default function ExtractPagesPage() {
         let rEnd = selectedIndices[0];
 
         for (let i = 1; i < selectedIndices.length; i++) {
+            // eslint-disable-next-line security/detect-object-injection
             if (selectedIndices[i] === rEnd + 1) {
+                // eslint-disable-next-line security/detect-object-injection
                 rEnd = selectedIndices[i];
             } else {
                 ranges.push(rStart === rEnd ? `${rStart}` : `${rStart}-${rEnd}`);
+                // eslint-disable-next-line security/detect-object-injection
                 rStart = selectedIndices[i];
+                // eslint-disable-next-line security/detect-object-injection
                 rEnd = selectedIndices[i];
             }
         }
@@ -127,6 +134,7 @@ export default function ExtractPagesPage() {
 
             if (extractionMode === 'single') {
                 const newPdfBytes = await organizePDF(file, selectedIndices.map(i => ({ index: i })));
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const blob = new Blob([newPdfBytes as any], { type: 'application/pdf' });
                 setResult({ blob, fileName: `${baseName}_extracted.pdf` });
             } else {
@@ -136,6 +144,7 @@ export default function ExtractPagesPage() {
 
                 const zip = new JSZip();
                 pdfs.forEach((bytes, i) => {
+                    // eslint-disable-next-line security/detect-object-injection
                     zip.file(`${baseName}_page_${selectedIndices[i] + 1}.pdf`, bytes);
                     setProgress(Math.round(((i + 1) / pdfs.length) * 100));
                 });

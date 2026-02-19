@@ -12,7 +12,7 @@ import { ScanTool } from '@/components/tools/ScanTool';
 import { PDFToWordTool } from '@/components/tools/PDFToWordTool';
 import { ChatTool } from '@/components/tools/ChatTool';
 import { ToolHeader } from '@/components/shared/ToolHeader';
-import { Lucide } from '@/lib/lucide-registry';
+// import { Lucide } from '@/lib/lucide-registry';
 
 interface Props {
     params: { slug: string };
@@ -161,6 +161,7 @@ export default function PSEOPage({ params }: Props) {
             <GlassCard className="p-8 md:p-12 mb-16">
                 <div
                     className="prose prose-invert max-w-none prose-headings:gradient-text prose-a:text-primary hover:prose-a:underline"
+                    // eslint-disable-next-line react/no-danger
                     dangerouslySetInnerHTML={{ __html: page.content }}
                 />
             </GlassCard>

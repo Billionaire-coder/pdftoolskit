@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, GripVertical, Play, Download, Sparkles, FileText, Lock, Key, Droplet, Layers, FolderCog, FileType, CheckCircle } from 'lucide-react';
+// import { motion } from 'framer-motion';
+import { Plus, Trash2, GripVertical, Play, Download, Sparkles, FileText, Lock, Key, Droplet, Layers, FileType, CheckCircle } from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -75,6 +75,7 @@ export default function CreateWorkflowPage() {
         setSteps(steps.filter(s => s.id !== id));
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updateStepParams = (id: string, newParams: any) => {
         setSteps(steps.map(s => s.id === id ? { ...s, params: { ...s.params, ...newParams } } : s));
     };
@@ -99,9 +100,9 @@ export default function CreateWorkflowPage() {
 
         try {
             // Mock progress for better UX + Actual Engine execution
-            let processedSteps = 0;
-            const total = steps.length;
-            const stepWeight = 100 / total;
+            // const _processedSteps = 0;
+            // const total = steps.length;
+            // const _stepWeight = 100 / total;
 
             // Hook into engine logs or just simulate? 
             // The engine runs synchronously (await step 1, await step 2).
@@ -124,8 +125,8 @@ export default function CreateWorkflowPage() {
             setProgress(100);
             setCurrentStepInfo('Workflow Complete!');
 
-            // @ts-expect-error - Uint8Array -> Blob
-            const blob = new Blob([outcome.pdfBytes], { type: 'application/pdf' });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const blob = new Blob([outcome.pdfBytes as any], { type: 'application/pdf' });
             setResult({ blob, fileName: `workflow_result_${getBaseFileName(file.name)}.pdf` });
             toast.success('Workflow executed successfully!');
 
@@ -340,6 +341,7 @@ export default function CreateWorkflowPage() {
 
 // --- Subcomponent: Sortable Step Item ---
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function SortableStepItem({ step, index, onRemove, onUpdate }: { step: StepConfig, index: number, onRemove: (id: string) => void, onUpdate: (id: string, p: any) => void }) {
     const {
         attributes,

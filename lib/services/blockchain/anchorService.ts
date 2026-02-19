@@ -1,4 +1,4 @@
-import { createPublicClient, http, hexToBytes, bytesToHex } from 'viem';
+import { createPublicClient, http } from 'viem';
 import { base } from 'viem/chains';
 
 export interface AnchorResult {
@@ -25,6 +25,7 @@ export class AnchorService {
      * For the Sovereign Legality prototype, we simulate a high-fidelity L2 anchor.
      */
     static async anchorHash(docHash: string, network: 'base' | 'arbitrum' = 'base'): Promise<AnchorResult> {
+        // eslint-disable-next-line no-console
         console.log(`[Forever Ledger] Anchoring hash ${docHash} to ${network.toUpperCase()}...`);
 
         // Simulating the transaction delay and receipt
@@ -56,6 +57,7 @@ export class AnchorService {
             // For now, we simulate the 'Confirmed' state if the hash is valid
             return docHash.length === 64;
         } catch (error) {
+            // eslint-disable-next-line no-console
             console.error('[Blockchain] Verification Error:', error);
             return false;
         }

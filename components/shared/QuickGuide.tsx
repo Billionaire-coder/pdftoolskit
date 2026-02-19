@@ -1,6 +1,6 @@
 import { GlassCard } from '@/components/ui/GlassCard';
 import { useTranslation } from 'react-i18next';
-import { CheckCircle2 } from 'lucide-react';
+
 
 interface QuickGuideProps {
     steps: {

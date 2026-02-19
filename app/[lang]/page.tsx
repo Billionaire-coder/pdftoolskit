@@ -9,7 +9,7 @@ export async function generateStaticParams() {
     return i18n.locales.map((locale) => ({ lang: locale }));
 }
 
-export default function Home({ params }: { params: { lang: string } }) {
+export default function Home({ params: _params }: { params: { lang: string } }) {
     return (
         <>
             <Hero />

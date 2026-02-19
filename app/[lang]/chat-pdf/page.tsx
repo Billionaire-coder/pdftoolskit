@@ -9,7 +9,7 @@ import { ChatTool } from '@/components/tools/ChatTool';
 import { FeatureGate } from '@/components/shared/FeatureGate';
 import { MessageSquare } from 'lucide-react';
 import { ToolHeader } from '@/components/shared/ToolHeader';
-import { useTranslation } from 'react-i18next';
+// import { useTranslation } from 'react-i18next';
 
 export default function ChatPDFPage() {
     return (

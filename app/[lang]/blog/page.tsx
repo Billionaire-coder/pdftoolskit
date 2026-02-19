@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, ArrowRight, BookOpen, Tag } from 'lucide-react';
+import { Calendar, Clock, ArrowRight, BookOpen } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { ToolHeader } from '@/components/shared/ToolHeader';
 import { getBlogPosts } from '@/data/blog-posts';

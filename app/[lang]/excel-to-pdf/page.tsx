@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FileCode2, Download, Table, Sheet } from 'lucide-react';
+import { FileCode2, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
 import { ProgressBar } from '@/components/shared/ProgressBar';
@@ -72,6 +72,7 @@ export default function ExcelToPDFPage() {
             clearInterval(progressInterval);
             setProgress(100);
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
             const filename = file.name.replace(/\.[^/.]+$/, "") + '.pdf';
 

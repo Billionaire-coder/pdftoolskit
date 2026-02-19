@@ -1,14 +1,14 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { FileText, Download, Plus, Layers, Zap, ShieldCheck, Gauge, Cpu, Trash2, ArrowUp, ArrowDown, Sparkles, Files, CheckCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { Download, Plus, Layers, Cpu, Trash2, ArrowUp, ArrowDown, Sparkles, CheckCircle, Gauge } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
 import { ProgressBar } from '@/components/shared/ProgressBar';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { mergePDFs } from '@/lib/services/pdf/manipulators/basic';
-import { downloadFile, validatePDFFile, cn, formatFileSize } from '@/lib/utils';
+import { downloadFile, validatePDFFile, formatFileSize } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { useSubscription } from '@/components/providers/SubscriptionProvider';
 
@@ -50,8 +50,10 @@ export function MergeTool({ initialFiles = [] }: MergeToolProps) {
     const moveFile = (index: number, direction: 'up' | 'down') => {
         const newFiles = [...files];
         if (direction === 'up' && index > 0) {
+            // eslint-disable-next-line security/detect-object-injection
             [newFiles[index], newFiles[index - 1]] = [newFiles[index - 1], newFiles[index]];
         } else if (direction === 'down' && index < files.length - 1) {
+            // eslint-disable-next-line security/detect-object-injection
             [newFiles[index], newFiles[index + 1]] = [newFiles[index + 1], newFiles[index]];
         }
         setFiles(newFiles);
@@ -83,6 +85,7 @@ export function MergeTool({ initialFiles = [] }: MergeToolProps) {
             clearInterval(interval);
             setProgress(100);
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const blob = new Blob([mergedPdfBytes as any], { type: 'application/pdf' });
             setResult({ blob, fileName: `merged_${new Date().getTime()}.pdf` });
             toast.success("Document assembly complete!");

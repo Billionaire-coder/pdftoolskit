@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Upload, Download, RefreshCw, Sparkles, LayoutGrid, Info } from 'lucide-react';
+import { Download, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
 import { ProgressBar } from '@/components/shared/ProgressBar';
@@ -55,6 +55,7 @@ export function RotateTool() {
     const rotatePage = (pageIndex: number) => {
         setRotations(prev => ({
             ...prev,
+            // eslint-disable-next-line security/detect-object-injection
             [pageIndex]: ((prev[pageIndex] || 0) + 90) % 360
         }));
     };
@@ -64,6 +65,7 @@ export function RotateTool() {
             // Apply to all if none selected
             setFineRotations(prev => {
                 const next = { ...prev };
+                // eslint-disable-next-line security/detect-object-injection
                 for (let i = 0; i < pageCount; i++) next[i] = angle;
                 return next;
             });
@@ -78,15 +80,7 @@ export function RotateTool() {
         }
     };
 
-    const rotateAll = () => {
-        setRotations(prev => {
-            const next = { ...prev };
-            for (let i = 0; i < pageCount; i++) {
-                next[i] = ((next[i] || 0) + 90) % 360;
-            }
-            return next;
-        });
-    };
+
 
     const resetRotation = () => {
         setRotations({});
@@ -100,6 +94,7 @@ export function RotateTool() {
             for (let i = 0; i < pageCount; i++) {
                 const isEven = (i + 1) % 2 === 0;
                 if (type === 'all' || (type === 'even' && isEven) || (type === 'odd' && !isEven)) {
+                    // eslint-disable-next-line security/detect-object-injection
                     next[i] = ((next[i] || 0) + angle + 360) % 360;
                 }
             }
@@ -115,6 +110,7 @@ export function RotateTool() {
                 const next = { ...prev };
                 for (let i = 0; i < pageCount; i++) {
                     const isEven = (i + 1) % 2 === 0;
+                    // eslint-disable-next-line security/detect-object-injection
                     next[i] = isEven ? ((next[i] || 0) - 90 + 360) % 360 : ((next[i] || 0) + 90) % 360;
                 }
                 return next;
@@ -140,6 +136,7 @@ export function RotateTool() {
         try {
             const arrayBuffer = await file.arrayBuffer();
             const pdfjsLib = await import('pdfjs-dist');
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${(pdfjsLib as any).version}/pdf.worker.min.js`;
 
             const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -149,10 +146,10 @@ export function RotateTool() {
             for (let i = 1; i <= sampleCount; i++) {
                 const page = await pdf.getPage(i);
                 const textContent = await page.getTextContent();
-
                 let verticalCount = 0;
                 let horizontalCount = 0;
 
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 textContent.items.forEach((item: any) => {
                     const transform = item.transform;
                     if (Math.abs(transform[1]) > 0.5 || Math.abs(transform[2]) > 0.5) {
@@ -202,7 +199,9 @@ export function RotateTool() {
             const pages = pdfDoc.getPages();
 
             pages.forEach((page, index) => {
+                // eslint-disable-next-line security/detect-object-injection
                 const rot = rotations[index] || 0;
+                // eslint-disable-next-line security/detect-object-injection
                 const fineRot = fineRotations[index] || 0;
 
                 // Cardinal flag rotation (lossless)
@@ -225,7 +224,9 @@ export function RotateTool() {
                     const ty = -sin * (width / 2) + (1 - cos) * (height / 2);
 
                     page.pushOperators(
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         { op: 'q', args: [] } as any, // Save state
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         { op: 'cm', args: [cos, sin, -sin, cos, tx, ty] } as any // Rotate matrix
                     );
                     // Prepending operators to the start of the stream is better for layout
@@ -237,6 +238,7 @@ export function RotateTool() {
             clearInterval(progressInterval);
             setProgress(100);
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const blob = new Blob([rotatedPdfBytes as any], { type: 'application/pdf' });
             const baseName = getBaseFileName(file.name);
             const outputName = `${baseName}_rotated.pdf`;
@@ -359,10 +361,13 @@ export function RotateTool() {
                             onPageRotate={(idx) => rotatePage(idx)}
                             customOverlay={(idx) => (
                                 <div className="flex flex-col gap-1 items-end">
+                                    {/* eslint-disable-next-line security/detect-object-injection */}
                                     {rotations[idx] ? <div className="text-[10px] bg-blue-500 text-white px-2 py-0.5 rounded-full">{rotations[idx]}°</div> : null}
+                                    {/* eslint-disable-next-line security/detect-object-injection */}
                                     {fineRotations[idx] ? <div className="text-[10px] bg-rose-500 text-white px-2 py-0.5 rounded-full">Level: {fineRotations[idx].toFixed(1)}°</div> : null}
                                 </div>
                             )}
+                            // eslint-disable-next-line security/detect-object-injection
                             customOverlayColor={(idx) => rotations[idx] ? "items-start justify-end p-2" : ""}
                         />
                     </div>

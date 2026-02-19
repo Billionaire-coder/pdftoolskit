@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Scissors, Download, CheckCircle, Zap, Shield, ArrowRight, Settings2, Trash2, FileText, Sparkles, Filter, Database, Gauge, Layers, ListFilter, LayoutGrid } from 'lucide-react';
+import React, { useState } from 'react';
+import { Scissors, Download, CheckCircle, Database, Layers, LayoutGrid } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
 import { ProgressBar } from '@/components/shared/ProgressBar';
@@ -10,13 +10,13 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { PDFGrid } from '@/components/pdf/PDFGrid';
 import { SplitService, SplitOptions } from '@/lib/services/pdf/splitService';
 import { downloadFile, validatePDFFile, formatFileSize, cn } from '@/lib/utils';
-import { useTranslation } from 'react-i18next';
+// import { useTranslation } from 'react-i18next';
 import { useSubscription } from '@/components/providers/SubscriptionProvider';
 
 type SplitMode = 'manual' | 'interval' | 'range';
 
 export function SplitTool() {
-    const { t } = useTranslation('common');
+    // const { t } = useTranslation('common');
     const { limits, isPro } = useSubscription();
 
     const [file, setFile] = useState<File | null>(null);
@@ -47,7 +47,7 @@ export function SplitTool() {
                 const doc = await PDFDocument.load(arrayBuffer);
                 setPageCount(doc.getPageCount());
                 toast.success("Document analyzed");
-            } catch (e) {
+            } catch (_e) {
                 toast.error("Failed to load PDF structure");
             }
         } else {
@@ -92,7 +92,7 @@ export function SplitTool() {
             setProgress(100);
             setResult(splitResult);
             toast.success("Extraction Complete");
-        } catch (error) {
+        } catch (_error) {
             toast.error("Split failed");
         } finally {
             setProcessing(false);

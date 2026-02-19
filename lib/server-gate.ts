@@ -14,6 +14,7 @@ export async function checkSubscription() {
 
     // Real Subscription Check
     // We check if the user object has the pro flag from the database/session
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const isPro = session.user.image === 'pro' || (session.user as any).isPro === true;
 
     if (!isPro) {

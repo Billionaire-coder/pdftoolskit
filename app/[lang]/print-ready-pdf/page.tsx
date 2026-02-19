@@ -7,7 +7,7 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { FileUpload } from '@/components/shared/FileUpload';
 import { Button } from '@/components/ui/Button';
 import { convertImagesToPrintPdf, PrintSize } from '@/lib/services/pdf/print/imageToPrintPdf';
-import { downloadFile, formatFileSize } from '@/lib/utils';
+import { downloadFile } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { ProcessingOverlay } from '@/components/shared/ProcessingOverlay';
 import { saveToHistory } from '@/lib/history-store';
@@ -19,8 +19,8 @@ import { toolGuides } from '@/data/guides';
 import { useSubscription } from '@/components/providers/SubscriptionProvider';
 
 export default function PrintReadyPdfPage() {
-    const { limits, isPro } = useSubscription();
-    const { t } = useTranslation('common');
+    const { limits: _limits, isPro: _isPro } = useSubscription();
+    const { t: _t } = useTranslation('common');
     const [files, setFiles] = useState<File[]>([]);
     const [isProcessing, setIsProcessing] = useState(false);
     const [dpi, setDpi] = useState(300);

@@ -39,6 +39,7 @@ export function PDFGrid({
                 {Array.from({ length: pageCount }, (_, i) => i + 1).map((pageNum) => {
                     const pageIndex = pageNum - 1;
                     const isSelected = selectedPages.includes(pageNum);
+                    // eslint-disable-next-line security/detect-object-injection
                     const rotation = rotations[pageIndex] || 0;
 
                     return (
@@ -55,11 +56,12 @@ export function PDFGrid({
                                 pageNumber={pageNum}
                                 selected={isSelected}
                                 rotation={rotation}
+                                // eslint-disable-next-line security/detect-object-injection
                                 fineRotation={fineRotations[pageIndex] || 0}
                                 showGrid={showGrid}
                                 onClick={onPageClick ? () => onPageClick(pageIndex) : undefined}
-                                onRotate={onPageRotate ? (e) => onPageRotate(pageIndex) : undefined}
-                                onDelete={onPageDelete ? (e) => onPageDelete(pageIndex) : undefined}
+                                onRotate={onPageRotate ? (_e) => onPageRotate(pageIndex) : undefined}
+                                onDelete={onPageDelete ? (_e) => onPageDelete(pageIndex) : undefined}
                                 overlayIcon={customOverlay ? customOverlay(pageIndex) : undefined}
                                 overlayColor={customOverlayColor ? customOverlayColor(pageIndex) : undefined}
                             />

@@ -1,24 +1,24 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Globe, Download, Code, Smartphone, Tablet, Monitor, ShieldCheck, Zap, Sparkles, AlertCircle, CheckCircle, Search, Gauge, Cpu, Trash2, Wind } from 'lucide-react';
+import React, { useState } from 'react';
+import { Globe, Download, Smartphone, Tablet, Monitor, ShieldCheck, Zap, Sparkles, Search, Gauge, Cpu, Wind } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { ProgressBar } from '@/components/shared/ProgressBar';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { downloadFile, cn, formatFileSize } from '@/lib/utils';
+import { downloadFile, cn } from '@/lib/utils';
 import { toolGuides } from '@/data/guides';
 import { QuickGuide } from '@/components/shared/QuickGuide';
 import { RelatedTools } from '@/components/shared/RelatedTools';
 import { ToolContent } from '@/components/shared/ToolContent';
 import { ToolHeader } from '@/components/shared/ToolHeader';
-import { useSubscription } from '@/components/providers/SubscriptionProvider';
+// import { useSubscription } from '@/components/providers/SubscriptionProvider';
 
 export default function HTMLToPDFPage() {
-    const { limits, isPro } = useSubscription();
+    // const { limits, isPro } = useSubscription();
     const [url, setUrl] = useState('');
-    const [format, setFormat] = useState<'a4' | 'letter'>('a4');
-    const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('portrait');
+    const [_format, _setFormat] = useState<'a4' | 'letter'>('a4');
+    const [_orientation, _setOrientation] = useState<'portrait' | 'landscape'>('portrait');
     const [viewport, setViewport] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
     const [cleanShot, setCleanShot] = useState(true);
 
@@ -68,8 +68,8 @@ export default function HTMLToPDFPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     url: targetUrl,
-                    format,
-                    orientation,
+                    format: _format,
+                    orientation: _orientation,
                     viewport,
                     cleanShot
                 }),
@@ -90,6 +90,7 @@ export default function HTMLToPDFPage() {
 
             setResult({ blob, fileName: filename });
             toast.success('Website captured successfully');
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             console.error('PDF Generation Error:', error);
             toast.error(error.message || 'Capture failed');
@@ -247,11 +248,11 @@ export default function HTMLToPDFPage() {
                             <div className="w-full space-y-3 mb-8">
                                 <div className="flex justify-between text-[10px] text-slate-500 uppercase font-black">
                                     <span>Format</span>
-                                    <span className="text-indigo-400">{format}</span>
+                                    <span className="text-indigo-400">{_format}</span>
                                 </div>
                                 <div className="flex justify-between text-[10px] text-slate-500 uppercase font-black">
                                     <span>Orientation</span>
-                                    <span className="text-indigo-400">{orientation}</span>
+                                    <span className="text-indigo-400">{_orientation}</span>
                                 </div>
                                 <div className="flex justify-between text-[10px] text-slate-500 uppercase font-black">
                                     <span>Viewport</span>

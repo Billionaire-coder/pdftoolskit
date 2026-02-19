@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Layers, Download, Stamp, ShieldCheck, Info, CheckCircle2, AlertTriangle, Settings2, FileLock2, Zap } from 'lucide-react';
+import { Layers, Download, Stamp, ShieldCheck, CheckCircle2, AlertTriangle, Settings2, FileLock2, Zap } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
 import { ProgressBar } from '@/components/shared/ProgressBar';
@@ -70,8 +70,8 @@ export default function FlattenPDFPage() {
             setProgress(100);
             setStatusMessage('Document Sealed.');
 
-            // @ts-expect-error - Uint8Array is compatible with BlobPart
-            const blob = new Blob([newPdfBytes], { type: 'application/pdf' });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const blob = new Blob([newPdfBytes as any], { type: 'application/pdf' });
             const baseName = getBaseFileName(file.name);
 
             setResult({ blob, fileName: `${baseName}_flattened.pdf` });

@@ -7,7 +7,6 @@ import { ReactNode, useEffect } from 'react';
 export function I18nProvider({ children, locale }: { children: ReactNode; locale: string }) {
     useEffect(() => {
         if (locale && i18n.language !== locale) {
-            console.log(`I18nProvider: Switching language to ${locale}`);
             i18n.changeLanguage(locale);
         }
     }, [locale]);

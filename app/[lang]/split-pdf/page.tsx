@@ -11,7 +11,7 @@ import { QuickGuide } from '@/components/shared/QuickGuide';
 import { toolGuides } from '@/data/guides';
 
 export default function SplitPDFPage() {
-    const { t } = useTranslation('common');
+    const { t: _t } = useTranslation('common');
 
     return (
         <div className="container mx-auto px-4 py-12 lg:py-20 max-w-6xl">

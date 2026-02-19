@@ -68,6 +68,7 @@ export class LayoutIntelligenceService {
      */
     static async performAIInference(_pageImage: Blob): Promise<DetectedField[]> {
         // AI Model (YOLOv10/DocLayNet) would be loaded here
+        // eslint-disable-next-line no-console
         console.log('AI Inference triggered for page image...');
         return [];
     }

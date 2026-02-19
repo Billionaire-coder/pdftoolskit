@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { Camera } from 'lucide-react';
 import { toolGuides } from '@/data/guides';
 import { QuickGuide } from '@/components/shared/QuickGuide';
@@ -9,7 +8,7 @@ import { ToolContent } from '@/components/shared/ToolContent';
 import { ScanTool } from '@/components/tools/ScanTool';
 import { ToolHeader } from '@/components/shared/ToolHeader';
 
-type ScanFilter = 'original' | 'grayscale' | 'b&w' | 'contrast';
+// type ScanFilter = 'original' | 'grayscale' | 'b&w' | 'contrast';
 
 export default function ScanPDFPage() {
     return (

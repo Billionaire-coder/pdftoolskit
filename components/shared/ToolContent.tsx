@@ -61,6 +61,7 @@ export function ToolContent({ toolName }: ToolContentProps) {
 
     const rawContent = hasTranslation
         ? { title: t(`${toolName}.title`), htmlContext: t(`${toolName}.htmlContext`) }
+        // eslint-disable-next-line security/detect-object-injection
         : toolSeoContent[toolName];
 
     if (!rawContent) return null;
@@ -86,13 +87,13 @@ export function ToolContent({ toolName }: ToolContentProps) {
                         <ReactMarkdown
                             rehypePlugins={[rehypeRaw]}
                             components={{
-                                h3: ({ node, ...props }) => <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-8 mb-4" {...props} />,
-                                p: ({ node, ...props }) => <p className="mb-4 leading-relaxed" {...props} />,
-                                ul: ({ node, ...props }) => <ul className="list-disc list-inside ml-4 space-y-2 mb-6" {...props} />,
-                                li: ({ node, ...props }) => <li className="marker:text-primary" {...props} />,
-                                a: ({ node, ...props }) => <a className="text-primary hover:underline font-medium transition-colors" target="_blank" rel="noopener noreferrer" {...props} />,
-                                strong: ({ node, ...props }) => <strong className="font-bold text-slate-700 dark:text-slate-200" {...props} />,
-                                em: ({ node, ...props }) => <em className="italic text-slate-500 dark:text-slate-400" {...props} />,
+                                h3: ({ ...props }) => <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-8 mb-4" {...props} />,
+                                p: ({ ...props }) => <p className="mb-4 leading-relaxed" {...props} />,
+                                ul: ({ ...props }) => <ul className="list-disc list-inside ml-4 space-y-2 mb-6" {...props} />,
+                                li: ({ ...props }) => <li className="marker:text-primary" {...props} />,
+                                a: ({ ...props }) => <a className="text-primary hover:underline font-medium transition-colors" target="_blank" rel="noopener noreferrer" {...props} />,
+                                strong: ({ ...props }) => <strong className="font-bold text-slate-700 dark:text-slate-200" {...props} />,
+                                em: ({ ...props }) => <em className="italic text-slate-500 dark:text-slate-400" {...props} />,
                             }}
                         >
                             {content.htmlContext}

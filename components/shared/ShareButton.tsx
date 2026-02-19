@@ -38,6 +38,7 @@ export function ShareButton({ className, url, title, text }: ShareButtonProps) {
             } else {
                 throw new Error('Web Share API not supported');
             }
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             // If user cancelled share, do nothing
             if (error.name === 'AbortError') return;
@@ -48,7 +49,7 @@ export function ShareButton({ className, url, title, text }: ShareButtonProps) {
                 setCopied(true);
                 toast.success('Link copied to clipboard!');
                 setTimeout(() => setCopied(false), 2000);
-            } catch (err) {
+            } catch (_err) {
                 toast.error('Failed to copy link');
             }
         }

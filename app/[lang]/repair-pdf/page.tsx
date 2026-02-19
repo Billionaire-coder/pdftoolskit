@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Wrench, Download, ShieldCheck, Activity, Zap, Search, Layers, CheckCircle2 } from 'lucide-react';
+import { Download, Sparkles, CheckCircle, Activity, ShieldCheck, Stethoscope } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
 import { ProgressBar } from '@/components/shared/ProgressBar';
@@ -120,7 +120,7 @@ export default function RepairPDFPage() {
                                 <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
                                     <div className="flex-grow">
                                         <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
-                                            <Zap className="w-5 h-5 text-emerald-400" />
+                                            <Sparkles className="w-5 h-5 text-emerald-400" />
                                             Heal Engine Ready
                                         </h3>
                                         <p className="text-slate-400 text-sm max-w-md">
@@ -162,7 +162,7 @@ export default function RepairPDFPage() {
                 <div className="space-y-6 animate-in fade-in duration-700">
                     <div className="text-center mb-8">
                         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-500/10 border border-emerald-500/30 rounded-full mb-3 shadow-lg shadow-emerald-500/5">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                            <CheckCircle className="w-4 h-4 text-emerald-400" />
                             <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">Document Restored</span>
                         </div>
                         <h2 className="text-3xl font-black text-white tracking-tight">Forensic Analysis Complete</h2>
@@ -195,13 +195,13 @@ export default function RepairPDFPage() {
                             <ul className="space-y-1 text-xs text-slate-300">
                                 {report.issuesFixed.map((issue, i) => (
                                     <li key={i} className="flex items-start gap-2">
-                                        <CheckCircle2 className="w-3 h-3 text-emerald-500 mt-0.5" />
+                                        <CheckCircle className="w-3 h-3 text-emerald-500 mt-0.5" />
                                         {issue}
                                     </li>
                                 ))}
                                 {report.fallbackUsed && (
                                     <li className="flex items-start gap-2 text-amber-400">
-                                        <Activity className="w-3 h-3 mt-0.5" />
+                                        <Stethoscope className="w-3 h-3 mt-0.5" />
                                         Fallback: Rasterized Reconstruction
                                     </li>
                                 )}
@@ -223,7 +223,13 @@ export default function RepairPDFPage() {
                             <Button
                                 variant="primary"
                                 size="lg"
-                                onClick={() => result && downloadFile(new Blob([result.data as any], { type: 'application/pdf' }), downloadFileName || result.fileName)}
+                                onClick={() => {
+                                    if (result) {
+                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                        const blob = new Blob([result.data as any], { type: 'application/pdf' });
+                                        downloadFile(blob, downloadFileName || result.fileName);
+                                    }
+                                }}
                                 icon={<Download className="w-5 h-5" />}
                                 className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-500/20 px-8"
                             >

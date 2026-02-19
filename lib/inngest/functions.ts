@@ -7,6 +7,7 @@ export const generatePdf = inngest.createFunction(
         const { html, options } = event.data;
 
         const pdfBuffer = await step.run("generate-pdf-buffer", async () => {
+            // eslint-disable-next-line no-console
             console.log("Processing PDF generation for:", options?.filename || "document.pdf");
 
             // Phase 34: Real Logic

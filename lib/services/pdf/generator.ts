@@ -49,6 +49,7 @@ export async function generatePdfBuffer({
             page.setDefaultNavigationTimeout(45000);
             page.setDefaultTimeout(45000);
 
+            // eslint-disable-next-line security/detect-object-injection
             const vpSize = VIEWPORT_MAP[viewport];
             await page.setViewport(vpSize);
 
@@ -109,6 +110,7 @@ export async function generatePdfBuffer({
             await new Promise(resolve => setTimeout(resolve, 2000));
 
             const pdfBuffer = await page.pdf({
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 format: format.toUpperCase() as any,
                 landscape: orientation === 'landscape',
                 printBackground: true,

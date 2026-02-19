@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Presentation, Download, LayoutTemplate, Layers, Zap, MousePointer2, Shield, Sparkles, Files, Gauge, Cpu, CheckCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { Presentation, Download, LayoutTemplate, Zap, Sparkles, Files, Gauge, Cpu, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
 import { ProgressBar } from '@/components/shared/ProgressBar';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { PptxService, PptxOptions } from '@/lib/services/pdf/converters/pdfToPptx';
+import { PptxService } from '@/lib/services/pdf/converters/pdfToPptx';
 import { downloadFile, validatePDFFile, cn, formatFileSize } from '@/lib/utils';
 import { toolGuides } from '@/data/guides';
 import { QuickGuide } from '@/components/shared/QuickGuide';
@@ -62,6 +62,7 @@ export default function PDFToPowerPointPage() {
             clearInterval(interval);
             setProgress(100);
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const blob = new Blob([pptxBytes as any], {
                 type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
             });

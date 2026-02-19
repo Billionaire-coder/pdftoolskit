@@ -1,14 +1,14 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Tag, Download, Save, FileText, Calendar, Zap, ShieldAlert, Sparkles, Trash2, ShieldCheck, Info, RefreshCw } from 'lucide-react';
+import React, { useState } from 'react';
+import { Tag, Download, FileText, Calendar, ShieldAlert, Sparkles, Trash2, ShieldCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
-import { ProgressBar } from '@/components/shared/ProgressBar';
+// import { ProgressBar } from '@/components/shared/ProgressBar';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { updateMetadata, getMetadata, stripMetadata } from '@/lib/pdf-utils';
-import { downloadFile, validatePDFFile, getBaseFileName, cn } from '@/lib/utils';
+import { downloadFile, validatePDFFile, getBaseFileName } from '@/lib/utils';
 import { toolGuides } from '@/data/guides';
 import { QuickGuide } from '@/components/shared/QuickGuide';
 import { RelatedTools } from '@/components/shared/RelatedTools';
@@ -20,7 +20,7 @@ export default function EditMetadataPage() {
     const { limits, isPro } = useSubscription();
     const [file, setFile] = useState<File | null>(null);
     const [processing, setProcessing] = useState(false);
-    const [progress, setProgress] = useState(0);
+    const [_progress, setProgress] = useState(0);
 
     const [metadata, setMetadata] = useState({
         title: '',
@@ -82,6 +82,7 @@ export default function EditMetadataPage() {
             const allText = p1.map(i => i.str).join(' ');
             const words = allText.toLowerCase().replace(/[^a-z0-9 ]/g, '').split(/\s+/).filter(w => w.length > 4);
             const freq: Record<string, number> = {};
+            // eslint-disable-next-line security/detect-object-injection
             words.forEach(w => freq[w] = (freq[w] || 0) + 1);
             const suggestedKeywords = Object.entries(freq).sort((a, b) => b[1] - a[1]).slice(0, 5).map(e => e[0]).join(', ');
 
@@ -92,7 +93,7 @@ export default function EditMetadataPage() {
             }));
 
             toast.success('AI Suggestions Applied!', { id: 'ai-suggest' });
-        } catch (e) {
+        } catch (_e) {
             toast.error('AI could not determine metadata', { id: 'ai-suggest' });
         }
     };
@@ -104,10 +105,11 @@ export default function EditMetadataPage() {
         setProcessing(true);
         try {
             const newPdfBytes = await stripMetadata(file);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const blob = new Blob([newPdfBytes as any], { type: 'application/pdf' });
             downloadFile(blob, `${getBaseFileName(file.name)}_anonymized.pdf`);
             toast.success('Document Anonymized!');
-        } catch (e) {
+        } catch (_e) {
             toast.error('Wipe operation failed');
         } finally {
             setProcessing(false);
@@ -128,8 +130,8 @@ export default function EditMetadataPage() {
                 modificationDate: metadata.modificationDate ? new Date(metadata.modificationDate) : undefined
             });
 
-            // @ts-expect-error - Uint8Array is compatible with BlobPart
-            const blob = new Blob([newPdfBytes], { type: 'application/pdf' });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const blob = new Blob([newPdfBytes as any], { type: 'application/pdf' });
             downloadFile(blob, `${getBaseFileName(file.name)}_synced.pdf`);
 
             toast.success('XMP & Info Dictionary Synced!');

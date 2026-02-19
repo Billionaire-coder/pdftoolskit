@@ -11,7 +11,8 @@ import { tools } from '@/data/tools';
 
 import { useTranslation } from 'react-i18next';
 
-export function ToolCard({ tool, index = 0 }: { tool: any, index?: number }) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function ToolCard({ tool, index: _index = 0 }: { tool: any, index?: number }) {
     const { t } = useTranslation('common');
     return (
         <Link href={tool.href} prefetch={false}>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { WorkflowStep } from '@/lib/workflow-engine';
-import { Trash2, GripVertical, Settings } from 'lucide-react';
+import { Trash2, GripVertical } from 'lucide-react';
 
 interface StepCardProps {
     step: WorkflowStep;
@@ -134,10 +134,7 @@ export function StepCard({ step, index, onUpdate, onRemove }: StepCardProps) {
         }
     };
 
-    const getStepIcon = () => {
-        // You could map icons here, for now using generic names styled
-        return null;
-    };
+
 
     return (
         <div className="group relative flex gap-4 p-4 rounded-xl bg-slate-900/50 border border-white/5 hover:border-blue-500/30 transition-all mb-3 text-left">

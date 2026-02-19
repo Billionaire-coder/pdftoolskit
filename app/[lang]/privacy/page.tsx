@@ -11,7 +11,7 @@ export async function generateMetadata({ params: { lang } }: { params: { lang: L
     };
 }
 
-export default async function PrivacyPolicy({ params: { lang } }: { params: { lang: Locale } }) {
+export default async function PrivacyPolicy({ params: { lang: _lang } }: { params: { lang: Locale } }) {
     // In a real app, you'd fetch this from your dictionary
     // For now, I'm hardcoding a standard, clean policy that is Google-compliant
 

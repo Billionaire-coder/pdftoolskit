@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
-import { ShieldCheck, Zap, Lock, Globe, Heart, FileText, Cpu, Star } from 'lucide-react';
+// import { motion } from 'framer-motion';
+import { ShieldCheck, Zap, Lock, Globe, FileText, Cpu, Star } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';

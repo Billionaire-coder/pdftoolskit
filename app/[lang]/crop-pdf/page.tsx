@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import * as Lucide from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
-import { ProgressBar } from '@/components/shared/ProgressBar';
+// import { ProgressBar } from '@/components/shared/ProgressBar';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { cropPDF } from '@/lib/pdf-utils';
@@ -36,13 +36,14 @@ export default function CropPDFPage() {
     const { limits, isPro } = useSubscription();
     const [file, setFile] = useState<File | null>(null);
     const [processing, setProcessing] = useState(false);
-    const [progress, setProgress] = useState(0);
+    const [_progress, setProgress] = useState(0);
 
     // Current Interaction State
     const [margins, setMargins] = useState<Margins>({ top: 0, bottom: 0, left: 0, right: 0 });
     const [mode, setMode] = useState<CropMode>('keep');
     const [aspectRatio, setAspectRatio] = useState<AspectRatio>('free');
     const [anonymize, setAnonymize] = useState(false);
+    const [_applyToAllState, _setApplyToAllState] = useState(false);
 
     // Page Dimensions & State
     const [pageIndex, setPageIndex] = useState(1);
@@ -107,7 +108,7 @@ export default function CropPDFPage() {
     };
 
     const handleSelectionChange = (rect: SelectionRect) => {
-        let newRect = { ...rect };
+        const newRect = { ...rect };
 
         // Aspect Ratio Logic
         if (aspectRatio !== 'free') {
@@ -155,7 +156,7 @@ export default function CropPDFPage() {
     };
 
     const undoCrop = () => {
-        const { [pageIndex - 1]: removed, ...rest } = pendingCrops;
+        const { [pageIndex - 1]: _removed, ...rest } = pendingCrops;
         setPendingCrops(rest);
         // Reset visual to full page
         setMargins({ top: 0, bottom: 0, left: 0, right: 0 });
@@ -164,7 +165,7 @@ export default function CropPDFPage() {
         toast('Page reset');
     };
 
-    const applyToAll = () => {
+    const _applyToAll = () => {
         if (!pageDims.width) return;
         // Apply current margins/mode to ALL pages (naive, assumes same size)
         // In a real app we'd need per-page dimensions logic for accurate relative crops
@@ -194,7 +195,7 @@ export default function CropPDFPage() {
     const handleCropPDF = async () => {
         if (!file) return;
 
-        let cropsToSubmit = { ...pendingCrops };
+        const cropsToSubmit = { ...pendingCrops };
 
         // If no specific crops, but user has a selection, imply "Apply this to current page"
         if (Object.keys(cropsToSubmit).length === 0) {
@@ -228,8 +229,8 @@ export default function CropPDFPage() {
             clearInterval(progressInterval);
             setProgress(100);
 
-            // @ts-expect-error - Uint8Array is compatible with BlobPart
-            const blob = new Blob([newPdfBytes], { type: 'application/pdf' });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const blob = new Blob([newPdfBytes as any], { type: 'application/pdf' });
             const baseName = getBaseFileName(file.name);
 
             setResult({ blob, fileName: `${baseName}_${anonymize ? 'secure' : 'cropped'}.pdf` });
@@ -246,6 +247,7 @@ export default function CropPDFPage() {
         }
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const MarginInput = ({ label, value, field, icon: Icon }: any) => (
         <div className="flex flex-col">
             <label className="text-white text-xs font-semibold mb-2 flex items-center gap-2">

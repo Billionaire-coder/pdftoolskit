@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Presentation, Download, LayoutTemplate, Layers, Zap, MousePointer2, Shield, Sparkles, Files, Gauge, Cpu, CheckCircle, FileText, Activity } from 'lucide-react';
+import { Presentation, Download, Layers, Shield, Sparkles, CheckCircle, FileText, Activity, Cpu } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
 import { ProgressBar } from '@/components/shared/ProgressBar';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { PptToPdfService, PptToPdfOptions } from '@/lib/services/pdf/converters/pptToPdf';
-import { downloadFile, validatePDFFile, cn, formatFileSize } from '@/lib/utils';
+import { PptToPdfService } from '@/lib/services/pdf/converters/pptToPdf';
+import { downloadFile, cn, formatFileSize } from '@/lib/utils';
 import { toolGuides } from '@/data/guides';
 import { QuickGuide } from '@/components/shared/QuickGuide';
 import { RelatedTools } from '@/components/shared/RelatedTools';
@@ -61,6 +61,7 @@ export default function PowerPointToPDFPage() {
             clearInterval(interval);
             setProgress(100);
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
             const filename = file.name.replace(/\.[^/.]+$/, "") + '.pdf';
 

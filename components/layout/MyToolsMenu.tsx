@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 import { GlassCard } from '@/components/ui/GlassCard';
 
 export function MyToolsMenu() {
-    const { t } = useTranslation('common');
+    const { t: _t } = useTranslation('common');
     const { favorites, removeFavorite } = useFavoritesStore();
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);

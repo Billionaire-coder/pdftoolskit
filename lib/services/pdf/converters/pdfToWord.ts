@@ -41,6 +41,7 @@ export async function pdfToWord(file: File): Promise<{ data: Uint8Array; isScann
 
             // 1. Group items into lines
             const lines: Line[] = [];
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const items = textContent.items as any[];
 
             items.forEach(item => {

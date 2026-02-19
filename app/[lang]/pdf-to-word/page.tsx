@@ -52,6 +52,7 @@ export default function PDFToWordPage() {
             clearInterval(progressInterval);
             setProgress(100);
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const blob = new Blob([data as any], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
             const filename = getBaseFileName(file.name) + '.docx';
 

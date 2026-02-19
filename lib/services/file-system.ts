@@ -5,6 +5,7 @@
 
 declare global {
     interface Window {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         showDirectoryPicker: (options?: any) => Promise<FileSystemDirectoryHandle>;
     }
     interface FileSystemHandle {
@@ -63,6 +64,7 @@ class FileSystemService {
             const writable = await fileHandle.createWritable();
             await writable.write(await file.arrayBuffer());
             await writable.close();
+            // eslint-disable-next-line no-console
             console.log(`[FileSystem] Saved ${file.name} to workspace.`);
             return true;
         } catch (error) {

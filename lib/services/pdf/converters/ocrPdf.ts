@@ -22,6 +22,7 @@ function preprocessImage(canvas: HTMLCanvasElement, adaptive: boolean): HTMLCanv
     // We calculate the mean luminance and use it as a threshold
     let sum = 0;
     for (let i = 0; i < data.length; i += 4) {
+        // eslint-disable-next-line security/detect-object-injection
         const luminance = 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
         sum += luminance;
     }
@@ -29,8 +30,10 @@ function preprocessImage(canvas: HTMLCanvasElement, adaptive: boolean): HTMLCanv
     const threshold = mean * 0.95; // Slightly lower than mean to pick up text better
 
     for (let i = 0; i < data.length; i += 4) {
+        // eslint-disable-next-line security/detect-object-injection
         const luminance = 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
         const val = luminance > threshold ? 255 : 0;
+        // eslint-disable-next-line security/detect-object-injection
         data[i] = data[i + 1] = data[i + 2] = val;
     }
 
@@ -49,7 +52,7 @@ export async function* ocrPdfGenerator(
     // Initialize Scheduler and Pool
     const scheduler = createScheduler();
     const numWorkers = Math.min(4, navigator.hardwareConcurrency || 2);
-    const workers = await Promise.all(
+    const _workers = await Promise.all(
         Array.from({ length: numWorkers }).map(async () => {
             const worker = await createWorker(options.languages.join('+'));
             scheduler.addWorker(worker);
@@ -74,11 +77,13 @@ export async function* ocrPdfGenerator(
             const processedCanvas = preprocessImage(canvas, options.adaptiveThreshold);
 
             // Perform OCR
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const { data: { text, pdf } } = await (scheduler.addJob('recognize', processedCanvas, { pdfTitle: `Page ${i}` }) as any);
 
             yield {
                 page: i,
                 text,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 pdfPage: new Uint8Array(pdf as any)
             };
 

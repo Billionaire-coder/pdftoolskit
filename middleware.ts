@@ -35,8 +35,9 @@ function getLocale(request: NextRequest): string {
 }
 
 export async function middleware(req: NextRequest) {
+    const pathname = req.nextUrl.pathname;
     // 1. Rate Limiter for API Routes
-    if (req.nextUrl.pathname.startsWith('/api')) {
+    if (pathname.startsWith('/api')) {
         try {
             const { ratelimit } = await import('@/lib/ratelimit');
             const ip = req.ip ?? '127.0.0.1';
@@ -68,12 +69,13 @@ export async function middleware(req: NextRequest) {
         }
     }
 
-    // 2. Skip if internal paths (but NOT api anymore, as we just handled it)
+    // 2. Skip if internal paths
     if (
-        req.nextUrl.pathname.startsWith('/_next') ||
-        req.nextUrl.pathname.startsWith('/static') ||
-        req.nextUrl.pathname.includes('.') || // files
-        req.nextUrl.pathname.startsWith('/worker')
+        pathname.startsWith('/_') || // Skip all internal Next.js paths including /_next, /_document, etc.
+        pathname.startsWith('/static') ||
+        pathname.startsWith('/monitoring') || // Skip Sentry tunnel
+        pathname.includes('.') || // files
+        pathname.startsWith('/worker')
     ) {
         return NextResponse.next();
     }
@@ -88,7 +90,6 @@ export async function middleware(req: NextRequest) {
 
     // 2. Check if path already has locale
     // 2. Check if path already has locale
-    const pathname = req.nextUrl.pathname;
 
     // Check if the pathname is missing a locale
     const pathnameIsMissingLocale = i18n.locales.every(
@@ -148,6 +149,6 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-    // Matcher excluding api, _next, etc is handled inside, but good to keep typical matcher
-    matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)']
+    // Matcher excluding api, _next, monitoring (Sentry), etc
+    matcher: ['/((?!api|_next|_document|monitoring|favicon.ico|.*\\..*).*)']
 };

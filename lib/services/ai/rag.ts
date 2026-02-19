@@ -14,8 +14,6 @@ export const CHUNK_OVERLAP = 200;
  */
 export function extractChunks(textItems: TextItemWithCoords[]): Chunk[] {
     const chunks: Chunk[] = [];
-    let currentText = '';
-    let currentPageIndex = 0;
 
     // Group text by page first to maintain structural context
     const pages: { index: number; text: string }[] = [];
@@ -55,6 +53,7 @@ export function getRelevantContext(query: string, chunks: Chunk[], topN: number 
     const termDocCounts: Record<string, number> = {};
 
     queryTokens.forEach(token => {
+        // eslint-disable-next-line security/detect-object-injection
         termDocCounts[token] = chunks.filter(c => c.text.toLowerCase().includes(token)).length;
     });
 
@@ -66,6 +65,7 @@ export function getRelevantContext(query: string, chunks: Chunk[], topN: number 
             const tf = (lowerText.match(new RegExp(token, 'g')) || []).length;
             if (tf > 0) {
                 // IDF approximation: log(total/docCount)
+                // eslint-disable-next-line security/detect-object-injection
                 const docCount = termDocCounts[token] || 1;
                 const idf = Math.log(totalDocs / docCount) + 1;
                 score += tf * idf;

@@ -40,6 +40,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ] as const;
 
     const staticUrls = staticPages.flatMap(page =>
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         generateLocalizedUrls(page.path, page.priority, page.freq as any)
     );
 

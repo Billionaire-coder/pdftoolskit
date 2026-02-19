@@ -18,7 +18,7 @@ import { RelatedTools } from '@/components/shared/RelatedTools';
 import { toolGuides } from '@/data/guides';
 
 export default function PdfAPage() {
-    const { t } = useTranslation('common');
+    const { t: _t } = useTranslation('common');
     const [file, setFile] = useState<File | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
 

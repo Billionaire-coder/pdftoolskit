@@ -65,6 +65,7 @@ export async function protectPDF(file: File, options: ProtectionOptions): Promis
                 documentAssembly: options.permissions?.documentAssembly ?? false,
             };
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (newPdf as any).encrypt({
                 userPassword: options.userPassword,
                 ownerPassword: options.ownerPassword || options.userPassword,
@@ -112,6 +113,7 @@ export async function analyzeSecurity(file: File): Promise<SecurityAnalysis> {
             isOwnerLocked: isEncrypted, // If it loaded but is encrypted, it's owner locked (permissions only)
             isOpenLocked: false
         };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
         if (error.message && error.message.includes('Password required')) {
             return {

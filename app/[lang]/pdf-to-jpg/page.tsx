@@ -45,7 +45,7 @@ export default function PDFtoJPGPage() {
         }
     };
 
-    const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+    // const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
     const handleConvertToJPG = async () => {
         if (!file) return;

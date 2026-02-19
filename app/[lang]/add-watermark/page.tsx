@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Type, Download, Droplet, MoveHorizontal, MoveVertical, Palette, RotateCw } from 'lucide-react';
+import { Type, Download, Droplet, MoveVertical, Palette, RotateCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
 import { ProgressBar } from '@/components/shared/ProgressBar';
@@ -125,8 +125,8 @@ export default function AddWatermarkPage() {
             clearInterval(progressInterval);
             setProgress(100);
 
-            // @ts-expect-error - Uint8Array is compatible with BlobPart
-            const blob = new Blob([newPdfBytes], { type: 'application/pdf' });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const blob = new Blob([newPdfBytes as any], { type: 'application/pdf' });
             const baseName = getBaseFileName(file.name);
 
             setResult({ blob, fileName: `${baseName}_watermarked.pdf` });

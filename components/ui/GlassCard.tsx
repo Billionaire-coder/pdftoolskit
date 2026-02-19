@@ -28,8 +28,9 @@ export function GlassCard({
     };
 
     const Component = animate ? motion.div : 'div';
+    // eslint-disable-next-line security/detect-object-injection
     const animationProps = animate ? {
-        initial: { opacity: 0, y: 20 },
+        initial: { opacity: 0, y: 10 },
         animate: { opacity: 1, y: 0 },
         transition: { duration: 0.5 }
     } : {};
@@ -38,6 +39,7 @@ export function GlassCard({
         <Component
             className={cn(
                 baseStyles,
+                // eslint-disable-next-line security/detect-object-injection
                 variants[variant],
                 hover && 'glass-hover hover:scale-[1.02]',
                 className

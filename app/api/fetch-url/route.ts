@@ -81,13 +81,13 @@ export async function POST(request: Request) {
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
             },
             // Prevent following redirects to private IPs (fetch follows transparently, which is risky)
-            redirect: 'error', 
+            redirect: 'error',
         });
 
         if (!response.ok) {
             // Check for redirect manually if needed, or just fail for now to be safe
             if (response.status >= 300 && response.status < 400) {
-                 return NextResponse.json({ error: 'Redirects are currently disabled for security' }, { status: 400 });
+                return NextResponse.json({ error: 'Redirects are currently disabled for security' }, { status: 400 });
             }
             return NextResponse.json({ error: `Failed to fetch URL: ${response.statusText}` }, { status: response.status });
         }
@@ -99,7 +99,7 @@ export async function POST(request: Request) {
 
         // Simple regex-based replacement for common attributes
         // Replaces href="/..." src="/..." etc.
-        
+
         // 1. Handle root-relative paths (starting with /)
         html = html.replace(/(href|src|action)="\//g, `$1="${baseUrl}/`);
         html = html.replace(/(href|src|action)='\//g, `$1='${baseUrl}/`);
@@ -117,6 +117,7 @@ export async function POST(request: Request) {
 
         return NextResponse.json({ html });
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
         console.error('Proxy fetch error:', error);
         return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });

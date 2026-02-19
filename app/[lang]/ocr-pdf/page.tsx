@@ -81,10 +81,10 @@ export default function OCRPDFPage() {
 
             const generator = ocrPdfGenerator(file, options);
             const mergedPdf = await PDFDocument.create();
-            let fullText = '';
+            // let fullText = '';
 
             for await (const result of generator) {
-                fullText += `--- Page ${result.page} ---\n\n${result.text}\n\n`;
+                // fullText += `--- Page ${result.page} ---\n\n${result.text}\n\n`;
                 setExtractedText(prev => prev + `--- Page ${result.page} ---\n\n${result.text}\n\n`);
 
                 if (result.pdfPage) {
@@ -233,6 +233,7 @@ export default function OCRPDFPage() {
                                             </div>
                                             <Button
                                                 variant="primary"
+                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                 onClick={() => downloadFile(new Blob([searchablePdfBytes as any], { type: 'application/pdf' }), `${downloadFileName}_searchable.pdf`)}
                                                 className="bg-emerald-600 hover:bg-emerald-500 py-6 px-8 text-lg"
                                                 icon={<Download className="w-5 h-5" />}
@@ -294,7 +295,7 @@ export default function OCRPDFPage() {
                                             </div>
                                             <div>
                                                 <p className="text-xs font-bold text-white">Adaptive Scan</p>
-                                                <p className="text-[9px] text-slate-500 uppercase tracking-tighter">Otsu's Mean Threshold</p>
+                                                <p className="text-[9px] text-slate-500 uppercase tracking-tighter">Otsu&apos;s Mean Threshold</p>
                                             </div>
                                         </div>
                                         <button

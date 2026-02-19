@@ -8,7 +8,7 @@ import { ProgressBar } from '@/components/shared/ProgressBar';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { removePagesFromPDF } from '@/lib/pdf-utils';
-import { downloadFile, validatePDFFile, getBaseFileName, cn } from '@/lib/utils';
+import { downloadFile, validatePDFFile, getBaseFileName } from '@/lib/utils';
 import { PDFGrid } from '@/components/pdf/PDFGrid';
 import { toolGuides } from '@/data/guides';
 import { QuickGuide } from '@/components/shared/QuickGuide';
@@ -91,8 +91,8 @@ export default function RemovePagesPage() {
             clearInterval(progressInterval);
             setProgress(100);
 
-            // @ts-expect-error - Uint8Array is compatible with BlobPart
-            const blob = new Blob([modifiedPdfBytes], { type: 'application/pdf' });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const blob = new Blob([modifiedPdfBytes as any], { type: 'application/pdf' });
             const baseName = getBaseFileName(file.name);
 
             setResult({ blob, fileName: `${baseName}_modified.pdf` });

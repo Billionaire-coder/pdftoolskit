@@ -38,7 +38,7 @@ export async function extractTextFromPDF(file: File): Promise<TextItemWithCoords
                 // The item.transform[4], item.transform[5] are PDF x,y.
                 // But text is drawn from bottom-left (usually).
 
-                const tx = pdfjsLib.Util.transform(
+                const _tx = pdfjsLib.Util.transform(
                     viewport.transform,
                     item.transform
                 );
@@ -46,8 +46,8 @@ export async function extractTextFromPDF(file: File): Promise<TextItemWithCoords
                 // Calculate dimensions
                 // width is available in item.width (in PDF units?)
                 // converting width to viewport scale
-                const fontScale = item.transform[0] || 1; // Approx scale
-                const width = item.width * (viewport.scale); // This might be simplistic
+                const _fontScale = item.transform[0] || 1; // Approx scale
+                const _width = item.width * (viewport.scale); // This might be simplistic
 
                 // Better approach: use the same logic as PDFPageViewer.tsx if possible
                 // In PDFPageViewer we used:
@@ -68,7 +68,7 @@ export async function extractTextFromPDF(file: File): Promise<TextItemWithCoords
 
                 const fontSize = Math.sqrt((item.transform[0] * item.transform[0]) + (item.transform[1] * item.transform[1]));
                 // Viewport height
-                const vHeight = fontSize * Math.abs(viewport.transform[3]); // Approx
+                const _vHeight = fontSize * Math.abs(viewport.transform[3]); // Approx
 
                 // vy is the baseline? 
                 // PDF.js text layer renders at (vx, vy - vHeight) basically due to coordinate flip?

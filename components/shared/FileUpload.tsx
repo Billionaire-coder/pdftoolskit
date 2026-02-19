@@ -8,7 +8,6 @@ import { formatFileSize } from '@/lib/utils';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { PrivacyBadge } from './PrivacyBadge';
 import Link from 'next/link';
-import Script from 'next/script';
 import toast from 'react-hot-toast';
 import { useState, useEffect } from 'react';
 
@@ -39,6 +38,7 @@ export function FileUpload({
         const appKey = process.env.NEXT_PUBLIC_DROPBOX_APP_KEY;
         if (!appKey || appKey === 'your-dropbox-app-key') return;
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if ((window as any).Dropbox) {
             setSdkReady(true);
             return;
@@ -64,9 +64,10 @@ export function FileUpload({
         }
 
         const loadPicker = () => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             if ((window as any).gapi) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (window as any).gapi.load('picker', () => {
-                    console.log('Google Picker API loaded');
                     setGDriveReady(true);
                 });
             }
@@ -99,6 +100,7 @@ export function FileUpload({
         };
 
         // Try immediate load if window.gapi exists
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if ((window as any).gapi) {
             loadPicker();
         } else {
@@ -114,7 +116,7 @@ export function FileUpload({
         [onFilesSelected]
     );
 
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    const { getRootProps, isDragActive } = useDropzone({
         onDrop,
         accept,
         multiple,
@@ -135,7 +137,9 @@ export function FileUpload({
             return;
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (window as any).Dropbox.choose({
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             success: async (files: any[]) => {
                 const dropboxFile = files[0];
                 try {
@@ -148,6 +152,7 @@ export function FileUpload({
                     const file = new File([blob], dropboxFile.name, { type: 'application/pdf' });
                     onFilesSelected([file]);
                     toast.success('File imported from Dropbox!');
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 } catch (error: any) {
                     console.error('Dropbox Import Error:', error);
                     toast.error(`Failed to import from Dropbox: ${error.message}`);
@@ -162,6 +167,7 @@ export function FileUpload({
     const handleGoogleDriveClick = () => {
         if (!gDriveReady) {
             // Force check if it's actually ready now
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             if ((window as any).gapi && (window as any).google) {
                 setGDriveReady(true);
             } else {
@@ -179,22 +185,28 @@ export function FileUpload({
         }
 
         try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const tokenClient = (window as any).google.accounts.oauth2.initTokenClient({
                 client_id: clientId,
                 // Use drive.readonly to ensure we can download ANY file the user selects
                 // drive.file scope sometimes fails if the file wasn't created by this app
                 scope: 'https://www.googleapis.com/auth/drive.readonly',
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 callback: async (response: any) => {
                     if (response.error !== undefined) {
                         console.error('Auth Error:', response);
                         throw response;
                     }
 
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     const picker = new (window as any).google.picker.PickerBuilder()
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         .addView((window as any).google.picker.ViewId.DOCS) // Show all files
                         .setOAuthToken(response.access_token)
                         .setDeveloperKey(apiKey)
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         .setCallback(async (data: any) => {
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             if (data.action === (window as any).google.picker.Action.PICKED) {
                                 const file = data.docs[0];
                                 const url = `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`;
@@ -223,6 +235,7 @@ export function FileUpload({
                                     const importedFile = new File([blob], file.name, { type: mimeType });
                                     onFilesSelected([importedFile]);
                                     toast.success(`Imported ${file.name} from Drive!`);
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 } catch (error: any) {
                                     console.error('Google Drive Import Error:', error);
                                     toast.error(`Failed to download from Google Drive: ${error.message}`);
@@ -289,6 +302,7 @@ export function FileUpload({
                                 title="Import from Google Drive"
                             >
                                 <div className="p-2 transition-transform duration-300 group-hover/cloud:scale-110">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img
                                         src="/google-drive-logo-vector.png"
                                         alt="Google Drive"

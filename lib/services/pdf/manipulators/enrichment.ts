@@ -47,7 +47,10 @@ export async function addPageNumbers(
         let effectivePos = options.position;
         if (options.mirror && (i + 1) % 2 === 0) {
             // Even page: swap left/right
+            // Even page: swap left/right
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             if (effectivePos.includes('left')) effectivePos = effectivePos.replace('left', 'right') as any;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             else if (effectivePos.includes('right')) effectivePos = effectivePos.replace('right', 'left') as any;
         }
 

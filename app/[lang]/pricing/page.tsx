@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Check, Zap, Crown, Shield, Rocket, Clock, Globe } from 'lucide-react';
+import { Check, Zap, Shield, Globe } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
 import { useSubscription } from '@/components/providers/SubscriptionProvider';

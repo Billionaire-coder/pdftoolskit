@@ -4,7 +4,7 @@ import React from 'react';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { Crown, Check, Shield, Zap, X } from 'lucide-react';
-import { GlassCard } from '@/components/ui/GlassCard';
+
 import { useRouter } from 'next/navigation';
 
 interface PaywallProps {

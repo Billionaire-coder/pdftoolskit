@@ -59,6 +59,7 @@ export function PDFToWordTool() {
 
             const baseName = getBaseFileName(file.name);
             const outputName = `${baseName}.docx`;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const blob = new Blob([data.buffer as any], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
 
             setResult({ blob, fileName: outputName });

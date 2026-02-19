@@ -1,6 +1,6 @@
 import React from 'react';
 import { ToolHeader } from '@/components/shared/ToolHeader';
-import { HelpCircle } from 'lucide-react';
+// import { HelpCircle } from 'lucide-react';
 
 export default function FAQPage() {
     return (

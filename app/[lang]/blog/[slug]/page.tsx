@@ -6,12 +6,12 @@ import dynamic from 'next/dynamic';
 const MarkdownRenderer = dynamic(() => import('@/components/shared/MarkdownRenderer').then(mod => mod.MarkdownRenderer), { ssr: false });
 
 // ... (existing imports)
-import { Calendar, Clock, ArrowLeft, Tag, User } from 'lucide-react';
+import { ArrowLeft, Tag } from 'lucide-react';
 import { getBlogPosts } from '@/data/blog-posts';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { RelatedTools } from '@/components/shared/RelatedTools';
 import { ToolHeader } from '@/components/shared/ToolHeader';
-import { BookOpen } from 'lucide-react';
+// import { BookOpen } from 'lucide-react';
 
 interface BlogPostPageProps {
     params: {

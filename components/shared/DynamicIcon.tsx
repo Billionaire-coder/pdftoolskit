@@ -9,8 +9,8 @@ interface DynamicIconProps extends React.SVGProps<SVGSVGElement> {
 }
 
 export function DynamicIcon({ name, size = 24, className, ...props }: DynamicIconProps) {
-    // @ts-ignore
-    const Icon = LucideIcons[name];
+    // eslint-disable-next-line security/detect-object-injection, @typescript-eslint/no-explicit-any
+    const Icon = (LucideIcons as any)[name];
 
     if (!Icon) {
         console.warn(`Icon "${name}" not found in lucide-react`);

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
 export interface SelectionRect {
@@ -83,7 +83,7 @@ export function InteractiveOverlay({
 
         // Constrain to container
         let constrainedX = Math.max(0, x);
-        let constrainedY = Math.max(0, y);
+        const constrainedY = Math.max(0, y);
         let constrainedW = Math.min(w, width - constrainedX);
         let constrainedH = Math.min(h, height - constrainedY);
 
@@ -134,8 +134,9 @@ export function InteractiveOverlay({
         setIsDragging(false);
     };
 
-    const handleTouchStart = (e: React.TouchEvent) => {
+    const _handleTouchStart = (e: React.TouchEvent) => {
         if (mode !== 'draw') return;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const pos = getMousePos(e.nativeEvent as any);
         setStartPos(pos);
         setIsDragging(true);

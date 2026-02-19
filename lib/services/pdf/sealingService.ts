@@ -36,6 +36,7 @@ export class SealingService {
         pdfData: Uint8Array,
         privateKey: CryptoKey
     ): Promise<Uint8Array> {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const hash = await window.crypto.subtle.digest('SHA-256', pdfData as any);
 
         // Sign using ECDSA

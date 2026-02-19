@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, MessageSquare, Send, MapPin, HelpCircle, ArrowRight } from 'lucide-react';
+import { Mail, Send, HelpCircle, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { ToolHeader } from '@/components/shared/ToolHeader';
 import { GlassCard } from '@/components/ui/GlassCard';

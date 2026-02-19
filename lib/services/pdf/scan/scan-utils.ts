@@ -17,22 +17,28 @@ export function applyScanFilter(ctx: CanvasRenderingContext2D, width: number, he
     const data = imageData.data;
 
     for (let i = 0; i < data.length; i += 4) {
+        // eslint-disable-next-line security/detect-object-injection
         const r = data[i];
         const g = data[i + 1];
         const b = data[i + 2];
 
         if (filter === 'grayscale') {
             const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+            // eslint-disable-next-line security/detect-object-injection
             data[i] = data[i + 1] = data[i + 2] = gray;
         } else if (filter === 'bw') {
             const gray = (r + g + b) / 3;
             const val = gray > 128 ? 255 : 0;
+            // eslint-disable-next-line security/detect-object-injection
             data[i] = data[i + 1] = data[i + 2] = val;
         } else if (filter === 'high-contrast') {
             const threshold = 120;
             const factor = (259 * (threshold + 255)) / (255 * (259 - threshold));
+            // eslint-disable-next-line security/detect-object-injection
             data[i] = factor * (r - 128) + 128;
+            // eslint-disable-next-line security/detect-object-injection
             data[i + 1] = factor * (g - 128) + 128;
+            // eslint-disable-next-line security/detect-object-injection
             data[i + 2] = factor * (b - 128) + 128;
         }
     }

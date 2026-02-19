@@ -43,6 +43,7 @@ export async function powerPointToPdf(file: File): Promise<Uint8Array> {
             doc.setTextColor(50, 50, 50);
 
             for (let i = 0; i < textElements.length; i++) {
+                // eslint-disable-next-line security/detect-object-injection
                 const text = textElements[i].textContent || '';
                 if (text.trim()) {
                     const lines = doc.splitTextToSize(text, 180);

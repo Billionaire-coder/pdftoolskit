@@ -62,6 +62,7 @@ export function LanguageSelector() {
         // pathname starts with /, so segments[0] is ''
         // segments[1] is the locale if present
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (segments.length > 1 && i18nConfig.locales.includes(segments[1] as any)) {
             segments[1] = code;
         } else {

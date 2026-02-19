@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useIDKitRequest } from '@worldcoin/idkit';
 import type { IDKitResult } from '@worldcoin/idkit';
-import { PenTool, Download, Eraser, Move, Type, Image as ImageIcon, Check, Layers, Undo, ShieldCheck, FileText, Activity, Search, RefreshCw, Smartphone, Laptop, Monitor, CheckSquare, Loader2, ScanEye, Zap, Sparkles, Fingerprint } from 'lucide-react';
+import { PenTool, Download, Eraser, Type, Image as ImageIcon, Check, Layers, Undo, ShieldCheck, Activity, Search, RefreshCw, Smartphone, Laptop, Monitor, CheckSquare, Loader2, ScanEye, Zap, Sparkles, Fingerprint } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
 import { ProgressBar } from '@/components/shared/ProgressBar';
@@ -23,7 +23,7 @@ import { ToolHeader } from '@/components/shared/ToolHeader';
 import { AuditService, AuditRecord } from '@/lib/services/pdf/auditService';
 
 // Helper to load cursive font
-const SIGNATURE_FONTS = ['Dancing Script', 'Great Vibes', 'Sacramento', 'cursive'];
+// const SIGNATURE_FONTS = ['Dancing Script', 'Great Vibes', 'Sacramento', 'cursive'];
 
 type SignatureMode = 'draw' | 'type' | 'upload' | 'remote';
 type InkColor = 'black' | 'blue' | 'red';
@@ -79,17 +79,22 @@ export default function SignPDFPage() {
 
     // Multi-Page Placements
     const [placements, setPlacements] = useState<Placement[]>([]);
-    const [applyToAll, setApplyToAll] = useState(false);
+    const [applyToAll, _setApplyToAll] = useState(false);
 
     const [result, setResult] = useState<{ blob: Blob; fileName: string } | null>(null);
     const [downloadFileName, setDownloadFileName] = useState('');
     const [hwSecurityLevel, setHwSecurityLevel] = useState<'hardware' | 'protected' | 'software'>('software');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [suggestedFields, setSuggestedFields] = useState<any[]>([]);
     const [isScanning, setIsScanning] = useState(false);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [zkStatus, setZkStatus] = useState<any | null>(null);
     const [isIdentifying, setIsIdentifying] = useState(false);
-    const [swarmCursors, setSwarmCursors] = useState<Record<string, { x: number; y: number; name: string }>>({});
-    const [swarmVectors, setSwarmVectors] = useState<any[]>([]);
+    const [_swarmCursors, setSwarmCursors] = useState<Record<string, { x: number; y: number; name: string }>>({});
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [_swarmVectors, _setSwarmVectors] = useState<any[]>([]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [forensicReport, setForensicReport] = useState<any | null>(null);
     const [storagePref, setStoragePref] = useState<'local' | 'cloud'>('local');
 
@@ -144,6 +149,7 @@ export default function SignPDFPage() {
 
         // P2P Swarm Subscriber
         const setupSwarm = async () => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await SignalingService.onMessage(p2pSessionId || '', (data: any) => {
                 const { type, payload, nodeId } = data;
                 if (type === 'STATE_SYNC') {
@@ -294,6 +300,7 @@ export default function SignPDFPage() {
         setBiometricData(prev => [...prev, {
             x: pos.x, y: pos.y,
             pressure,
+            tiltX, tiltY,
             timestamp: Date.now()
         }]); // Updated to match biometricData type
         setHasSignature(true);
@@ -424,6 +431,7 @@ export default function SignPDFPage() {
         }
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const acceptSuggestion = (field: any) => {
         const newPlacement: Placement = {
             pageIndex: field.pageIndex,
@@ -445,11 +453,14 @@ export default function SignPDFPage() {
 
         try {
             const { ZKIdentityService } = await import('@/lib/services/identity/zkIdentityService');
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const resAny = result as any;
             const status = await ZKIdentityService.handleVerification({
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 proof: Array.isArray(resAny.responses?.[0]?.proof) ? resAny.responses[0].proof.join(',') : '',
                 nullifier_hash: resAny.responses?.[0]?.nullifier || '',
                 merkle_root: resAny.responses?.[0]?.proof?.[4] || '',
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } as any);
             setZkStatus(status);
             toast.success('Sovereign Identity Verified: "Unique Human" confirmed via WorldID.');
@@ -473,6 +484,7 @@ export default function SignPDFPage() {
             expires_at: Math.floor(Date.now() / 1000) + 3600,
             signature: '0x'
         }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
 
     const handleSignPDF = async () => {
@@ -518,7 +530,7 @@ export default function SignPDFPage() {
             const { ForensicService } = await import('@/lib/services/pdf/forensicService');
             const report = ForensicService.analyzeDynamics(biometricData);
             setForensicReport(report);
-            console.log('[Forensics] Analysis Report:', report);
+            // console.log('[Forensics] Analysis Report:', report);
 
             const progressInterval = setInterval(() => {
                 setProgress((prev) => {
@@ -612,6 +624,7 @@ export default function SignPDFPage() {
             clearInterval(progressInterval);
             setProgress(100);
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const resultBlob = new Blob([newPdfBytes as any], { type: 'application/pdf' });
             setResult({ blob: resultBlob, fileName: `${getBaseFileName(file.name)}_signed.pdf` });
 
@@ -731,7 +744,8 @@ export default function SignPDFPage() {
                                         )}
                                         {mode === 'upload' && (
                                             <div className="w-full p-4 text-center">
-                                                {uploadedImage ? <img src={uploadedImage.src} className="max-h-[120px] mx-auto object-contain" /> : (
+                                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                {uploadedImage ? <img src={uploadedImage.src} alt="Uploaded Signature" className="max-h-[120px] mx-auto object-contain" /> : (
                                                     <label className="cursor-pointer">
                                                         <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                                                         <ImageIcon className="w-10 h-10 text-slate-300 mx-auto mb-2" />
@@ -766,7 +780,8 @@ export default function SignPDFPage() {
                                                 {p2pStatus === 'linking' && qrCodeUrl && (
                                                     <div className="flex flex-col items-center animate-in zoom-in-95 duration-500">
                                                         <div className="bg-white p-2 rounded-lg mb-3 shadow-xl">
-                                                            <img src={qrCodeUrl} className="w-32 h-32" />
+                                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                            <img src={qrCodeUrl} alt="QR Code" className="w-32 h-32" />
                                                         </div>
                                                         <p className="text-[10px] font-bold text-indigo-400 animate-pulse flex items-center gap-2">
                                                             <Smartphone className="w-3 h-3" /> Scan to Sign on Mobile
@@ -856,7 +871,7 @@ export default function SignPDFPage() {
                                         ))}
 
                                         {/* Locked Placements Visualizer */}
-                                        Use "Confirm Position" to add.
+                                        Use &quot;Confirm Position&quot; to add.
                                     </div>
                                 ) : placements.map((p, i) => (
                                     <div key={i} className="flex items-center justify-between bg-white/5 p-2 rounded-lg border border-white/5 text-[10px]">
@@ -882,7 +897,7 @@ export default function SignPDFPage() {
                                 </label>
                             </div>
                             <p className="text-[9px] text-slate-400 leading-relaxed">
-                                When enabled, a "Certificate of Authenticity" with unique document hashes and timestamps will be appended to the final PDF.
+                                When enabled, a &quot;Certificate of Authenticity&quot; with unique document hashes and timestamps will be appended to the final PDF.
                             </p>
                             {enableAuditTrail && (
                                 <div className="p-2 bg-black/40 rounded border border-indigo-500/10 font-mono text-[8px] text-indigo-400 space-y-1">

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lucide } from '@/lib/lucide-registry';
 // Import additional icons needed for the inline menu
-import { Sun, Moon, Globe, Accessibility, ChevronRight, Check, Eye, Zap, Menu, X } from 'lucide-react';
+import { Sun, Moon, Globe, Accessibility, Check, Eye, Zap, Menu, X } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { useSubscription } from '@/components/providers/SubscriptionProvider';
 import { Button } from '@/components/ui/Button';
@@ -70,6 +70,7 @@ export function Header() {
     const handleLanguageSelect = (code: string) => {
         if (!pathname) return;
         const segments = pathname.split('/');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (segments.length > 1 && i18nConfig.locales.includes(segments[1] as any)) {
             segments[1] = code;
         } else {
@@ -94,6 +95,7 @@ export function Header() {
                 <nav className="flex items-center justify-between">
                     {/* Logo */}
                     <Link href="/" className="flex items-center gap-2 hover-glow">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src="/favicon.png"
                             alt="PDFToolskit Logo"

@@ -7,7 +7,7 @@ import { FileUpload } from '@/components/shared/FileUpload';
 import { ProgressBar } from '@/components/shared/ProgressBar';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { unlockPDF, analyzeSecurity, SecurityAnalysis } from '@/lib/pdf-utils';
+import { unlockPDF, analyzeSecurity } from '@/lib/pdf-utils';
 import { downloadFile, validatePDFFile } from '@/lib/utils';
 import { ToolHeader } from '@/components/shared/ToolHeader';
 import { QuickGuide } from '@/components/shared/QuickGuide';
@@ -94,6 +94,7 @@ export default function UnlockPDFPage() {
             clearInterval(progressInterval);
             setProgress(100);
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const blob = new Blob([unlockedPdfBytes as any], { type: 'application/pdf' });
             const filename = file.name.replace('.pdf', '_unlocked.pdf');
 
@@ -209,7 +210,7 @@ export default function UnlockPDFPage() {
                                     <div>
                                         <p className="text-sm font-medium text-emerald-200">No Encryption Detected</p>
                                         <p className="text-xs text-emerald-300/70">
-                                            This file is not encrypted. You can still process it to ensure it's clean.
+                                            This file is not encrypted. You can still process it to ensure it&apos;s clean.
                                         </p>
                                     </div>
                                 </div>

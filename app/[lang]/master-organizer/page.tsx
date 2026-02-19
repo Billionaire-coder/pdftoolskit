@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { LayoutGrid, RotateCw, Trash2, GripVertical, Check, Download, MousePointer2, Plus, X, ListFilter, Wand2, Info } from 'lucide-react';
+import { LayoutGrid, RotateCw, Trash2, Check, Plus, X, ListFilter, Wand2, Info } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
 import { ProgressBar } from '@/components/shared/ProgressBar';
@@ -58,8 +58,8 @@ function SortablePage({
         isDragging
     } = useSortable({
         id: item.id,
-        // @ts-ignore
-        resizeObserverConfig: {}
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        resizeObserverConfig: {} as any
     });
 
     const style = {
@@ -150,8 +150,10 @@ function PDFCell({ columnIndex, rowIndex, style, items, onRenderItem, columnCoun
     onRenderItem: (id: string, index: number) => React.ReactNode,
     columnCount: number
 }) {
+    // eslint-disable-next-line security/detect-object-injection
     const index = rowIndex * columnCount + columnIndex;
     if (index >= items.length) return null;
+    // eslint-disable-next-line security/detect-object-injection
     const item = items[index];
 
     return (
@@ -187,7 +189,9 @@ function VirtualizedGrid({ items, onRenderItem }: {
                             rowCount={rowCount}
                             rowHeight={280}
                             style={{ height: h, width: w }}
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             cellComponent={PDFCell as any}
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             cellProps={{ items, onRenderItem, columnCount } as any}
                         />
                     );
@@ -356,6 +360,7 @@ export default function MasterOrganizerPage() {
             }
 
             const pdfBytes = await newPdf.save();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
 
             const fileName = files.length === 1

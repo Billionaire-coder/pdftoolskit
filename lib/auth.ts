@@ -28,16 +28,22 @@ export const authOptions: NextAuthOptions = {
     callbacks: {
         async jwt({ token, user }) {
             if (user) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 token.role = (user as any).role;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 token.isPro = (user as any).isPro;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 token.uploadLimit = (user as any).isPro ? 1073741824 : 10485760; // 1GB vs 10MB
             }
             return token;
         },
         async session({ session, token }) {
             if (session.user) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (session.user as any).role = token.role;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (session.user as any).isPro = token.isPro;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (session.user as any).uploadLimit = token.uploadLimit;
             }
             return session;

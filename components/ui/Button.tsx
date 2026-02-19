@@ -42,12 +42,15 @@ export function Button({
         <motion.button
             className={cn(
                 baseStyles,
+                // eslint-disable-next-line security/detect-object-injection
                 variants[variant],
+                // eslint-disable-next-line security/detect-object-injection
                 sizes[size],
                 className
             )}
             whileTap={{ scale: 0.95 }}
             disabled={disabled || loading}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             {...(props as any)}
         >
             {loading ? (

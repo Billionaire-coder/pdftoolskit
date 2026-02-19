@@ -86,6 +86,7 @@ export async function generateMetadata({ params }: { params: { lang: string } })
     const languages: Record<string, string> = {};
     i18n.locales.forEach(locale => {
         // e.g. https://pdftoolskit.com/es/merge-pdf
+        // eslint-disable-next-line security/detect-object-injection
         languages[locale] = `${baseUrl}/${locale}${purePath}`;
     });
 
@@ -194,6 +195,7 @@ export default function RootLayout({
                                             </div>
                                             <OfflineDetection />
                                             <script
+                                                // eslint-disable-next-line react/no-danger
                                                 dangerouslySetInnerHTML={{
                                                     __html: `
                                     if ('serviceWorker' in navigator) {

@@ -79,6 +79,7 @@ function SortableImageItem({ id, item, onRemove }: { id: string, item: SortableF
             </button>
 
             <div className="flex-grow flex items-center justify-center p-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                     src={item.preview}
                     alt={item.file.name}
@@ -178,6 +179,7 @@ export default function JPGtoPDFPage() {
             setProgress(100);
 
             const baseName = items.length === 1 ? getBaseFileName(items[0].file.name) : 'converted_images';
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
 
             setResult({ blob, fileName: `${baseName}.pdf` });

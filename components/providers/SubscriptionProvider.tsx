@@ -18,7 +18,7 @@ const SubscriptionContext = createContext<SubscriptionContextType | undefined>(u
 
 export function SubscriptionProvider({ children }: { children: React.ReactNode }) {
     const { tier, setTier, isPro, getLimits } = useSubscriptionStore();
-    const { data: session } = useSession();
+    const { data: _session } = useSession();
 
     // Sync with server state (Bypassed for Local Testing)
     useEffect(() => {

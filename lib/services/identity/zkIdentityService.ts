@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-expect-error - idkit types might be missing in some envs
 import { ISuccessResult } from '@worldcoin/idkit';
 
 export interface ZKStatus {
@@ -7,6 +7,7 @@ export interface ZKStatus {
     nullifierHash?: string; // For WorldID personhood uniqueness
     merkleRoot?: string;
     verificationStatus?: 'verified' | 'failed' | 'idle';
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     metadata?: any;
     timestamp: string;
 }
@@ -21,6 +22,7 @@ export class ZKIdentityService {
      * In the Live environment, this is called after successful IDKitWidget interaction.
      */
     static async handleVerification(result: ISuccessResult): Promise<ZKStatus> {
+        // eslint-disable-next-line no-console
         console.log('[ZK-ID] Verification Proof received:', result.proof);
 
         return {
@@ -37,6 +39,7 @@ export class ZKIdentityService {
      * Existing simulation method for development fallback.
      */
     static async verifyPersonhood(appId: string, action: string): Promise<ZKStatus> {
+        // eslint-disable-next-line no-console
         console.log(`Triggering WorldID verification for App: ${appId}, Action: ${action}`);
 
         return new Promise((resolve) => {

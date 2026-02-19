@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { User, Bot, Cpu, Zap, Search, BookOpen, Sparkles, MessageSquare, Terminal, ShieldCheck, Activity, Share2, Maximize2, Hash, FileText, CheckCircle, BrainCircuit, Gauge } from 'lucide-react';
+import { User, Bot, Zap, Search, BookOpen, ShieldCheck, Activity, BrainCircuit, Gauge, FileText, Hash } from 'lucide-react';
 import { FileUpload } from '@/components/shared/FileUpload';
 import { PDFPageViewer } from '@/components/pdf/PDFPageViewer';
 import { Button } from '@/components/ui/Button';
@@ -12,7 +12,7 @@ import toast from 'react-hot-toast';
 import { getMLCEngine, checkWebGPU, SELECTED_MODEL, FALLBACK_MODEL, streamChatCompletion } from '@/lib/web-llm';
 import { ProgressBar } from '@/components/shared/ProgressBar';
 import { extractChunks, getRelevantContext, buildRAGPrompt, Chunk } from '@/lib/services/ai/rag';
-import { cn, formatFileSize } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 
 interface Message {
     id: string;
@@ -29,9 +29,9 @@ export function ChatTool() {
     ]);
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
-    const [pdfText, setPdfText] = useState<{ page: number, text: string }[]>([]);
+    const [_pdfText, setPdfText] = useState<{ page: number, text: string }[]>([]);
     const [chunks, setChunks] = useState<Chunk[]>([]);
-    const [activeSources, setActiveSources] = useState<Chunk[]>([]);
+    const [_activeSources, setActiveSources] = useState<Chunk[]>([]);
 
     const [fullTextData, setFullTextData] = useState<TextItemWithCoords[]>([]);
     const [highlights, setHighlights] = useState<{ x: number, y: number, width: number, height: number, color?: string }[]>([]);
@@ -45,7 +45,7 @@ export function ChatTool() {
     const [isLlmLoading, setIsLlmLoading] = useState(false);
     const [llmProgress, setLlmProgress] = useState(0);
     const [llmStatus, setLlmStatus] = useState('');
-    const [isLlmReady, setIsLlmReady] = useState(false);
+    const [_isLlmReady, setIsLlmReady] = useState(false);
     const [gpuStatus, setGpuStatus] = useState<{ supported: boolean; hasF16: boolean } | null>(null);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);

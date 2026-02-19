@@ -1,6 +1,6 @@
 import React from 'react';
 import { WorkflowAction } from '@/lib/workflow-engine';
-import { Plus, Maximize, RotateCw, FileInput, Shield, ShieldAlert, Key, Hash, ArrowUpDown, FileText } from 'lucide-react';
+import { Plus, Maximize, RotateCw, FileInput, Shield, ShieldAlert, Hash, ArrowUpDown, FileText } from 'lucide-react';
 
 interface StepControlsProps {
     onAddStep: (type: WorkflowAction) => void;

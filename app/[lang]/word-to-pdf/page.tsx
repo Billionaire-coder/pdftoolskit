@@ -52,6 +52,7 @@ export default function WordToPDFPage() {
             clearInterval(progressInterval);
             setProgress(100);
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
             const filename = getBaseFileName(file.name) + '.pdf';
 

@@ -119,5 +119,8 @@ module.exports = withSentryConfig(
 
         // Enables automatic instrumentation of Vercel Cron Monitors.
         automaticVercelMonitors: true,
+
+        // Disable automatic Pages Router instrumentation as we only use App Router
+        disableDefaultPagesInstrumentation: true,
     }
 );

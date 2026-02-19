@@ -15,7 +15,7 @@ interface AdSenseProps {
  * In development, it shows a "Mock Ad" block.
  * In production, it loads the Carbon or AdSense script logic.
  */
-export function AdSense({ slot, format = 'auto', className = '', style }: AdSenseProps) {
+export function AdSense({ slot, format: _format = 'auto', className = '', style }: AdSenseProps) {
     const { isPro } = useSubscription();
     const [isDev, setIsDev] = useState(false);
     const [hasConsent, setHasConsent] = useState(false);

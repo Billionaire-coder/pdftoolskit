@@ -46,6 +46,7 @@ export function Footer() {
 
                     {/* TOP: Centered Logo */}
                     <Link href="/" className="flex items-center gap-2">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src="/favicon.png"
                             alt="PDFToolskit Logo"

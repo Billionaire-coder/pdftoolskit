@@ -32,7 +32,9 @@ export class ForensicService {
         // let totalDistance = 0;
 
         for (let i = 1; i < points.length; i++) {
+            // eslint-disable-next-line security/detect-object-injection
             const p1 = points[i - 1];
+            // eslint-disable-next-line security/detect-object-injection
             const p2 = points[i];
             const dt = p2.timestamp - p1.timestamp;
             const dx = p2.x - p1.x;
@@ -55,6 +57,7 @@ export class ForensicService {
         // Humans aren't perfectly linear. Bots often are.
         const accels = [];
         for (let i = 1; i < velocities.length; i++) {
+            // eslint-disable-next-line security/detect-object-injection
             accels.push(velocities[i] - velocities[i - 1]);
         }
         const avgAccel = accels.reduce((a, b) => a + Math.abs(b), 0) / accels.length;

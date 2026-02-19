@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { checkSubscription } from '@/lib/server-gate';
 
+
 export async function POST(request: Request) {
     const { isAuthorized, error, status } = await checkSubscription();
     if (!isAuthorized) {
@@ -33,14 +34,17 @@ export async function POST(request: Request) {
 
         const pdfBuffer = await generatePdfBuffer({
             url: targetUrl,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             format: format as any,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             orientation: orientation as any,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             viewport: viewport as any,
             cleanShot: !!cleanShot,
             browserlessToken: process.env.BROWSERLESS_TOKEN
         });
 
-        // Return PDF
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const blob = new Blob([pdfBuffer as any], { type: 'application/pdf' });
         return new NextResponse(blob, {
             headers: {
@@ -50,6 +54,7 @@ export async function POST(request: Request) {
             },
         });
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
         console.error('PDF Generation Error:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

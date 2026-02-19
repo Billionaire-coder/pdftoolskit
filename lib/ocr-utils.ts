@@ -18,6 +18,7 @@ export async function preprocessImage(blob: Blob): Promise<string> {
 
                 // Preprocessing: Grayscale + High Contrast Binarization
                 for (let i = 0; i < data.length; i += 4) {
+                    // eslint-disable-next-line security/detect-object-injection
                     const r = data[i];
                     const g = data[i + 1];
                     const b = data[i + 2];
@@ -28,6 +29,7 @@ export async function preprocessImage(blob: Blob): Promise<string> {
                     // Simple threshold
                     const val = gray > 130 ? 255 : 0;
 
+                    // eslint-disable-next-line security/detect-object-injection
                     data[i] = val;
                     data[i + 1] = val;
                     data[i + 2] = val;

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Calendar, Clock, Shield, Lock, ArrowRight, BookOpen } from 'lucide-react';
+import { Shield, Lock, ArrowRight } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { ToolHeader } from '@/components/shared/ToolHeader';
 

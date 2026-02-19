@@ -61,6 +61,7 @@ export default function PDFToExcelPage() {
             clearInterval(progressInterval);
             setProgress(100);
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const blob = new Blob([excelBytes as any], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
             const filename = getBaseFileName(file.name) + '.xlsx';
 

@@ -1,4 +1,4 @@
-import { excelToPdf as advancedExcelToPdf, ExcelToPdfOptions } from './services/pdf/converters/excelToPdf';
+import { excelToPdf as advancedExcelToPdf } from './services/pdf/converters/excelToPdf';
 
 // ... (pdfToExcel remains the same)
 

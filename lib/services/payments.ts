@@ -19,6 +19,7 @@ export class PaymentService {
      * Simulates the creation of a checkout session and returns a redirect URL.
      */
     static async createCheckoutSession(options: CheckoutOptions): Promise<string> {
+        // eslint-disable-next-line no-console
         console.log(`Creating checkout session for plan: ${options.planId} in locale: ${options.locale}`);
 
         // Simulate network delay
@@ -40,6 +41,7 @@ export class PaymentService {
      * Verifies if a payment was successful (Mock).
      */
     static async verifyPayment(sessionId: string): Promise<boolean> {
+        // eslint-disable-next-line no-console
         console.log(`Verifying payment for session: ${sessionId}`);
         return true;
     }

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ShieldAlert, Download, Trash2, ShieldCheck, Globe } from 'lucide-react';
+import { ShieldAlert, Trash2, ShieldCheck, Globe } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
 import { ProgressBar } from '@/components/shared/ProgressBar';
@@ -20,6 +20,7 @@ export default function MetadataAuditorPage() {
     const { limits, isPro } = useSubscription();
     const { t } = useTranslation('common');
     const [file, setFile] = useState<File | null>(null);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [metadata, setMetadata] = useState<any>(null);
     const [processing, setProcessing] = useState(false);
     const [progress, setProgress] = useState(0);
@@ -32,7 +33,7 @@ export default function MetadataAuditorPage() {
                 const data = await getMetadata(files[0]);
                 setMetadata(data);
                 toast.success('Metadata extracted successfully');
-            } catch (e) {
+            } catch (_e) {
                 toast.error('Failed to read metadata');
             }
         } else {
@@ -55,8 +56,8 @@ export default function MetadataAuditorPage() {
             clearInterval(progressInterval);
             setProgress(100);
 
-            // @ts-expect-error - Uint8Array is compatible with BlobPart
-            const blob = new Blob([cleanPdfBytes], { type: 'application/pdf' });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const blob = new Blob([cleanPdfBytes as any], { type: 'application/pdf' });
             const baseName = getBaseFileName(file.name);
             downloadFile(blob, `${baseName}_clean.pdf`);
 

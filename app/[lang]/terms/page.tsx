@@ -1,6 +1,6 @@
 import React from 'react';
 import { ToolHeader } from '@/components/shared/ToolHeader';
-import { FileText } from 'lucide-react';
+// import { FileText } from 'lucide-react';
 
 export default function TermsPage() {
     return (

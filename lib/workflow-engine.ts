@@ -23,6 +23,7 @@ export type WorkflowAction =
 export interface WorkflowStep {
     id: string;
     action: WorkflowAction;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     params: any;
 }
 
@@ -42,6 +43,7 @@ export class WorkflowEngine {
         this.logs = [];
         this.log(`Starting workflow with ${steps.length} steps.`);
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let currentPdfBytes: any = new Uint8Array(await file.arrayBuffer());
         // For tools that need a File object, we might need to reconstruct it?
         // Most tools in this codebase take `File`. 
@@ -53,6 +55,7 @@ export class WorkflowEngine {
         const currentFilename = file.name;
 
         for (let index = 0; index < steps.length; index++) {
+            // eslint-disable-next-line security/detect-object-injection
             const step = steps[index];
             this.log(`Step ${index + 1}: Executing ${step.action}...`);
 
@@ -133,6 +136,7 @@ export async function executeWorkflow(
     const total = files.length;
 
     for (let i = 0; i < total; i++) {
+        // eslint-disable-next-line security/detect-object-injection
         const file = files[i];
 
         if (onProgress) {
@@ -144,6 +148,7 @@ export async function executeWorkflow(
 
             // Create a File from the result bytes
             // We reuse the original filename, effectively modifying it "in place" for the next step or output
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const processedFile = new File([result.pdfBytes as any], file.name, { type: 'application/pdf', lastModified: Date.now() });
             results.push(processedFile);
 

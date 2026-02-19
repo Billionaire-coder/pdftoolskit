@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
-import { Minimize2, Download, CheckCircle, Zap, Shield, ArrowRight, Settings2, Trash2, FileText, Sparkles, Filter, Database, Gauge } from 'lucide-react';
+import React, { useState, Suspense } from 'react';
+import { Minimize2, Download, CheckCircle, Zap, Shield, ArrowRight, Settings2, Sparkles, Database } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
 import { ProgressBar } from '@/components/shared/ProgressBar';
@@ -10,16 +10,14 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { compressPDF } from '@/lib/pdf-utils';
 import { downloadFile, validatePDFFile, formatFileSize, cn } from '@/lib/utils';
 import { PDFThumbnail } from '@/components/pdf/PDFThumbnail';
-import { useTranslation } from 'react-i18next';
 import { useSubscription } from '@/components/providers/SubscriptionProvider';
-import { useSearchParams } from 'next/navigation';
 
 type CompressionMode = 'extreme' | 'balanced' | 'lossless' | 'custom';
 
 function CompressToolContent() {
-    const { t } = useTranslation('common');
+    // const { t } = useTranslation('common');
     const { limits, isPro } = useSubscription();
-    const searchParams = useSearchParams();
+    // const searchParams = useSearchParams();
 
     const [file, setFile] = useState<File | null>(null);
     const [processing, setProcessing] = useState(false);
@@ -69,6 +67,7 @@ function CompressToolContent() {
             clearInterval(interval);
             setProgress(100);
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const blob = new Blob([compressedBytes as any], { type: 'application/pdf' });
             setResult({
                 originalSize: file.size,
@@ -78,7 +77,7 @@ function CompressToolContent() {
             });
 
             toast.success("Semantic Compression Complete");
-        } catch (error) {
+        } catch (_error) {
             toast.error("Optimization failed");
         } finally {
             setProcessing(false);

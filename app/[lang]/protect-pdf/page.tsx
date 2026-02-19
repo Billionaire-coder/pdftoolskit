@@ -112,8 +112,8 @@ export default function ProtectPDFPage() {
             clearInterval(progressInterval);
             setProgress(100);
 
-            // @ts-expect-error - Uint8Array is compatible with BlobPart
-            const blob = new Blob([protectedPdfBytes], { type: 'application/pdf' });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const blob = new Blob([protectedPdfBytes as any], { type: 'application/pdf' });
             const filename = file.name.replace('.pdf', '_protected.pdf');
 
             setResult({ blob, fileName: filename });
@@ -123,7 +123,9 @@ export default function ProtectPDFPage() {
             setPassword('');
             setConfirmPassword('');
             setProgress(0);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
+            // eslint-disable-next-line no-console
             console.error('Error protecting PDF:', error);
             toast.error(error.message || 'Failed to protect PDF. Please try again.');
         } finally {

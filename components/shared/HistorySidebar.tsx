@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { History, X, Download, Trash2, FileText, File } from 'lucide-react';
+import { History, X, Download, Trash2, FileText } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { getHistory, HistoryItem, deleteHistoryItem, clearHistory } from '@/lib/history-store';
 import { downloadFile, formatFileSize } from '@/lib/utils';

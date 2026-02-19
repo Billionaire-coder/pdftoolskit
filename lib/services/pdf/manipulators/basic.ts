@@ -17,6 +17,7 @@ export async function cropPDF(
     const arrayBuffer = await file.arrayBuffer();
     const pdfDoc = await PDFDocument.load(arrayBuffer);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updatePageBoxes = (page: any, newX: number, newY: number, newWidth: number, newHeight: number) => {
         if (options?.anonymize) {
             // Hard-Crop: Sync all boxes to prevent easy recovery
@@ -37,6 +38,7 @@ export async function cropPDF(
         Object.entries(options.perPageCrops).forEach(([pageIndexStr, config]) => {
             const index = parseInt(pageIndexStr, 10);
             if (index >= 0 && index < pages.length) {
+                // eslint-disable-next-line security/detect-object-injection
                 const page = pages[index];
                 const { x, y, width, height } = page.getMediaBox();
 
@@ -67,6 +69,7 @@ export async function cropPDF(
         const pageIndices = parsePageRange(options?.pageRange || '', totalPages);
 
         const pages = pdfDoc.getPages();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         pages.forEach((page: any, index: number) => {
             if (!pageIndices.includes(index)) return;
 
@@ -236,6 +239,7 @@ export async function organizePDF(file: File, pages: { index: number; rotation?:
     const copiedPages = await newPdf.copyPages(sourcePdf, indices);
 
     copiedPages.forEach((page, i) => {
+        // eslint-disable-next-line security/detect-object-injection
         const rotationToAdd = pages[i].rotation || 0;
         if (rotationToAdd !== 0) {
             const currentRotation = page.getRotation().angle;

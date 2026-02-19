@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Type, Download, ArrowDown, ArrowUp, ArrowLeft, ArrowRight, LayoutTemplate } from 'lucide-react';
+import { Download, LayoutTemplate } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FileUpload } from '@/components/shared/FileUpload';
 import { ProgressBar } from '@/components/shared/ProgressBar';
@@ -70,6 +70,7 @@ export default function AddPageNumbersPage() {
             clearInterval(progressInterval);
             setProgress(100);
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const blob = new Blob([newPdfBytes as any], { type: 'application/pdf' });
             const baseName = getBaseFileName(file.name);
 
@@ -228,7 +229,7 @@ export default function AddPageNumbersPage() {
                                     onClick={() => setTextPattern("Page {n} of {total}")}
                                     className="px-2 py-1 text-xs bg-slate-800 text-slate-300 rounded hover:bg-slate-700"
                                 >
-                                    Preset: "1 of 10"
+                                    Preset: &quot;1 of 10&quot;
                                 </button>
                             </div>
                         </div>

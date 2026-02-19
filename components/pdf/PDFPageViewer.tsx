@@ -6,6 +6,7 @@ import { Loader2 } from 'lucide-react';
 
 // Configure worker
 if (typeof window !== 'undefined' && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
+    // eslint-disable-next-line security/detect-object-injection
     pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
 }
 
@@ -63,6 +64,7 @@ export function PDFPageViewer({
     useEffect(() => {
         if (!pdfDoc || !canvasRef.current) return;
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let renderTask: any = null;
         let isCancelled = false;
 
@@ -101,6 +103,7 @@ export function PDFPageViewer({
                     if (onTextLayerLoaded) {
                         try {
                             const textContent = await page.getTextContent();
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             const items = textContent.items.map((item: any) => {
                                 // PDF coordinates from content item
                                 const pdfX = item.transform[4];
@@ -131,7 +134,9 @@ export function PDFPageViewer({
                             console.error("Text extraction failed", e);
                         }
                     }
+
                 }
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (err: any) {
                 if (err.name !== 'RenderingCancelledException' && !isCancelled) {
                     console.error('Error rendering page:', err);

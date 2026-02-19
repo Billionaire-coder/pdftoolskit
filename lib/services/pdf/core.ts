@@ -6,7 +6,9 @@ export function applyBranding(pdfDoc: PDFDocument) {
     const creator = PDFString.of('PDFToolskit');
 
     const context = pdfDoc.context;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (context && (context as any).trailerInfo && (context as any).trailerInfo.Info) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const infoRef = (context as any).trailerInfo.Info;
         const info = context.lookup(infoRef);
         if (info instanceof PDFDict) {
@@ -20,12 +22,15 @@ export function applyBranding(pdfDoc: PDFDocument) {
     pdfDoc.setCreator('PDFToolskit');
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getGlobalPDFLib(): Promise<any> {
     if (typeof window === 'undefined') {
         return { PDFDocument, StandardFonts, rgb, degrees, PDFName, PDFString, PDFDict };
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ((window as any).PDFLib) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return (window as any).PDFLib;
     }
 
@@ -33,7 +38,9 @@ export async function getGlobalPDFLib(): Promise<any> {
         const script = document.createElement('script');
         script.src = 'https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.js';
         script.onload = () => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             if ((window as any).PDFLib) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 resolve((window as any).PDFLib);
             } else {
                 reject(new Error('PDFLib not found in window after script load'));
